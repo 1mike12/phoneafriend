@@ -2,7 +2,7 @@ const path = require("path");
 const BodyParser = require("body-parser");
 const express = require("express");
 let app = express();
-const config = require("../../config");
+const config = require("../config");
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(__dirname + '/public_dist'));

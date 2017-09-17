@@ -4,10 +4,10 @@
   "private": true,
   "devDependencies": {
     "babel-preset-react-native-stage-0": "^1.0.1",
-    "jest-expo": "~20.0.0",
-    "react-test-renderer": "16.0.0-alpha.12",
     "chai": "^3.5.0",
+    "jest-expo": "~20.0.0",
     "mocha": "^3.2.0",
+    "react-test-renderer": "16.0.0-alpha.12",
     "sinon": "^2.3.5"
   },
   "scripts": {
@@ -20,6 +20,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "axios": "^0.16.2",
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.1",
     "bookshelf": "^0.10.3",
@@ -38,12 +39,13 @@
     "moment": "^2.18.1",
     "password-hash": "^1.2.2",
     "pg": "^6.1.5",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.0",
     "react": "16.0.0-alpha.12",
     "react-native": "^0.47.0",
     "react-native-material-color": "^1.0.14",
+    "react-native-material-kit": "^0.4.1",
     "react-native-webrtc": "^1.58.2",
-    "react-router-native": "^4.2.0"
+    "react-router-native": "^4.2.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
   }
 }

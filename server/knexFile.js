@@ -1,4 +1,4 @@
-const config = require("../config");
+const config = require("./config");
 
 const DB_NAME = config.databaseName;
 const DB_NAME_TEST = config.databaseNameTest;

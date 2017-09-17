@@ -4,7 +4,7 @@
 const BaseModel = require("./BaseModel");
 const passwordHash = require("password-hash");
 const jwt = require("jsonwebtoken");
-const config = require("../../config");
+const config = require("../config");
 const uuid1 = require("uuid/v1");
 
 const TABLE_NAME = "users";
