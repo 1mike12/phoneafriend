@@ -6,12 +6,9 @@ module.exports = new function(){
 
     self.wipe = function(){
 
-        return knex("checks").del()
-        .then(function(){
-            return knex("routes").del()
-        })
-        .then(function(){
-            return knex("users").del()
-        })
+        return knex("skills_users").del()
+        .then(() => knex("sessions").del())
+        .then(() => knex("skills").del())
+        .then(() => knex("users").del())
     };
 };

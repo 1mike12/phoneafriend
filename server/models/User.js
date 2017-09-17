@@ -7,13 +7,13 @@ const jwt = require("jsonwebtoken");
 const config = require("../../config");
 
 const TABLE_NAME = "users";
-let Instance = new function() {
+let Instance = new function(){
     let self = this;
 
     self.tableName = TABLE_NAME;
     self.hidden = ['password'];
 
-    self.setPassword = function(pass) {
+    self.setPassword = function(pass){
         this.set("password", passwordHash.generate(pass))
     };
 
@@ -21,8 +21,8 @@ let Instance = new function() {
      * returns token or null
      * @param password
      */
-    self.getTokenForPassword = function(password) {
-        if (passwordHash.verify(password, this.get("password"))) {
+    self.getTokenForPassword = function(password){
+        if (passwordHash.verify(password, this.get("password"))){
             const payload = JSON.stringify({
                 userId: this.get("id")
             });
@@ -34,14 +34,18 @@ let Instance = new function() {
             return null
         }
     };
+
+    self.skills = function(){
+        return this.belongsToMany(require('./Skill'))
+    }
 };
 
-let Static = new function() {
+let Static = new function(){
     let self = this;
 
     self.MIGRATION = {
-        up: (knex, Promise) => {
-            return knex.schema.createTableIfNotExists(TABLE_NAME, function(table) {
+        up: (knex, Promise) =>{
+            return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){
                 table.increments();
                 table.string("email", 127).unique();
                 table.boolean("email_verified").defaultTo(false);
@@ -65,7 +69,7 @@ let Static = new function() {
                 table.dateTime("deleted_at");
             });
         },
-        down: (knex, Promise) => {
+        down: (knex, Promise) =>{
             return knex.schema.dropTableIfExists(TABLE_NAME)
         }
     }

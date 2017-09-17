@@ -1,4 +1,4 @@
-const TABLE_NAME = "skill_user"
+const TABLE_NAME = "skills_users"
 exports.up = function(knex, Promise) {
     return knex.schema.createTableIfNotExists(TABLE_NAME, function(table) {
         table.increments().primary();
