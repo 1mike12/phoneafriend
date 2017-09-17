@@ -1,6 +1,8 @@
 const User = require("./../models/User");
 const Skill = require("../models/Skill");
-const Promise = require('bluebird')
+const Promise = require('bluebird');
+const Session = require('../models/Session');
+
 module.exports = dev = new function(){
     let self = this;
 
@@ -36,10 +38,32 @@ module.exports = dev = new function(){
 
     };
 
+    self.createSessions = () =>{
+        return Promise.join(
+            User.query(qb => qb.limit(2)).fetchAll(),
+            Skill.query(qb => qb.limit(3)).fetchAll(),
+            (users, skills) =>{
+                let user1 = users.at(0);
+                let user2 = users.at(1);
+
+                return Session.forge({
+                    teacher_id: user1.get("id"),
+                    pupil_id: user2.get('id'),
+                })
+                .save()
+                .then(session =>{
+                    let skillIds = skills.map(skill => skill.get('id'));
+                    return session.skills().attach(skillIds)
+                })
+            }
+        )
+    };
+
     self.run = function(){
         return self.users()
         .then(() => self.skills())
         .then(() => self.setSkills())
+        .then(() => self.createSessions())
     }
 };
 require("./_wiper").wipe()

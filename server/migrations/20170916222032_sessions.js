@@ -1,21 +1,5 @@
-const TABLE_NAME = "sessions"
-exports.up = function(knex, Promise) {
-    return knex.schema.createTableIfNotExists(TABLE_NAME, function(table) {
-        table.increments().primary();
+const Class = require("../models/Session");
 
-        table.integer("teacher_id")
-        .unsigned().index()
-        .references("id").inTable("users");
+exports.up = Class.MIGRATION.up;
 
-        table.integer("pupil_id")
-        .unsigned().index()
-        .references("id").inTable("users");
-
-        table.timestamps();
-        table.dateTime("deleted_at");
-    });
-};
-
-exports.down = function(knex, Promise) {
-    return knex.schema.dropTableIfExists(TABLE_NAME)
-};
+exports.down = Class.MIGRATION.down;

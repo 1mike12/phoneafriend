@@ -7,6 +7,7 @@ module.exports = new function(){
     self.wipe = function(){
 
         return knex("skills_users").del()
+        .then(()=> knex("sessions_skills").del())
         .then(() => knex("sessions").del())
         .then(() => knex("skills").del())
         .then(() => knex("users").del())
