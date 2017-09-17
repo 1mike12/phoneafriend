@@ -16,7 +16,8 @@ app.use(["/api/*"], require("./middleware/authenticated"));
 
 app.use("/api/test/", require("./test_api"));
 app.use("/api/session/", require("./session_api"));
-
+app.use("/api/skill/", require("./skill_api"));
+app.use("/api/user/", require("./user_api"));
 /*
 PUBLIC APIS
  */

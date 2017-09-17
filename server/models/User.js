@@ -5,6 +5,7 @@ const BaseModel = require("./BaseModel");
 const passwordHash = require("password-hash");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
+const uuid1 = require("uuid/v1");
 
 const TABLE_NAME = "users";
 let Instance = new function(){
@@ -12,6 +13,13 @@ let Instance = new function(){
 
     self.tableName = TABLE_NAME;
     self.hidden = ['password'];
+
+    self.initialize = function(){
+        this.on("creating", (model, attrs, options) =>{
+            model.set("uuid", uuid1())
+        });
+    };
+
 
     self.setPassword = function(pass){
         this.set("password", passwordHash.generate(pass))

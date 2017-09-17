@@ -7,7 +7,7 @@ router.get("/", (req, res, next) =>{
     .then(collection => res.send(collection))
 });
 
-router.get("/my-sessions", (req, res, next) =>{
+router.get("/mine", (req, res, next) =>{
     Class.where({pupil_id: req.userId}).fetchAll()
     .then(collection => res.send(collection))
 });
