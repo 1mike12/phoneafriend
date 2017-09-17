@@ -15,6 +15,7 @@ app.use(["/api/*"], BodyParser.urlencoded({extended: true}));
 app.use(["/api/*"], require("./middleware/authenticated"));
 
 app.use("/api/test/", require("./test_api"));
+app.use("/api/session/", require("./session_api"));
 
 /*
 PUBLIC APIS

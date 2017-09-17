@@ -10,7 +10,7 @@ module.exports = dev = new function(){
         let mike = User.forge({email: "1mike12@gmail.com"});
         mike.setPassword("123");
 
-        let brian = User.forge({email: "bgioia@gmail.com"})
+        let brian = User.forge({email: "bgioia@gmail.com"});
         brian.setPassword("123");
 
         return Promise.all([
@@ -39,24 +39,34 @@ module.exports = dev = new function(){
     };
 
     self.createSessions = () =>{
-        return Promise.join(
-            User.query(qb => qb.limit(2)).fetchAll(),
-            Skill.query(qb => qb.limit(3)).fetchAll(),
-            (users, skills) =>{
-                let user1 = users.at(0);
-                let user2 = users.at(1);
-
-                return Session.forge({
+        return User.query(qb => qb.limit(2)).fetchAll()
+        .then(users =>{
+            let user1 = users.at(0);
+            let user2 = users.at(1);
+            return Promise.all([
+                Session.forge({
                     teacher_id: user1.get("id"),
                     pupil_id: user2.get('id'),
                 })
-                .save()
-                .then(session =>{
-                    let skillIds = skills.map(skill => skill.get('id'));
-                    return session.skills().attach(skillIds)
+                .save(),
+                Session.forge({
+                    pupil_id: user2.get('id'),
                 })
-            }
-        )
+                .save(),
+                Skill.query(qb => qb.limit(3)).fetchAll()
+            ])
+        })
+        .then(array =>{
+            let session1 = array[0];
+            let session2 = array[1];
+            let skills = array[2];
+            let skillIds = skills.map(skill => skill.get('id'));
+
+            return Promise.all([
+                session1.skills().attach(skillIds),
+                session2.skills().attach(skillIds)
+            ])
+        })
     };
 
     self.run = function(){
