@@ -1,0 +1,20 @@
+1. sign a jwt , with a payload json object embedded inside
+api_login.js
+
+User.where({email: submittedEmail}).fetch()
+        .then(function(user){
+            if (passwordHash.verify(password, user.get("password"))) {
+
+                const payload = {userId: user.get("id")};
+
+                const options = {};
+                const token = jwt.sign(payload, config.get("jwtSecret"), options);
+
+2. in middleware, attach payload's values to the request object
+authenticated.js
+
+function(req, res, next){
+    jwt.verify(token, config.get("jwtSecret"), function(err, payload){
+        foreach(payload.keys, ()=>{req.key = value})
+    }
+}
