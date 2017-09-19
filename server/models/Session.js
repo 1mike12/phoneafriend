@@ -37,6 +37,9 @@ let Static = new function(){
             return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){
                 table.increments().primary();
                 table.string("uuid");
+
+                table.string("title");
+                table.text("description");
                 table.integer("teacher_id")
                 .unsigned().index()
                 .references("id").inTable("users");

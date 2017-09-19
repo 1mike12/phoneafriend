@@ -9,13 +9,15 @@ router.get("/", (req, res, next) =>{
 
 router.get("/mine", (req, res, next) =>{
     Class.where({pupil_id: req.userId}).fetchAll()
-    .then(collection => res.send(collection))
+    .then(collection => {
+        res.send(collection)
+    })
 });
 
 router.get("/teachable", (req, res, next) =>{
     User.where({id: req.userId}).fetch({withRelated: "skills"})
     .then(user =>{
-        let skillIds = user.related("skills").map(s=> s.get("id"));
+        let skillIds = user.related("skills").map(s => s.get("id"));
 
         //todo optimize this many to many call
         return Class.query(qb =>{
@@ -31,6 +33,11 @@ router.get("/teachable", (req, res, next) =>{
         })
     })
     .then(collection => res.send(collection))
+});
+
+router.get("/:uuid", (req, res, next) =>{
+    Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch()
+    .then(item => res.send(item))
 });
 
 

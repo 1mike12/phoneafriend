@@ -7,6 +7,7 @@ import color from "react-native-material-color";
 import Home from "./components/Home";
 import Video from "./components/Video";
 import Login from "./components/Login";
+import Request from "./components/Request";
 
 const styles = StyleSheet.create({
     container: {
@@ -43,7 +44,8 @@ export default class App extends React.Component {
                     />
                     <View style={{padding: 16}}>
                         <Route exact path="/" component={Login}/>
-                        <Route exact path="/Home" component={Home}/>
+                        <Route exact path="/home" component={Home}/>
+                        <Route path="/request/:uuid" component={Request}/>
                     </View>
                 </View>
             </NativeRouter>
