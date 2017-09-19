@@ -2,9 +2,9 @@ import React from 'react';
 import {Button, FlatList, Text, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
-import timeAgo from "time-ago";
 import {Link} from "react-router-native";
 
+import timeAgo from "time-ago";
 const ta = timeAgo();
 
 export default class Home extends React.Component {
