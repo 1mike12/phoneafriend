@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'stretch',
+        backgroundColor: "#DDD"
     },
     toolbar: {
         backgroundColor: color.Indigo,
@@ -40,7 +41,7 @@ export default class App extends React.Component {
                             {title: "Log out", show: "never"}
                         ]}
                     />
-                    <View style={{padding: 24}}>
+                    <View style={{padding: 16}}>
                         <Route exact path="/" component={Login}/>
                         <Route exact path="/Home" component={Home}/>
                     </View>

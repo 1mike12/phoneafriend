@@ -45,6 +45,7 @@
     "react-native-webrtc": "^1.58.2",
     "react-router-native": "^4.2.0",
     "request": "^2.81.0",
-    "request-promise": "^4.2.0"
+    "request-promise": "^4.2.0",
+    "time-ago": "^0.1.0"
   }
 }

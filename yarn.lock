@@ -4860,6 +4860,10 @@ tildify@~1.0.0:
   dependencies:
     user-home "^1.0.0"
 
+time-ago@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/time-ago/-/time-ago-0.1.0.tgz#5b4921a11843081c95ea50930084f90007f4a026"
+
 time-stamp@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/time-stamp/-/time-stamp-1.1.0.tgz#764a5a11af50561921b133f3b44e618687e0f5c3"
