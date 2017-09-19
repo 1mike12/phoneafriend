@@ -42,6 +42,7 @@ export default class App extends React.Component {
                     />
                     <View style={{padding: 24}}>
                         <Route exact path="/" component={Login}/>
+                        <Route exact path="/Home" component={Home}/>
                     </View>
                 </View>
             </NativeRouter>

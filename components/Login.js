@@ -5,6 +5,7 @@ import {MKButton, MKColor, MKProgress, MKTextField} from "react-native-material-
 import config from "../configReact";
 import http from "../services/http"
 import Authentication from "../services/Authentication";
+import {NativeRouter, Route, Link} from "react-router-native";
 
 const styles = StyleSheet.create({
     progress: {
@@ -60,7 +61,6 @@ export default class Home extends React.Component {
     }
 
     getMySkills(){
-        console.log("getting skills")
         return http.get("api/skill/mine")
         .then(res =>{
             console.log(res.data)
@@ -90,15 +90,18 @@ export default class Home extends React.Component {
                 <View style={{marginTop: 24}}/>
 
                 <LoginButton onPress={this.login}/>
+
                 {this.valid() ? <Text>Valid</Text> : <Text>Invalid</Text>}
                 {this.state.loading ?
                     <MKProgress.Indeterminate
                         style={styles.progress}
                     /> : null}
-                <Button title="Test"
-                        onPress={this.getMySkills}
-                />
 
+                <Link to={"/Home"}>
+                    <View>
+                        <Text>Go To Home</Text>
+                    </View>
+                </Link>
             </View>
         );
     }
