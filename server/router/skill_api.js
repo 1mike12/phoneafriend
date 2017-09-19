@@ -35,4 +35,16 @@ router.get("/teachable", (req, res, next) =>{
     .then(collection => res.send(collection))
 });
 
+router.get("/search/:query", (req, res, next)=> {
+
+    let query = req.params.query;
+
+    Class.query(qb=> {
+        qb.where("name", "LIKE", `${query}%`);
+        qb.limit(10);
+    })
+    .fetchAll()
+    .then(collection => res.send(collection))
+});
+
 module.exports = router;
