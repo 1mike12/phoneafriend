@@ -2,10 +2,8 @@ import React from 'react';
 import {StatusBar, StyleSheet, Text, TextInput, ToolbarAndroid, View} from 'react-native';
 import {NativeRouter, Route, Link} from "react-router-native";
 import config from "./server/config";
-import Platform from "react-native";
 import color from "react-native-material-color";
 import Home from "./components/Home";
-import Video from "./components/Video";
 import Login from "./components/Login";
 import Request from "./components/Request";
 
