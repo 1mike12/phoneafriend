@@ -3,6 +3,7 @@ const BodyParser = require("body-parser");
 const express = require("express");
 let app = express();
 const config = require("../config");
+const os = require("os");
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(__dirname + '/public_dist'));
@@ -24,11 +25,27 @@ PUBLIC APIS
 app.use("/api/public/login", require("./public/api_login"));
 
 //Exception handler has to be last
-const port = process.env.NODE_ENV === "testing" ? config.testPort : config.port;
+const PORT = process.env.NODE_ENV === "testing" ? config.testPort : config.port;
 
-let server = app.listen(port, function () {
-    let host = server.address().address;
+let server = app.listen(PORT, function () {
     const port = server.address().port;
-    console.log(`Started on ${host}:${port}`)
+
+    console.log(`Started on ${getIpAddress()}:${port}`)
 });
 
+
+function getIpAddress() {
+    let ifaces = os.networkInterfaces();
+    let address = "";
+    Object.keys(ifaces).forEach((ifname) => {
+        ifaces[ifname].forEach((iface) => {
+            if ('IPv4' !== iface.family || iface.internal !== false) {
+                // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+                return;
+            }
+
+            address = iface.address;
+        });
+    });
+    return address;
+}
