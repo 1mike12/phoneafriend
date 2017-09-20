@@ -1,6 +1,5 @@
 import React from 'react';
 import {Button, FlatList, Text, View} from "react-native";
-import {MKProgress, getTheme} from "react-native-material-kit";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -40,8 +39,6 @@ export default class Request extends React.Component {
     }
 
     render(){
-        if (this.state.loading) return <MKProgress.Indeterminate/>;
-
         return (
             <View>
                 <Button title="load" onPress={this.loadAll}/>
