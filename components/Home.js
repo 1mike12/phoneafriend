@@ -1,6 +1,5 @@
 import React from 'react';
 import {Button, FlatList, Text, View} from "react-native";
-import {MKProgress} from "react-native-material-kit";
 import http from '../services/http';
 import styles from "../styles";
 
@@ -37,9 +36,6 @@ export default class Home extends React.Component {
         return (
             <View>
                 <Text style={styles.h1}>Skills:</Text>
-                {this.state.loading ?
-                    <MKProgress.Indeterminate
-                    /> : null}
                 <FlatList
                     data={this.state.skills}
                     renderItem={({item}) =>{

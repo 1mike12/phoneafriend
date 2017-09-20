@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from "axios";
-import {FlatList, Text, View, StyleSheet, Button} from "react-native";
-import {MKButton, MKColor, MKProgress, MKTextField} from "react-native-material-kit";
+import {FlatList, Text, View, StyleSheet, Button, TextInput} from "react-native";
 import config from "../configReact";
 import http from "../services/http"
 import Authentication from "../services/Authentication";
@@ -16,10 +15,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
     }
 });
-
-const LoginButton = MKButton.button()
-.withText('Login')
-.build();
 
 export default class Home extends React.Component {
 
@@ -60,42 +55,28 @@ export default class Home extends React.Component {
         return this.state.email.match(emailPattern) && this.state.password
     }
 
-    getMySkills(){
-        return http.get("api/skill/mine")
-        .then(res =>{
-            console.log(res.data)
-        })
-        .catch(e =>{
-            console.log(e);
-        })
-    }
-
     render(){
         return (
             <View>
-                <MKTextField
+                <TextInput
                     placeholder="Email"
-                    floatingLabelEnabled={true}
                     style={styles.textField}
                     onTextChange={(email) => this.setState({email})}
                     text={this.state.email}
                 />
-                <MKTextField
+                <TextInput
                     placeholder="Password"
-                    floatingLabelEnabled={true}
                     style={styles.textField}
+                    text={this.state.password}
                     onTextChange={(password) => this.setState({password})}
                     password={true}
                 />
                 <View style={{marginTop: 24}}/>
-
-                <LoginButton onPress={this.login}/>
+                <Button title="Login"
+                        onPress={this.login}
+                />
 
                 {this.valid() ? <Text>Valid</Text> : <Text>Invalid</Text>}
-                {this.state.loading ?
-                    <MKProgress.Indeterminate
-                        style={styles.progress}
-                    /> : null}
 
                 <Link to={"/Home"}>
                     <View>
