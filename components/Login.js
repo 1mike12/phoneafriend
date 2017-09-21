@@ -40,7 +40,7 @@ export default class Home extends React.Component {
         })
         .then(res =>{
             this.setState({loading: false});
-            Authentication.setToken(res.data.token);
+            Authentication.commitToken(res.data.token);
             http.setToken(res.data.token);
             console.log(res.data)
         })
