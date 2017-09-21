@@ -3,6 +3,7 @@ package com.phoneafriend;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -25,7 +26,8 @@ public class MainApplication extends NavigationApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new WebRTCModulePackage()
+            new ReactNativeConfigPackage(),
+            new WebRTCModulePackage()
       );
     }
   };
@@ -40,7 +42,8 @@ public class MainApplication extends NavigationApplication {
          // Add additional packages you require here
          // No need to add RnnPackage and MainReactPackage
          return Arrays.<ReactPackage>asList(
-             new WebRTCModulePackage()
+             new WebRTCModulePackage(),
+             new ReactNativeConfigPackage()
          );
      }
 

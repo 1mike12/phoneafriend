@@ -1,4 +1,8 @@
-module.exports = {
-    domain: __DEV__ ? "http://192.168.86.15:8009" : "http://something.com",
+import Config from 'react-native-config';
+console.log(Config);
+console.log(Config.HOST);
+
+export default {
+    domain: __DEV__ ? Config.HOST : "http://something.com",
     name: "phoneafriend"
 };

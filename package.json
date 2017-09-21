@@ -41,6 +41,7 @@
     "pg": "^6.1.5",
     "react": "16.0.0-alpha.12",
     "react-native": "^0.47.0",
+    "react-native-config": "^0.6.1",
     "react-native-material-color": "^1.0.14",
     "react-native-navigation": "^1.1.228",
     "react-native-webrtc": "^1.58.2",
