@@ -5,11 +5,14 @@ exports.up = function(knex, Promise) {
 
         table.integer("user_id")
         .unsigned().index()
-        .references("id").inTable("users");
+        .references("id").inTable("users")
+        .onUpdate("cascade").onDelete("cascade");
+
 
         table.integer("skill_id")
         .unsigned().index()
-        .references("id").inTable("skills");
+        .references("id").inTable("skills")
+        .onUpdate("cascade").onDelete("cascade");
 
         table.timestamps();
         table.dateTime("deleted_at");

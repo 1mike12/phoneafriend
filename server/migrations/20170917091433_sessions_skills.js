@@ -5,11 +5,15 @@ exports.up = function(knex, Promise) {
 
         table.integer("session_id")
         .unsigned().index()
-        .references("id").inTable("sessions");
+        .references("id").inTable("sessions")
+        .onUpdate("cascade").onDelete("cascade");
+
 
         table.integer("skill_id")
         .unsigned().index()
-        .references("id").inTable("skills");
+        .references("id").inTable("skills")
+        .onUpdate("cascade").onDelete("cascade");
+
     });
 };
 

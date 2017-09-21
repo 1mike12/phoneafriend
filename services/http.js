@@ -25,6 +25,10 @@ class http {
         return this.axios.post(url, data)
     }
 
+    delete(url, data = {}){
+        return this.axios.delete(url, data)
+    }
+
 }
 
 export default new http();

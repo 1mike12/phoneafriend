@@ -2,6 +2,18 @@ let router = require("express").Router();
 let Class = require("../models/Session");
 let User = require("../models/User");
 
+router.delete("/", (req, res, next) =>{
+    Class.where({uuid: req.body.uuid, pupil_id: req.userId}).fetch()
+    .then(item => {
+        return item.destroy()
+    })
+    .then(() => res.sendStatus(200))
+    .catch(e=> {
+        res.sendStatus(400)
+        throw e;
+    })
+});
+
 router.get("/", (req, res, next) =>{
     Class.fetchAll({withRelated: ["teacher", "pupil"]})
     .then(collection => res.send(collection))
@@ -9,7 +21,7 @@ router.get("/", (req, res, next) =>{
 
 router.get("/mine", (req, res, next) =>{
     Class.where({pupil_id: req.userId}).fetchAll()
-    .then(collection => {
+    .then(collection =>{
         res.send(collection)
     })
 });

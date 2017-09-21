@@ -40,6 +40,7 @@ let Static = new function(){
 
                 table.string("title");
                 table.text("description");
+
                 table.integer("teacher_id")
                 .unsigned().index()
                 .references("id").inTable("users");

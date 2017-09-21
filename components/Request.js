@@ -17,6 +17,8 @@ export default class Request extends React.Component {
             }
         };
         this.loadAll = this.loadAll.bind(this);
+        this.destroy = this.destroy.bind(this);
+
         this.loadAll();
     }
 
@@ -36,8 +38,14 @@ export default class Request extends React.Component {
 
     }
 
-    delete(){
-
+    destroy(){
+        console.log(this.props);
+        return http.delete("api/session/" + this.props.uuid)
+        .then(()=> this.props.navigator.pop({
+            animated: true,
+            animationType: 'fade',
+        }))
+        .catch(console.log)
     }
 
     static getName(){
@@ -56,7 +64,7 @@ export default class Request extends React.Component {
                             <Text style={{marginBottom: 20}}> {this.state.request.description}</Text>
                             <Button title="Edit" onPress={this.edit}/>
                             <View style={{height: 12}}/>
-                            <Button title="Delete" onPress={this.delete}/>
+                            <Button title="Delete" onPress={this.destroy}/>
                         </View>
                     </View>
                 }
