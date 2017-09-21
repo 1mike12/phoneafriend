@@ -13,7 +13,11 @@ const styles = StyleSheet.create({
     textField: {
         height: 48,  // have to do it on iOS
         marginTop: 10,
-    }
+    },
+    multiLine:{
+        height: 100,
+        marginTop:10
+    },
 });
 
 export default class Home extends React.Component {
