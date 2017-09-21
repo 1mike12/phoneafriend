@@ -12,7 +12,7 @@ let Instance = new function(){
 
     self.initialize = function(){
         this.on("creating", (model, attrs, options) =>{
-            model.set("uuid", uuid1())
+            if (!model.get("uuid")) model.set("uuid", uuid1())
         });
     };
 

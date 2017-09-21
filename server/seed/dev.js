@@ -52,6 +52,7 @@ module.exports = dev = new function(){
             let user1 = otherUsers.at(0);
             return Promise.all([
                 Session.forge({
+                    uuid: "1",
                     teacher_id: user1.get("id"),
                     pupil_id: mike.get('id'),
                     title: "Need help with toyota corolla bearing replacement",
@@ -59,6 +60,7 @@ module.exports = dev = new function(){
                 })
                 .save(),
                 Session.forge({
+                    uuid: "2",
                     pupil_id: mike.get('id'),
                     title: "How to belay in lead climbing with gri gri",
                     description: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum e"
@@ -89,3 +91,4 @@ module.exports = dev = new function(){
 };
 require("./_wiper").wipe()
 .then(() => dev.run())
+.then(()=> process.exit())
