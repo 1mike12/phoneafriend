@@ -77,12 +77,6 @@ export default class Home extends React.Component {
                 />
 
                 {this.valid() ? <Text>Valid</Text> : <Text>Invalid</Text>}
-
-                <Link to={"/home"}>
-                    <View>
-                        <Text>Go To Home</Text>
-                    </View>
-                </Link>
             </View>
         );
     }
