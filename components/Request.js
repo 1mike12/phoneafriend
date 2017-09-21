@@ -66,7 +66,7 @@ export default class Request extends React.Component {
                                 <TextInput
                                     placeholder="Title"
                                     style={styles.textField}
-                                    onTextChange={(title) => this.setState({title})}
+                                    onChangeText={(title) => this.setState({title})}
                                     value={this.state.title}
                                 />
 
@@ -74,7 +74,10 @@ export default class Request extends React.Component {
                                     placeholder="Description"
                                     multiline={true}
                                     style={{height: 150, textAlignVertical: 'top'}}
-                                    onTextChange={(description) => this.setState({description})}
+                                    onChangeText={(description) =>{
+                                        console.log(description);
+                                        this.setState({description});
+                                    }}
                                     value={this.state.description}
                                 />
 
@@ -88,7 +91,7 @@ export default class Request extends React.Component {
                                 <View style={styles.card}>
                                     <Text style={styles.h1}>{this.state.title}</Text>
                                     <Text>{ta.ago(this.state.request.created_at)}</Text>
-                                    <Text style={{marginBottom: 20}}> {this.state.request.description}</Text>
+                                    <Text style={{marginBottom: 20}}> {this.state.description}</Text>
 
                                     <Button title="Edit" onPress={() =>{
                                         this.setState({editing: true})
