@@ -1,8 +1,9 @@
 import React from 'react';
-import {ActivityIndicator, Button, FlatList, ProgressBarAndroid, Text, TextInput, View} from "react-native";
+import {ActivityIndicator, Button, FlatList, Image, ProgressBarAndroid, Text, TextInput, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
+import Chip from "./Chip";
 
 const ta = timeAgo();
 
@@ -82,6 +83,13 @@ export default class Request extends React.Component {
                                 />
 
                                 <Text style={{textAlign: "right"}}>{this.state.description.length}/250</Text>
+                                <Image style={{height: 200, width: 200}}
+                                       source={{uri: 'https://i.ytimg.com/vi/oDdK-g4XOAU/maxresdefault.jpg'}}/>
+                                <View style={{paddingBottom: 46, paddingTop: 16, flex: 1, flexDirection: 'row'}}>
+                                    <Chip text="Climbing" />
+                                    <Chip text="Lead" />
+                                    <Chip text="Belay" />
+                                </View>
 
                                 <Button title="Done" onPress={() => this.setState({editing: false})}/>
                             </View>
