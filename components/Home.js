@@ -56,6 +56,10 @@ export default class Home extends React.Component {
         })
     }
 
+    static getName(){
+        return "Home"
+    }
+
     render(){
         return (
             <View>

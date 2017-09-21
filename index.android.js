@@ -22,6 +22,12 @@ Navigation.startTabBasedApp({
             selectedIcon: icon, // iOS only
             title: 'Home'
         },
-
+        {
+            label: 'Home',
+            screen: 'phoneafriend.Home', // this is a registered name for a screen
+            icon: icon,
+            selectedIcon: icon, // iOS only
+            title: 'Home'
+        },
     ]
 });

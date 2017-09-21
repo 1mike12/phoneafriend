@@ -38,6 +38,10 @@ export default class Request extends React.Component {
 
     }
 
+    static getName(){
+        return "Request"
+    }
+
     render(){
         return (
             <View>

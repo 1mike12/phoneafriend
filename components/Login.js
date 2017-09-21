@@ -55,6 +55,9 @@ export default class Home extends React.Component {
         return this.state.email.match(emailPattern) && this.state.password
     }
 
+    static getName(){
+        return "Login"
+    }
     render(){
         return (
             <View>
