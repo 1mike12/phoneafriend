@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, FlatList, ProgressBarAndroid, Text, View} from "react-native";
+import {ActivityIndicator, Button, FlatList, ProgressBarAndroid, Text, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -18,7 +18,9 @@ export default class Request extends React.Component {
         };
         this.loadAll = this.loadAll.bind(this);
         this.destroy = this.destroy.bind(this);
+    }
 
+    componentDidMount(){
         this.loadAll();
     }
 
@@ -29,8 +31,9 @@ export default class Request extends React.Component {
             console.log(res.data);
             this.setState({
                 request: res.data,
-                ready: true
+                // ready: true
             });
+            setTimeout(() => this.setState({ready: true}), 1500)
         });
     }
 
@@ -40,8 +43,8 @@ export default class Request extends React.Component {
 
     destroy(){
         console.log(this.props);
-        return http.delete("api/session/" + this.props.uuid)
-        .then(()=> this.props.navigator.pop({
+        return http.delete("api/session/", {data: {uuid: this.props.uuid}})
+        .then(() => this.props.navigator.pop({
             animated: true,
             animationType: 'fade',
         }))
@@ -55,7 +58,7 @@ export default class Request extends React.Component {
     render(){
         return (
             <View>
-                {!this.state.ready ? <ProgressBarAndroid/> :
+                {!this.state.ready ? <ActivityIndicator/> :
                     <View>
                         <Button title="load" onPress={this.loadAll}/>
                         <View style={styles.card}>
