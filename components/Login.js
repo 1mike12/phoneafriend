@@ -63,16 +63,17 @@ export default class Home extends React.Component {
             <View>
                 <TextInput
                     placeholder="Email"
+                    keyboardType="email-address"
                     style={styles.textField}
                     onTextChange={(email) => this.setState({email})}
-                    text={this.state.email}
+                    value={this.state.email}
                 />
                 <TextInput
                     placeholder="Password"
                     style={styles.textField}
-                    text={this.state.password}
+                    value={this.state.password}
                     onTextChange={(password) => this.setState({password})}
-                    password={true}
+                    secureTextEntry={true}
                 />
                 <View style={{marginTop: 24}}/>
                 <Button title="Login"

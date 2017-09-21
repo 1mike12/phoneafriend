@@ -5,6 +5,7 @@ import styles from "../styles";
 import {Link} from "react-router-native";
 
 import timeAgo from "time-ago";
+
 const ta = timeAgo();
 
 export default class Home extends React.Component {
@@ -20,6 +21,7 @@ export default class Home extends React.Component {
         this.loadSkills = this.loadSkills.bind(this);
         this.loadRequests = this.loadRequests.bind(this);
         this.loadAll = this.loadAll.bind(this);
+        this.goToRequest = this.goToRequest.bind(this);
 
         this.loadAll()
         .then(() => this.setState({loading: false}))
@@ -56,6 +58,22 @@ export default class Home extends React.Component {
         })
     }
 
+    goToRequest(uuid){
+        console.log(uuid);
+        this.props.navigator.push({
+            screen: 'phoneafriend.Request', // unique ID registered with Navigation.registerScreen
+            title: undefined, // navigation bar title of the pushed screen (optional)
+            titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==', // iOS only. navigation bar title image instead of the title text of the pushed screen (optional)
+            passProps: {uuid}, // Object that will be passed as props to the pushed screen (optional)
+            animated: true, // does the push have transition animation or does it happen immediately (optional)
+            animationType: 'fade', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
+            backButtonTitle: undefined, // override the back button title (optional)
+            backButtonHidden: false, // hide the back button altogether (optional)
+            navigatorStyle: {}, // override the navigator style for the pushed screen (optional)
+            navigatorButtons: {} // override the nav buttons for the pushed screen (optional)
+        });
+    }
+
     static getName(){
         return "Home"
     }
@@ -79,9 +97,7 @@ export default class Home extends React.Component {
                     <FlatList
                         data={this.state.requests}
                         renderItem={({item}) =>{
-                            return   <Link to={"/request/" + item.uuid}>
-                                <Text>{item.title} | {ta.ago(item.created_at)}</Text>
-                            </Link>
+                            return <Text onPress={()=> {this.goToRequest(item.uuid)}}>{item.title} | {ta.ago(item.created_at)}</Text>
 
                         }}
                     />
