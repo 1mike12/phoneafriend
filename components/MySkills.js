@@ -5,6 +5,7 @@ import styles from "../styles";
 import timeAgo from "time-ago";
 import Skill from "../models/Skill";
 import config from "../configReact";
+import Util from "../Util";
 
 const ta = timeAgo();
 
@@ -58,8 +59,14 @@ export default class MySkills extends React.Component {
     showDeleteSkillModal(skill){
         Vibration.vibrate([0, 25]);
         this.props.navigator.showLightBox({
-            screen: config.name + ".DeleteSkillModal", // unique ID registered with Navigation.registerScreen
-            passProps: {skill}, // simple serializable object that will pass as props to the lightbox (optional)
+            screen: config.name + ".DeleteSkillModal",
+            passProps: {
+                skill, onDelete: () =>{
+                    this.setState({
+                        skills: Util.removeFromArray(this.state.skills, skill)
+                    });
+                }
+            },
             style: {
                 backgroundBlur: "dark", // 'dark' / 'light' / 'xlight' / 'none' - the type of blur on the background
                 backgroundColor: "rgba(0, 0, 0, 0.5)" // tint color for the background, you can specify alpha here (optional)
@@ -89,7 +96,7 @@ export default class MySkills extends React.Component {
                             data={this.state.skills}
                             ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#DDD"}}/>}
                             renderItem={({item}) =>{
-                                return <Text onLongPress={()=> this.showDeleteSkillModal(item)}
+                                return <Text onLongPress={() => this.showDeleteSkillModal(item)}
                                              delayLongPress={1500}
                                              style={[styles.listItem, {marginLeft: 8}]}>#{item.name}
                                 </Text>
