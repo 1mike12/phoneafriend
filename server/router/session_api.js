@@ -48,7 +48,7 @@ router.get("/teachable", (req, res, next) =>{
 });
 
 router.get("/:uuid", (req, res, next) =>{
-    Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch()
+    Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch({withRelated: ["skills"]})
     .then(item => res.send(item))
 });
 

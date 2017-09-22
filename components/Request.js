@@ -4,6 +4,7 @@ import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
 import Chip from "./Chip";
+import Session from "../models/Session";
 
 const ta = timeAgo();
 
@@ -28,14 +29,14 @@ export default class Request extends React.Component {
         this.setState({ready: false});
         return http.get("api/session/" + this.props.uuid)
         .then(res =>{
-            let request = res.data;
-            console.log(request);
+
+            let session = new Session(res.data);
             this.setState({
-                title: request.title,
-                description: request.description,
-                request: res.data,
+                session: session,
                 ready: true
             });
+
+            console.log(session);
         });
     }
 
@@ -43,7 +44,6 @@ export default class Request extends React.Component {
     }
 
     destroy(){
-        console.log(this.props);
         return http.delete("api/session/", {uuid: this.props.uuid})
         .then(() => this.props.navigator.pop({
             animated: true,
@@ -67,7 +67,7 @@ export default class Request extends React.Component {
                                     placeholder="Title"
                                     style={styles.textField}
                                     onChangeText={(title) => this.setState({title})}
-                                    value={this.state.title}
+                                    value={this.state.session.title}
                                 />
 
                                 <TextInput
@@ -78,7 +78,7 @@ export default class Request extends React.Component {
                                         console.log(description);
                                         this.setState({description});
                                     }}
-                                    value={this.state.description}
+                                    value={this.state.session.description}
                                 />
 
                                 <Text style={{textAlign: "right"}}>{this.state.description.length}/250</Text>
@@ -97,9 +97,14 @@ export default class Request extends React.Component {
                                 <Button title="load" onPress={this.loadAll}/>
                                 <View style={styles.card}>
                                     <Text style={styles.h1}>{this.state.title}</Text>
-                                    <Text>{ta.ago(this.state.request.created_at)}</Text>
+                                    <Text>{ta.ago(this.state.session.created_at)}</Text>
                                     <Text style={{marginBottom: 20}}> {this.state.description}</Text>
 
+                                    <View style={{flexDirection: "row", flexWrap: "wrap"}}>
+                                        {this.state.session.skills.map(skill=> {
+                                            return <Chip text={"#" + skill.name}/>
+                                        })}
+                                    </View>
                                     <Button title="Edit" onPress={() =>{
                                         this.setState({editing: true})
                                     }}/>
