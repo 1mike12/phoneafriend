@@ -17,5 +17,11 @@ export default {
         },
         padding: 16,
         marginBottom: 8
+    },
+    listItem: {
+        marginLeft: 16,
+        fontSize: 16,
+        height: 48,
+        textAlignVertical: "center"
     }
 }

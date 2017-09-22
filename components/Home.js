@@ -96,8 +96,11 @@ export default class Home extends React.Component {
                     <Text style={styles.h1}>Requests </Text>
                     <FlatList
                         data={this.state.requests}
+                        itemSeparatorComponent={() => <View style={{width: 10, height: 10, backgroundColor: 'red'}}/>}
                         renderItem={({item}) =>{
-                            return <Text onPress={()=> {this.goToRequest(item.uuid)}}>{item.title} | {ta.ago(item.created_at)}</Text>
+                            return <Text onPress={() =>{
+                                this.goToRequest(item.uuid)
+                            }}>{item.title} | {ta.ago(item.created_at)}</Text>
 
                         }}
                     />

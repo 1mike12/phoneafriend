@@ -5,6 +5,7 @@ export default class Skill{
 
     constructor(obj){
         Object.assign(this, obj);
+        this.key = obj.id;
     }
 
     delete(){

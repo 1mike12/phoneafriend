@@ -39,7 +39,7 @@ function launchApp(){
             },
             {
                 label: 'Skills',
-                screen: config.name + '.Home', // this is a registered name for a screen
+                screen: config.name + '.MySkills', // this is a registered name for a screen
                 icon: icon,
                 selectedIcon: icon, // iOS only
                 title: 'Skills'

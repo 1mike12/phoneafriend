@@ -1,8 +1,9 @@
 import React from 'react';
-import {ActivityIndicator, Button, FlatList, ProgressBarAndroid, Text, View} from "react-native";
+import {ActivityIndicator, Button, FlatList, Text, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
+import Skill from "../models/Skill";
 
 const ta = timeAgo();
 
@@ -13,9 +14,7 @@ export default class MySkills extends React.Component {
         this.state = {
             ready: false,
             editing: false,
-            request: {
-                skills: []
-            }
+            skills: []
         };
         this.loadAll = this.loadAll.bind(this);
         this.destroy = this.destroy.bind(this);
@@ -27,14 +26,16 @@ export default class MySkills extends React.Component {
     }
 
     loadAll(){
+        console.log("loading skills");
         this.setState({ready: false});
-        return http.get("api/session/mine")
+        return http.get("api/skill/mine")
         .then(res =>{
-            console.log(res.data);
-            this.setState({
-                skills: res.data,
-            });
-            setTimeout(() => this.setState({ready: true}), 1500)
+            let skillsJson = res.data;
+            let skills = skillsJson.map(json => new Skill(json))
+            .sort((a, b) => a.name.localeCompare(b.name));
+            console.log(skills);
+
+            this.setState({skills, ready: true})
         });
     }
 
@@ -59,26 +60,15 @@ export default class MySkills extends React.Component {
     render(){
         return (
             <View>
+                <Button title="load" onPress={this.loadAll}/>
                 {!this.state.ready ? <ActivityIndicator/> :
-                    <View>
-                        {this.state.editing ?
-                            <View>
-                                <Button title="Done" onPress={() => this.setState({editing: false})}/>
-                            </View>
-                            :
-                            <View>
-                                <Button title="load" onPress={this.loadAll}/>
-                                <View style={styles.card}>
-                                    <Text style={styles.h1}>{this.state.request.title}</Text>
-                                    <Text>{ta.ago(this.state.request.created_at)}</Text>
-                                    <Text style={{marginBottom: 20}}> {this.state.request.description}</Text>
-
-                                    <Button title="Edit" onPress={this.edit}/>
-                                    <View style={{height: 12}}/>
-                                    <Button title="Delete" onPress={this.destroy}/>
-                                </View>
-                            </View>}
-                    </View>
+                    <FlatList
+                        data={this.state.skills}
+                        ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#CCC"}}/>}
+                        renderItem={({item}) =>{
+                            return <Text style={styles.listItem}>{item.name}</Text>
+                        }}
+                    />
                 }
             </View>
         );
