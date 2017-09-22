@@ -34,9 +34,8 @@ export default class Request extends React.Component {
                 title: request.title,
                 description: request.description,
                 request: res.data,
-                // ready: true
+                ready: true
             });
-            setTimeout(() => this.setState({ready: true}), 1500)
         });
     }
 
