@@ -4,12 +4,13 @@ import http from '../services/http';
 import styles from "../styles";
 
 const style = {
-    borderRadius:30,
-    padding: 8,
-    width: 100,
-    height: 30,
+    borderRadius: 80,
+    paddingLeft: 12,
+    paddingRight: 12,
+    height: 32,
     backgroundColor: "#DDD",
-    marginRight: 8
+    marginRight: 8,
+    textAlignVertical: "center", textAlign: "center", fontSize: 16
 };
 
 export default class Chip extends React.Component {
@@ -23,9 +24,7 @@ export default class Chip extends React.Component {
 
     render(){
         return (
-            <View style={style}>
-                <Text style={{textAlignVertical: "center", textAlign: "center", fontSize: 16}}>{this.state.text}</Text>
-            </View>
+            <Text style={style}>{this.state.text}</Text>
         );
     }
 }
