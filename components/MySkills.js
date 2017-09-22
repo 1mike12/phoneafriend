@@ -1,5 +1,5 @@
 import React from 'react';
-import {ActivityIndicator, Button, FlatList, Text, TextInput, View} from "react-native";
+import {Vibration, ActivityIndicator, Button, FlatList, Text, TextInput, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -56,12 +56,13 @@ export default class MySkills extends React.Component {
     }
 
     showDeleteSkillModal(skill){
+        Vibration.vibrate();
         this.props.navigator.showLightBox({
             screen: config.name + ".DeleteSkillModal", // unique ID registered with Navigation.registerScreen
             passProps: {skill}, // simple serializable object that will pass as props to the lightbox (optional)
             style: {
                 backgroundBlur: "dark", // 'dark' / 'light' / 'xlight' / 'none' - the type of blur on the background
-                backgroundColor: "#DDD" // tint color for the background, you can specify alpha here (optional)
+                backgroundColor: "rgba(0, 0, 0, 0.5)" // tint color for the background, you can specify alpha here (optional)
             },
             adjustSoftInput: "resize", // android only, adjust soft input, modes: 'nothing', 'pan', 'resize', 'unspecified' (optional, default 'unspecified')
             tapBackgroundToDismiss: true
