@@ -17,9 +17,12 @@ export default class DeleteSkillModal extends React.Component {
     }
 
     destroy(){
-        this.props.onDelete();
-        ToastAndroid.show(`Removed ${this.state.skill.name}`, ToastAndroid.SHORT);
-        this.props.navigator.dismissLightBox();
+        return this.state.skill.delete()
+        .then(()=> {
+            this.props.onDelete();
+            ToastAndroid.show(`Removed ${this.state.skill.name}`, ToastAndroid.SHORT);
+            this.props.navigator.dismissLightBox();
+        });
     }
 
     static getName(){

@@ -47,4 +47,21 @@ router.get("/search/:query", (req, res, next)=> {
     .then(collection => res.send(collection))
 });
 
+router.post("/", (req, res, next)=> {
+    let body = req.body;
+    res.send(200)
+});
+
+router.delete("/", (req, res, next)=> {
+    let skillId = req.body.id;
+    User.where({id: req.userId}).fetch()
+    .then(user=> {
+        return user.skills().detach([skillId])
+    })
+    .then(()=> res.sendStatus(200))
+    .catch(e => {
+        res.setStatus(400).send(e)
+    })
+});
+
 module.exports = router;

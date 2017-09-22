@@ -9,7 +9,7 @@ export default class Skill{
     }
 
     delete(){
-        return http.delete(URI, {uuid: this.uuid})
+        return http.delete(URI, {id: this.id})
     }
 
     update(){

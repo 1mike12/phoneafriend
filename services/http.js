@@ -26,7 +26,7 @@ class http {
     }
 
     delete(url, data = {}){
-        return this.axios.delete(url, data)
+        return this.axios.delete(url, {data})
     }
 
 }

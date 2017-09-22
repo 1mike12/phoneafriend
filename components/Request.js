@@ -44,7 +44,7 @@ export default class Request extends React.Component {
 
     destroy(){
         console.log(this.props);
-        return http.delete("api/session/", {data: {uuid: this.props.uuid}})
+        return http.delete("api/session/", {uuid: this.props.uuid})
         .then(() => this.props.navigator.pop({
             animated: true,
             animationType: 'fade',
