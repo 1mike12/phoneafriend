@@ -24,16 +24,20 @@ export default class DeleteSkillModal extends React.Component {
 
     render(){
         return (
-            <View style={{backgroundColor: "#FFF"}}>
-                <Text>Remove Skill?</Text>
-                <Button title="Yes"
-                        onPress={this.destroy}
-                />
-                <Button title="Cancel"
-                        onPress={() =>{
-                            this.props.navigator.dismissLightBox();
-                        }}
-                />
+            <View style={[styles.card, {marginLeft: 32, marginRight: 32}]}>
+                <Text style={[styles.h2, {textAlign: "center", marginBottom: 16}]}>Remove {this.state.skill.name}?</Text>
+                <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
+                    <Button title="Yes"
+                            onPress={this.destroy}
+                            style={{flex: 1}}
+                    />
+                    <Button title="Cancel"
+                            onPress={() =>{
+                                this.props.navigator.dismissLightBox();
+                            }}
+                            style={{flex: 1}}
+                    />
+                </View>
             </View>
         );
     }

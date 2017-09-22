@@ -56,7 +56,7 @@ export default class MySkills extends React.Component {
     }
 
     showDeleteSkillModal(skill){
-        Vibration.vibrate();
+        Vibration.vibrate([0, 25]);
         this.props.navigator.showLightBox({
             screen: config.name + ".DeleteSkillModal", // unique ID registered with Navigation.registerScreen
             passProps: {skill}, // simple serializable object that will pass as props to the lightbox (optional)
@@ -85,6 +85,7 @@ export default class MySkills extends React.Component {
                                    value={this.state.query}
                         />
                         <FlatList
+                            style={{marginBottom: 170}}
                             data={this.state.skills}
                             ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#CCC"}}/>}
                             renderItem={({item}) =>{

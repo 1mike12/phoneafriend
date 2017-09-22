@@ -3,6 +3,9 @@ export default {
         fontSize: 24,
         fontWeight: "bold"
     },
+    h2:{
+        fontSize: 18
+    },
     card: {
         backgroundColor: '#ffffff',
         borderRadius: 2,
