@@ -26,11 +26,11 @@ module.exports = dev = new function(){
     self.setSkills = () =>{
         return Promise.join(
             User.fetchAll(),
-            Skill.query(qb => qb.limit(10)).fetchAll(),
+            Skill.query(qb => qb.limit(15)).fetchAll(),
             (users, skills) =>{
                 return Promise.all(users.map(user =>{
                     console.log("this part")
-                    user.skills().attach(skills.slice(0, 3))
+                    user.skills().attach(skills.map(skill=> skill.id))
                 }))
             }
         )

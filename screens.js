@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Request from './components/Request';
 import config from "./configReact";
 import MySkills from "./components/MySkills";
+import DeleteSkillModal from "./components/DeleteSkillModal";
 
 // register all screens of the app (including internal ones)
 export function registerScreens() {
@@ -12,6 +13,7 @@ export function registerScreens() {
     register(Login);
     register(Request);
     register(MySkills);
+    register(DeleteSkillModal)
 }
 
 /**

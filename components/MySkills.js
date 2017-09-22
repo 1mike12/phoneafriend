@@ -1,9 +1,10 @@
 import React from 'react';
-import {ActivityIndicator, Button, FlatList, Text, View} from "react-native";
+import {ActivityIndicator, Button, FlatList, Text, TextInput, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
 import Skill from "../models/Skill";
+import config from "../configReact";
 
 const ta = timeAgo();
 
@@ -14,7 +15,8 @@ export default class MySkills extends React.Component {
         this.state = {
             ready: false,
             editing: false,
-            skills: []
+            skills: [],
+            query: ""
         };
         this.loadAll = this.loadAll.bind(this);
         this.destroy = this.destroy.bind(this);
@@ -53,6 +55,19 @@ export default class MySkills extends React.Component {
         .catch(console.log)
     }
 
+    showDeleteSkillModal(skill){
+        this.props.navigator.showLightBox({
+            screen: config.name + ".DeleteSkillModal", // unique ID registered with Navigation.registerScreen
+            passProps: {skill}, // simple serializable object that will pass as props to the lightbox (optional)
+            style: {
+                backgroundBlur: "dark", // 'dark' / 'light' / 'xlight' / 'none' - the type of blur on the background
+                backgroundColor: "#DDD" // tint color for the background, you can specify alpha here (optional)
+            },
+            adjustSoftInput: "resize", // android only, adjust soft input, modes: 'nothing', 'pan', 'resize', 'unspecified' (optional, default 'unspecified')
+            tapBackgroundToDismiss: true
+        });
+    }
+
     static getName(){
         return "MySkills"
     }
@@ -62,13 +77,24 @@ export default class MySkills extends React.Component {
             <View>
                 <Button title="load" onPress={this.loadAll}/>
                 {!this.state.ready ? <ActivityIndicator/> :
-                    <FlatList
-                        data={this.state.skills}
-                        ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#CCC"}}/>}
-                        renderItem={({item}) =>{
-                            return <Text style={styles.listItem}>{item.name}</Text>
-                        }}
-                    />
+                    <View>
+                        <TextInput placeholder="Add"
+                                   style={styles.textField}
+                                   onTextChange={(query) => this.setState({query})}
+                                   value={this.state.query}
+                        />
+                        <FlatList
+                            data={this.state.skills}
+                            ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#CCC"}}/>}
+                            renderItem={({item}) =>{
+                                return <Text onLongPress={()=> this.showDeleteSkillModal(item)}
+                                             delayLongPress={1500}
+                                             style={styles.listItem}>{item.name}
+                                </Text>
+                            }}
+                        />
+                    </View>
+
                 }
             </View>
         );
