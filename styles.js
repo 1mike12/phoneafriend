@@ -3,23 +3,21 @@ export default {
         fontSize: 24,
         fontWeight: "bold"
     },
-    h2:{
+    h2: {
         fontSize: 18
     },
     card: {
         backgroundColor: '#ffffff',
         borderRadius: 2,
-        borderColor: '#ffffff',
-        borderWidth: 1,
-        shadowColor: 'rgba(0, 0, 0, 0.5)',
-        shadowOpacity: 0.8,
+        shadowColor: '#000',
         shadowRadius: 5,
         shadowOffset: {
             height: 2,
             width: 2,
         },
         padding: 16,
-        marginBottom: 8
+        marginBottom: 8,
+        elevation: 2,
     },
     listItem: {
         fontSize: 16,
