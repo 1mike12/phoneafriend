@@ -1,6 +1,5 @@
 import React from 'react';
-import {ActivityIndicator, Button, FlatList, Text, TextInput, View} from "react-native";
-import http from '../services/http';
+import {ToastAndroid, ActivityIndicator, Button, FlatList, Text, TextInput, View} from "react-native";
 import styles from "../styles";
 import timeAgo from "time-ago";
 
@@ -13,9 +12,13 @@ export default class DeleteSkillModal extends React.Component {
         this.state = {
             skill: this.props.skill
         };
+
+        this.destroy = this.destroy.bind(this);
     }
 
     destroy(){
+        ToastAndroid.show(`Removed ${this.state.skill.name}`, ToastAndroid.SHORT);
+        this.props.navigator.dismissLightBox();
     }
 
     static getName(){

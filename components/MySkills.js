@@ -87,11 +87,11 @@ export default class MySkills extends React.Component {
                         <FlatList
                             style={{marginBottom: 170}}
                             data={this.state.skills}
-                            ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#CCC"}}/>}
+                            ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: "#DDD"}}/>}
                             renderItem={({item}) =>{
                                 return <Text onLongPress={()=> this.showDeleteSkillModal(item)}
                                              delayLongPress={1500}
-                                             style={styles.listItem}>{item.name}
+                                             style={[styles.listItem, {marginLeft: 8}]}>#{item.name}
                                 </Text>
                             }}
                         />
