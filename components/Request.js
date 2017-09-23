@@ -5,9 +5,11 @@ import styles from "../styles";
 import timeAgo from "time-ago";
 import Chip from "./Chip";
 import Session from "../models/Session";
+import config from "../configReact";
 
 const ta = timeAgo();
 
+const NAME = "Request";
 export default class Request extends React.Component {
 
     constructor(props){
@@ -53,7 +55,7 @@ export default class Request extends React.Component {
     }
 
     static getName(){
-        return "Request"
+        return `${config.name}.${NAME}`
     }
 
     render(){
@@ -81,13 +83,13 @@ export default class Request extends React.Component {
                                     value={this.state.session.description}
                                 />
 
-                                <Text style={{textAlign: "right"}}>{this.state.description.length}/250</Text>
+                                <Text style={{textAlign: "right"}}>{this.state.session.description.length}/250</Text>
                                 <Image style={{height: 200, width: 200}}
                                        source={{uri: 'https://i.ytimg.com/vi/oDdK-g4XOAU/maxresdefault.jpg'}}/>
                                 <View style={{paddingBottom: 46, paddingTop: 16, flex: 1, flexDirection: 'row'}}>
-                                    <Chip text="Climbing" />
-                                    <Chip text="Lead" />
-                                    <Chip text="Belay" />
+                                    <Chip text="Climbing"/>
+                                    <Chip text="Lead"/>
+                                    <Chip text="Belay"/>
                                 </View>
 
                                 <Button title="Done" onPress={() => this.setState({editing: false})}/>
@@ -98,10 +100,10 @@ export default class Request extends React.Component {
                                 <View style={styles.card}>
                                     <Text style={styles.h1}>{this.state.title}</Text>
                                     <Text>{ta.ago(this.state.session.created_at)}</Text>
-                                    <Text style={{marginBottom: 20}}> {this.state.description}</Text>
+                                    <Text style={{marginBottom: 20}}> {this.state.session.description}</Text>
 
                                     <View style={{flexDirection: "row", flexWrap: "wrap"}}>
-                                        {this.state.session.skills.map(skill=> {
+                                        {this.state.session.skills.map(skill =>{
                                             return <Chip text={"#" + skill.name}/>
                                         })}
                                     </View>

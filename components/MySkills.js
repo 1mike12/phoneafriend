@@ -6,9 +6,10 @@ import timeAgo from "time-ago";
 import Skill from "../models/Skill";
 import config from "../configReact";
 import Util from "../Util";
+import DeleteSkillModal from "./DeleteSkillModal";
 
 const ta = timeAgo();
-
+const NAME = "MySkills";
 export default class MySkills extends React.Component {
 
     constructor(props){
@@ -59,7 +60,7 @@ export default class MySkills extends React.Component {
     showDeleteSkillModal(skill){
         Vibration.vibrate([0, 25]);
         this.props.navigator.showLightBox({
-            screen: config.name + ".DeleteSkillModal",
+            screen: DeleteSkillModal.getName(),
             passProps: {
                 skill, onDelete: () =>{
                     this.setState({
@@ -77,9 +78,8 @@ export default class MySkills extends React.Component {
     }
 
     static getName(){
-        return "MySkills"
+        return `${config.name}.${NAME}`
     }
-
     render(){
         return (
             <View>

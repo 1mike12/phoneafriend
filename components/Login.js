@@ -1,10 +1,8 @@
 import React from 'react';
-import axios from "axios";
 import {FlatList, Text, View, StyleSheet, Button, TextInput} from "react-native";
 import config from "../configReact";
 import http from "../services/http"
 import Authentication from "../services/Authentication";
-import {NativeRouter, Route, Link} from "react-router-native";
 
 const styles = StyleSheet.create({
     progress: {
@@ -20,7 +18,8 @@ const styles = StyleSheet.create({
     },
 });
 
-export default class Home extends React.Component {
+const NAME = "Login";
+export default class Login extends React.Component {
 
     constructor(props){
         super(props);
@@ -60,8 +59,9 @@ export default class Home extends React.Component {
     }
 
     static getName(){
-        return "Login"
+        return `${config.name}.${NAME}`
     }
+
     render(){
         return (
             <View>

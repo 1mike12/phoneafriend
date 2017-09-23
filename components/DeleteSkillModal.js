@@ -2,9 +2,10 @@ import React from 'react';
 import {ToastAndroid, ActivityIndicator, Button, FlatList, Text, TextInput, View} from "react-native";
 import styles from "../styles";
 import timeAgo from "time-ago";
-
+import config from "../configReact";
 const ta = timeAgo();
 
+const NAME = "DeleteSkillModal";
 export default class DeleteSkillModal extends React.Component {
 
     constructor(props){
@@ -18,7 +19,7 @@ export default class DeleteSkillModal extends React.Component {
 
     destroy(){
         return this.state.skill.delete()
-        .then(()=> {
+        .then(() =>{
             this.props.onDelete();
             ToastAndroid.show(`Removed ${this.state.skill.name}`, ToastAndroid.SHORT);
             this.props.navigator.dismissLightBox();
@@ -26,13 +27,14 @@ export default class DeleteSkillModal extends React.Component {
     }
 
     static getName(){
-        return "DeleteSkillModal"
+        return `${config.name}.${NAME}`
     }
 
     render(){
         return (
             <View style={[styles.card, {marginLeft: 32, marginRight: 32}]}>
-                <Text style={[styles.h2, {textAlign: "center", marginBottom: 16}]}>Remove {this.state.skill.name}?</Text>
+                <Text
+                    style={[styles.h2, {textAlign: "center", marginBottom: 16}]}>Remove {this.state.skill.name}?</Text>
                 <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
                     <Button title="Yes"
                             onPress={this.destroy}

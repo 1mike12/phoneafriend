@@ -2,12 +2,13 @@ import React from 'react';
 import {Button, FlatList, Text, TouchableHighlight, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
-import {Link} from "react-router-native";
-
+import config from "../configReact";
 import timeAgo from "time-ago";
+import Request from "./Request";
+import MySkills from "./MySkills";
 
 const ta = timeAgo();
-
+const NAME = "Home";
 export default class Home extends React.Component {
 
     constructor(props){
@@ -61,7 +62,7 @@ export default class Home extends React.Component {
 
     goToRequest(uuid){
         this.props.navigator.push({
-            screen: 'phoneafriend.Request', // unique ID registered with Navigation.registerScreen
+            screen: Request.getName(), // unique ID registered with Navigation.registerScreen
             title: undefined, // navigation bar title of the pushed screen (optional)
             titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==', // iOS only. navigation bar title image instead of the title text of the pushed screen (optional)
             passProps: {uuid}, // Object that will be passed as props to the pushed screen (optional)
@@ -76,7 +77,7 @@ export default class Home extends React.Component {
 
     goToMySkills(){
         this.props.navigator.push({
-            screen: 'phoneafriend.MySkills', // unique ID registered with Navigation.registerScreen
+            screen: MySkills.getName(), // unique ID registered with Navigation.registerScreen
             title: undefined, // navigation bar title of the pushed screen (optional)
             titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==', // iOS only. navigation bar title image instead of the title text of the pushed screen (optional)
             animated: true, // does the push have transition animation or does it happen immediately (optional)
@@ -86,7 +87,7 @@ export default class Home extends React.Component {
     }
 
     static getName(){
-        return "Home"
+        return `${config.name}.${NAME}`
     }
 
     render(){

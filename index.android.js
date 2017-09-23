@@ -3,6 +3,9 @@ import {registerScreens} from './screens';
 import config from "./configReact";
 import Authentication from "./services/Authentication";
 import http from "./services/http";
+import Login from "./components/Login";
+import Home from "./components/Home";
+import MySkills from "./components/MySkills";
 
 registerScreens();
 
@@ -25,21 +28,21 @@ function launchApp(){
         tabs: [
             {
                 label: 'Login',
-                screen: config.name + '.Login',
+                screen: Login.getName(),
                 icon: icon,
                 selectedIcon: icon, // iOS only
                 title: 'Login'
             },
             {
                 label: 'Home',
-                screen: config.name + '.Home', // this is a registered name for a screen
+                screen: Home.getName(), // this is a registered name for a screen
                 icon: icon,
                 selectedIcon: icon, // iOS only
                 title: 'Home'
             },
             {
                 label: 'Skills',
-                screen: config.name + '.MySkills', // this is a registered name for a screen
+                screen: MySkills.getName(), // this is a registered name for a screen
                 icon: icon,
                 selectedIcon: icon, // iOS only
                 title: 'Skills'
