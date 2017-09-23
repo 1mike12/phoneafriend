@@ -10,8 +10,8 @@ import SessionEdit from "./SessionEdit";
 
 const ta = timeAgo();
 
-const NAME = "Request";
-export default class Request extends React.Component {
+const NAME = "SessionScreen";
+export default class SessionScreen extends React.Component {
 
     constructor(props){
         super(props);
