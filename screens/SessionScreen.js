@@ -3,10 +3,10 @@ import {ActivityIndicator, Button, FlatList, Image, ProgressBarAndroid, Text, Te
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
-import Chip from "./Chip";
+import Chip from "../components/Chip";
 import Session from "../models/Session";
 import config from "../configReact";
-import SessionEdit from "./SessionEdit";
+import SessionEdit from "./SessionEditScreen";
 
 const ta = timeAgo();
 

@@ -2,12 +2,12 @@ import React from 'react';
 import {ActivityIndicator, Button, FlatList, Image, ProgressBarAndroid, Text, TextInput, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
-import Chip from "./Chip";
+import Chip from "../components/Chip";
 import config from "../server/config";
 import update from 'immutability-helper';
 
-const NAME = "SessionEdit";
-export default class SessionEdit extends React.Component {
+const NAME = "SessionEditScreen";
+export default class SessionEditScreen extends React.Component {
 
     constructor(props){
         super(props);

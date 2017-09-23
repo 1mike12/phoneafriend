@@ -4,7 +4,7 @@ import http from '../services/http';
 import styles from "../styles";
 import config from "../configReact";
 import timeAgo from "time-ago";
-import Request from "./Request";
+import Request from "./SessionScreen";
 import MySkills from "./MySkills";
 
 const ta = timeAgo();

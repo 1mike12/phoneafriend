@@ -3,9 +3,9 @@ import {registerScreens} from './screens';
 import config from "./configReact";
 import Authentication from "./services/Authentication";
 import http from "./services/http";
-import Login from "./components/Login";
-import Home from "./components/Home";
-import MySkills from "./components/MySkills";
+import Login from "./screens/Login";
+import Home from "./screens/Home";
+import MySkills from "./screens/MySkills";
 
 registerScreens();
 
