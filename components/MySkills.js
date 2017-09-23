@@ -83,10 +83,6 @@ export default class MySkills extends React.Component {
     render(){
         return (
             <View>
-                <Button title="test" onPress={()=> {
-                    return http.delete("api/skill", {id: 2})
-                }}/>
-
                 <Button title="load" onPress={this.loadAll}/>
                 {!this.state.ready ? <ActivityIndicator/> :
                     <View>

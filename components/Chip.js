@@ -3,14 +3,28 @@ import {Button, FlatList, Text, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 
-const style = {
+const chipContainer = {
     borderRadius: 80,
     paddingLeft: 12,
     paddingRight: 12,
     height: 32,
     backgroundColor: "#DDD",
-    marginRight: 8,
-    textAlignVertical: "center", textAlign: "center", fontSize: 16
+};
+
+const chipText = {
+    fontSize: 16,
+};
+
+const closeButton = {
+    marginLeft: 4,
+    height: 16,
+    width: 16,
+    borderRadius: 80,
+    backgroundColor: "#333",
+    color: "#FFF",
+    textAlign: "center",
+    textAlignVertical: "center",
+    fontSize: 8
 };
 
 export default class Chip extends React.Component {
@@ -24,7 +38,10 @@ export default class Chip extends React.Component {
 
     render(){
         return (
-            <Text style={style}>{this.state.text}</Text>
+            <View style={chipContainer}>
+                <Text style={chipText}>{this.state.text}</Text>
+                <Text style={closeButton}>X</Text>
+            </View>
         );
     }
 }
