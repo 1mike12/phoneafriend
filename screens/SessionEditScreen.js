@@ -18,6 +18,13 @@ export default class SessionEditScreen extends React.Component {
         this.destroy = this.destroy.bind(this);
     }
 
+    componentDidMount(){
+        this.props.navigator.toggleTabs({
+            to: 'hidden',
+            animated: true
+        });
+    }
+
     destroy(){
         return http.delete("api/session/", {uuid: this.props.uuid})
         .then(() => this.props.navigator.pop({
