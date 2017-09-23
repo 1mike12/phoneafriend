@@ -7,10 +7,20 @@ module.exports = dev = new function(){
     let self = this;
 
     self.users = function(){
-        let mike = User.forge({email: "1mike12@gmail.com"});
+        let mike = User.forge({
+            email: "1mike12@gmail.com",
+            first_name: "Mike",
+            last_name: "Qin",
+            profile_url: "https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAA3mAAAAJDMzN2UxOWE4LTAyMjAtNDI4Ni04MjM0LTI5ODJhY2EwZTQ0OA.jpg"
+        });
         mike.setPassword("123");
 
-        let brian = User.forge({email: "bgioia@gmail.com"});
+        let brian = User.forge({
+            email: "bgioia@gmail.com",
+            first_name: "Brian",
+            last_name: "Gioia",
+            profile_url: "https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAnyAAAAJGFmNWVlYzlhLTdjYzUtNDZjYS1iYTk2LTI2NzNkNTMwNjViMw.jpg"
+        });
         brian.setPassword("123");
 
         return mike.save()
@@ -30,7 +40,7 @@ module.exports = dev = new function(){
             (users, skills) =>{
                 return Promise.all(users.map(user =>{
                     console.log("this part")
-                    user.skills().attach(skills.map(skill=> skill.id))
+                    user.skills().attach(skills.map(skill => skill.id))
                 }))
             }
         )
@@ -91,4 +101,4 @@ module.exports = dev = new function(){
 };
 require("./_wiper").wipe()
 .then(() => dev.run())
-.then(()=> process.exit())
+.then(() => process.exit())

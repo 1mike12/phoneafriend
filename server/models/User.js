@@ -12,7 +12,13 @@ let Instance = new function(){
     let self = this;
 
     self.tableName = TABLE_NAME;
-    self.hidden = ['password'];
+    self.hidden = ['password', "last_name"];
+
+    self.virtuals = {
+        last_initial: function(){
+            return this.get("last_name").substring(0, 1)
+        }
+    };
 
     self.initialize = function(){
         this.on("creating", (model, attrs, options) =>{
@@ -58,7 +64,9 @@ let Static = new function(){
                 table.string("email", 127).unique();
                 table.boolean("email_verified").defaultTo(false);
                 table.string("uuid").unique();
-                table.string("user_name");
+                table.string("first_name");
+                table.string("last_name");
+                table.string("profile_url");
                 table.string("password");
                 table.string("confirmation_uuid");
                 // table.specificType('geo', 'geometry(point, 4326)');
