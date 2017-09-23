@@ -15,7 +15,7 @@ export function registerScreens(){
         SessionScreen,
         SessionEditScreen,
         MySkills,
-        DeleteSkillModal
+        DeleteSkillModal,
     ]
     .forEach(register);
 }

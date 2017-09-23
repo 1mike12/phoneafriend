@@ -5,17 +5,31 @@ import styles from "../styles";
 import Chip from "../components/Chip";
 import config from "../server/config";
 import update from 'immutability-helper';
+import Session from "../models/Session";
+import {ToastAndroid} from "react-native";
 
 const NAME = "SessionEditScreen";
 export default class SessionEditScreen extends React.Component {
 
     constructor(props){
         super(props);
+
+        let isNew = true;
+        let session;
+        if (this.props.session && this.props.session.uuid){
+            isNew = false;
+            session = this.props.session;
+        } else {
+            session = new Session();
+        }
         this.state = {
             title: "",
-            session: this.props.session
+            isNew: isNew,
+            session: session
         };
         this.destroy = this.destroy.bind(this);
+        this.getFormErrors = this.getFormErrors.bind(this);
+        this.saveSession = this.saveSession.bind(this);
     }
 
     componentDidMount(){
@@ -38,21 +52,29 @@ export default class SessionEditScreen extends React.Component {
         return `${config.name}.${NAME}`
     }
 
-    componentWillUnmount(){
-        this.state.session.save()
+
+    getFormErrors(){
+        let errors = [];
+        let session = this.state.session;
+        if (!session.title) errors.push({message: "no title", field: "title"});
+        if (session.title.length > 127) errors.push({message: "title too long", field: "title"});
+        if (!session.description) errors.push({message: "no description", field: "description"});
+        if (session.description.length > 250) errors.push({message: "description too long", field: "description"});
+        return errors;
     }
 
-    isValid(){
-
-    }
-    save(){
-
+    saveSession(){
+        let errors = this.getFormErrors();
+        if (errors.length > 0){
+            ToastAndroid.show(errors[0].message, ToastAndroid.SHORT);
+        } else {
+            return this.state.session.save()
+        }
     }
 
     render(){
         return (
             <View style={{backgroundColor: "#FFF"}}>
-                <Button title="log session" onPress={() => console.log(this.state.session)}/>
                 <TextInput
                     placeholder="Title"
                     style={styles.textField}
@@ -77,7 +99,8 @@ export default class SessionEditScreen extends React.Component {
                 />
 
                 <Text style={{textAlign: "right"}}>{this.state.session.description.length}/250</Text>
-                <View style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8}}>
+                <View
+                    style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8}}>
                     {this.state.session.skills.map(skill =>{
                         return <View key={skill.id} style={{paddingRight: 8}}>
                             <Chip text={"#" + skill.name}/>
@@ -86,6 +109,7 @@ export default class SessionEditScreen extends React.Component {
                 </View>
                 <Image style={{height: 200, width: 200, marginBottom: 8}}
                        source={{uri: 'https://i.ytimg.com/vi/oDdK-g4XOAU/maxresdefault.jpg'}}/>
+                <Button title="Save" onPress={this.saveSession}/>
             </View>
         );
     }
