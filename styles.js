@@ -1,3 +1,5 @@
+import {StyleSheet} from "react-native";
+
 export default {
     h1: {
         fontSize: 24,
@@ -25,5 +27,9 @@ export default {
         textAlignVertical: "center"
     },
     primary: "#3F51B5",
-    highlight: ""
+    profilePic: {
+        borderRadius: 900,
+        height: 40,
+        width: 40
+    }
 }

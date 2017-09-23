@@ -65,9 +65,26 @@ export default class SessionScreen extends React.Component {
                 {!this.state.ready ? <ActivityIndicator/> :
                     <View>
                         <Button title="load" onPress={this.loadAll}/>
+
                         <View style={styles.card}>
-                            <Text style={styles.h1}>{this.state.title}</Text>
-                            <Text>Created {ta.ago(this.state.session.created_at)}</Text>
+                            <Text style={[styles.h2, {marginBottom: 8}]}>{this.state.session.title}</Text>
+                            <View style={{flexDirection: "row", alignItems: "center", marginBottom: 16}}>
+
+                                <Image style={[styles.profilePic, {marginRight: 8}]}
+                                       source={{uri: this.state.session.pupil.profile_url}}/>
+                                <Text>{this.state.session.pupil.getFirstAndInitial()} |
+                                    Created {ta.ago(this.state.session.created_at)}</Text>
+                            </View>
+
+                            {this.state.session.teacher ?
+                                <View style={{flexDirection: "row", alignItems: "center", marginBottom: 16}}>
+
+                                    <Image style={[styles.profilePic, {marginRight: 8}]}
+                                           source={{uri: this.state.session.teacher.profile_url}}/>
+                                    <Text>{this.state.session.teacher.getFirstAndInitial()}</Text>
+                                </View> : null}
+
+
                             <Text style={{marginBottom: 20}}>{this.state.session.description}</Text>
 
                             <View style={{flexDirection: "row", flexWrap: "wrap"}}>

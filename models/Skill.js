@@ -18,6 +18,5 @@ export default class Skill{
 
     save(){
         return http.post(URI, this)
-        .then(res=> this.constructor(res))
     }
 }

@@ -31,18 +31,25 @@ export default class SessionEditScreen extends React.Component {
         return `${config.name}.${NAME}`
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(){
         this.state.session.save()
+    }
+
+    isValid(){
+
+    }
+    save(){
+
     }
 
     render(){
         return (
             <View style={{backgroundColor: "#FFF"}}>
-                <Button title="log session" onPress={()=> console.log(this.state.session)}/>
+                <Button title="log session" onPress={() => console.log(this.state.session)}/>
                 <TextInput
                     placeholder="Title"
                     style={styles.textField}
-                    onChangeText={(title) => {
+                    onChangeText={(title) =>{
                         this.setState({
                             session: update(this.state.session, {title: {$set: title}})
                         })
@@ -63,13 +70,15 @@ export default class SessionEditScreen extends React.Component {
                 />
 
                 <Text style={{textAlign: "right"}}>{this.state.session.description.length}/250</Text>
-                <Image style={{height: 200, width: 200}}
-                       source={{uri: 'https://i.ytimg.com/vi/oDdK-g4XOAU/maxresdefault.jpg'}}/>
-                <View style={{paddingBottom: 46, paddingTop: 16, flex: 1, flexDirection: 'row'}}>
-                    <Chip text="Climbing"/>
-                    <Chip text="Lead"/>
-                    <Chip text="Belay"/>
+                <View style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8}}>
+                    {this.state.session.skills.map(skill =>{
+                        return <View key={skill.id} style={{paddingRight: 8}}>
+                            <Chip text={"#" + skill.name}/>
+                        </View>
+                    })}
                 </View>
+                <Image style={{height: 200, width: 200, marginBottom: 8}}
+                       source={{uri: 'https://i.ytimg.com/vi/oDdK-g4XOAU/maxresdefault.jpg'}}/>
             </View>
         );
     }
