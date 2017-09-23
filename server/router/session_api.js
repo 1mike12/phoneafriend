@@ -4,11 +4,11 @@ let User = require("../models/User");
 
 router.delete("/", (req, res, next) =>{
     Class.where({uuid: req.body.uuid, pupil_id: req.userId}).fetch()
-    .then(item => {
+    .then(item =>{
         return item.destroy()
     })
     .then(() => res.sendStatus(200))
-    .catch(e=> {
+    .catch(e =>{
         res.sendStatus(400)
         throw e;
     })
@@ -45,6 +45,29 @@ router.get("/teachable", (req, res, next) =>{
         })
     })
     .then(collection => res.send(collection))
+});
+
+router.post("/", (req, res, next) =>{
+    let instance = Class.forge(req.body);
+
+    if (instance.get("id")){
+        Class.where({id: instance.get("id"), pupil_id: req.userId})
+        .fetch()
+        .then(session =>{
+            if (session){
+                return instance.save();
+            } else {
+                throw new Error("couldn't save session")
+            }
+        })
+        .then(saved => res.send(saved))
+        .catch(e => {
+            res.sendStatus(400)
+        })
+    } else {
+        instance.save()
+        .then(saved => res.send(saved))
+    }
 });
 
 router.get("/:uuid", (req, res, next) =>{

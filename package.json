@@ -33,6 +33,7 @@
     "cron": "^1.2.1",
     "express": "^4.15.2",
     "faker": "^4.1.0",
+    "immutability-helper": "^2.4.0",
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.9",
     "lodash": "^4.17.4",

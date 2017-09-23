@@ -18,6 +18,7 @@ export default class Request extends React.Component {
         this.state = {
             ready: false,
             title: "",
+            session: null
         };
         this.loadAll = this.loadAll.bind(this);
         this.destroy = this.destroy.bind(this);
@@ -66,12 +67,12 @@ export default class Request extends React.Component {
                         <Button title="load" onPress={this.loadAll}/>
                         <View style={styles.card}>
                             <Text style={styles.h1}>{this.state.title}</Text>
-                            <Text>{ta.ago(this.state.session.created_at)}</Text>
-                            <Text style={{marginBottom: 20}}> {this.state.session.description}</Text>
+                            <Text>Created {ta.ago(this.state.session.created_at)}</Text>
+                            <Text style={{marginBottom: 20}}>{this.state.session.description}</Text>
 
                             <View style={{flexDirection: "row", flexWrap: "wrap"}}>
                                 {this.state.session.skills.map(skill =>{
-                                    return <Chip text={"#" + skill.name}/>
+                                    return <Chip key={skill.id} text={"#" + skill.name}/>
                                 })}
                             </View>
                             <Button title="Edit" onPress={() =>{

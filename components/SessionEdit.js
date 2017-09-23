@@ -4,6 +4,7 @@ import http from '../services/http';
 import styles from "../styles";
 import Chip from "./Chip";
 import config from "../server/config";
+import update from 'immutability-helper';
 
 const NAME = "SessionEdit";
 export default class SessionEdit extends React.Component {
@@ -30,13 +31,22 @@ export default class SessionEdit extends React.Component {
         return `${config.name}.${NAME}`
     }
 
+    componentWillUnmount() {
+        this.state.session.save()
+    }
+
     render(){
         return (
             <View style={{backgroundColor: "#FFF"}}>
+                <Button title="log session" onPress={()=> console.log(this.state.session)}/>
                 <TextInput
                     placeholder="Title"
                     style={styles.textField}
-                    onChangeText={(title) => this.setState({title})}
+                    onChangeText={(title) => {
+                        this.setState({
+                            session: update(this.state.session, {title: {$set: title}})
+                        })
+                    }}
                     value={this.state.session.title}
                 />
 
@@ -45,8 +55,9 @@ export default class SessionEdit extends React.Component {
                     multiline={true}
                     style={{height: 150, textAlignVertical: 'top'}}
                     onChangeText={(description) =>{
-                        console.log(description);
-                        this.setState({description});
+                        this.setState({
+                            session: update(this.state.session, {description: {$set: description}})
+                        })
                     }}
                     value={this.state.session.description}
                 />
