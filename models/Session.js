@@ -3,14 +3,23 @@ import Skill from "./Skill";
 import User from "./User";
 
 const URI = "api/session";
-export default class Session{
+export default class Session {
 
     constructor(obj){
+        if (!obj){
+            obj = {
+                id: null,
+                title: "",
+                description: "",
+                skills: []
+            }
+        }
         Object.assign(this, obj);
-        this.key = obj.id;
+
+        if (obj.id) this.key = obj.id;
 
         if (obj.skills){
-            this.skills = obj.skills.map(skillJson=> new Skill(skillJson))
+            this.skills = obj.skills.map(skillJson => new Skill(skillJson))
         } else {
             this.skills = [];
         }
