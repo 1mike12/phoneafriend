@@ -24,6 +24,7 @@ export default class SessionEditScreen extends React.Component {
         }
         this.state = {
             title: "",
+            skillQuery: "",
             isNew: isNew,
             session: session
         };
@@ -99,6 +100,16 @@ export default class SessionEditScreen extends React.Component {
                 />
 
                 <Text style={{textAlign: "right"}}>{this.state.session.description.length}/250</Text>
+
+                <TextInput
+                    placeholder="Search Skill"
+                    onChangeText={(skillQuery) =>{
+                        this.setState({skillQuery})
+                    }}
+                    value={this.state.skillQuery}
+                />
+
+
                 <View
                     style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8}}>
                     {this.state.session.skills.map(skill =>{
