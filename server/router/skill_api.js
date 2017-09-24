@@ -9,57 +9,44 @@ router.get("/", (req, res, next) =>{
 
 router.get("/mine", (req, res, next) =>{
     User.where({id: req.userId}).fetch({withRelated: "skills"})
-    .then(user=> {
+    .then(user =>{
         res.send(user.related("skills"))
     })
 });
 
-router.get("/teachable", (req, res, next) =>{
-    User.where({id: req.userId}).fetch({withRelated: "skills"})
-    .then(user =>{
-        let skillIds = user.related("skills").map(s=> s.get("id"));
+/**
+ * query = "string"
+ * exclude = csv of (of already seleceted) skills to exclude "mountain biking, writing"
+ */
+router.get("/search", (req, res, next) =>{
 
-        //todo optimize this many to many call
-        return Class.query(qb =>{
-            qb.whereNull("teacher_id");
-            qb.whereNot("pupil_id", user.get('id'));
-            qb.distinct("sessions.id");
-            qb.innerJoin("sessions_skills", "sessions.id", "sessions_skills.session_id");
-            qb.innerJoin("skills", "skills.id", "sessions_skills.skill_id");
-            qb.whereIn("skills.id", skillIds);
-        })
-        .fetchAll({
-            withRelated: ["skills"]
-        })
-    })
-    .then(collection => res.send(collection))
-});
+    const {query, exclude} = req.query;
+    if (!query) return res.sendStatus(400);
+    let excludedTerms;
+    if (exclude) excludedTerms = exclude.split(",").map(term => term.toLowerCase());
 
-router.get("/search/:query", (req, res, next)=> {
-
-    let query = req.params.query;
-
-    Class.query(qb=> {
+    Class.query(qb =>{
         qb.where("name", "LIKE", `${query}%`);
+        if (excludedTerms) qb.whereNotIn("name", excludedTerms);
         qb.limit(10);
     })
     .fetchAll()
     .then(collection => res.send(collection))
 });
 
-router.post("/", (req, res, next)=> {
+router.post("/", (req, res, next) =>{
     let body = req.body;
     res.send(200)
 });
 
-router.delete("/", (req, res, next)=> {
+router.delete("/", (req, res, next) =>{
     let skillId = req.body.id;
     User.where({id: req.userId}).fetch()
-    .then(user=> {
+    .then(user =>{
         return user.skills().detach([skillId])
     })
-    .then(()=> res.sendStatus(200))
-    .catch(e => {
+    .then(() => res.sendStatus(200))
+    .catch(e =>{
         res.setStatus(400).send(e)
     })
 });
