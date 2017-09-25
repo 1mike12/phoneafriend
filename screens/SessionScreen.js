@@ -1,5 +1,8 @@
 import React from 'react';
-import {ActivityIndicator, Button, FlatList, Image, ProgressBarAndroid, Text, TextInput, View} from "react-native";
+import {
+    ActivityIndicator, Button, FlatList, Image, ProgressBarAndroid, Text, TextInput, TouchableHighlight,
+    View
+} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -89,7 +92,11 @@ export default class SessionScreen extends React.Component {
 
                             <View style={{flexDirection: "row", flexWrap: "wrap"}}>
                                 {this.state.session.skills.map(skill =>{
-                                    return <Chip key={skill.id} text={"#" + skill.name}/>
+                                    return (
+                                        <View key={skill.id} style={{marginRight: 8, marginBottom: 8}}>
+                                            <Chip  text={"#" + skill.name}/>
+                                        </View>
+                                    )
                                 })}
                             </View>
                             <Button title="Edit" onPress={() =>{
