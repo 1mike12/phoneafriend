@@ -146,7 +146,19 @@ export default class SessionEditScreen extends React.Component {
                     data={this.nonSelectedSkills(this.state.skills)}
                     defaultValue={query}
                     onChangeText={this.queryChanged}
-                    placeholder="Skill Search"
+                    placeholder="Add Skill"
+                    inputContainerStyle={{borderWidth: 0}}
+                    listContainerStyle={{borderWidth: 0}}
+                    listStyle={{
+                        shadowColor: '#000',
+                        shadowRadius: 5,
+                        borderWidth: 0,
+                        shadowOffset: {
+                            height: 2,
+                            width: 2,
+                        },
+                        elevation: 2,
+                    }}
                     renderItem={(item) => (
                         <TouchableOpacity onPress={() =>{
                             this.setState({
@@ -162,16 +174,25 @@ export default class SessionEditScreen extends React.Component {
                     )}
                 />
 
-                <View style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8, marginTop: 60}}
+                <View style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    paddingLeft: 8,
+                    paddingRight: 8,
+                    marginBottom: 8,
+                    marginTop: 60
+                }}
                 >
                     {this.state.session.skills.map(skill =>{
                         return <View key={skill.id} style={{marginRight: 8, marginBottom: 4}}>
-                            <Chip text={"#" + skill.name} onDelete={()=> {
+                            <Chip text={"#" + skill.name} onDelete={() =>{
                                 let index = this.state.session.skills.indexOf(skill);
                                 this.setState({
-                                    session: update(this.state.session, {skills: {
-                                        $splice: [[index,1]]
-                                    }})
+                                    session: update(this.state.session, {
+                                        skills: {
+                                            $splice: [[index, 1]]
+                                        }
+                                    })
                                 })
                             }}/>
                         </View>

@@ -10,7 +10,7 @@ const chipStyles = StyleSheet.create({
     chipContainer: {
         borderRadius: 80,
         paddingLeft: 12,
-        paddingRight: 6,
+        paddingRight: 12,
         height: 32,
         backgroundColor: "#DDD",
         flexDirection: "row",
@@ -57,8 +57,9 @@ export default class Chip extends React.Component {
             <View style={chipStyles.chipContainer}>
                 <Text style={chipStyles.chipText}>{this.state.text}</Text>
                 <TouchableOpacity onPress={this.deletePress}
-                                         background={TouchableNativeFeedback.SelectableBackground()}>
-                    <Text style={chipStyles.closeButton}>X</Text>
+                                  background={TouchableNativeFeedback.SelectableBackground()}>
+
+                    {this.props.onDelete ? <Text style={chipStyles.closeButton}>X</Text> : null}
                 </TouchableOpacity>
             </View>
         );
