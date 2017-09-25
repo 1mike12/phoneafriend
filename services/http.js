@@ -17,8 +17,8 @@ class http {
         })
     }
 
-    get(url){
-        return this.axios.get(url)
+    get(url, data){
+        return this.axios.get(url, data)
     }
 
     post(url, data){

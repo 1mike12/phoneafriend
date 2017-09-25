@@ -21,7 +21,7 @@ router.get("/mine", (req, res, next) =>{
 router.get("/search", (req, res, next) =>{
 
     const {query, exclude} = req.query;
-    if (!query) return res.sendStatus(400);
+    if (!query) return res.setStatus(400).send('empty query');
     let excludedTerms;
     if (exclude) excludedTerms = exclude.split(",").map(term => term.toLowerCase());
 
@@ -45,7 +45,7 @@ router.delete("/", (req, res, next) =>{
     .then(user =>{
         return user.skills().detach([skillId])
     })
-    .then(() => res.sendStatus(200))
+    .then(() => res.status(200))
     .catch(e =>{
         res.setStatus(400).send(e)
     })
