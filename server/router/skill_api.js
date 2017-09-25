@@ -21,7 +21,7 @@ router.get("/mine", (req, res, next) =>{
 router.get("/search", (req, res, next) =>{
 
     const {query, exclude} = req.query;
-    if (!query) return res.setStatus(400).send('empty query');
+    if (!query) return res.status(400).send('empty query');
     let excludedTerms;
     if (exclude) excludedTerms = exclude.split(",").map(term => term.toLowerCase());
 
