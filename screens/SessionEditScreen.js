@@ -21,9 +21,23 @@ import Autocomplete from 'react-native-autocomplete-input';
 import Chip from "../components/Chip"
 import {debounce} from "lodash";
 
+const styles = StyleSheet.create({
+    autocompleteContainer: {
+        flex: 1,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 1
+    },
+    itemText: {
+        fontSize: 15,
+        margin: 2
+    },
+});
+
 const NAME = "SessionEditScreen";
 export default class SessionEditScreen extends React.Component {
-
 
     static getName(){
         return `${config.name}.${NAME}`
@@ -52,22 +66,9 @@ export default class SessionEditScreen extends React.Component {
         .bind(this);
     }
 
-    componentDidMount(){
-    }
-
     nonSelectedSkills(skills){
         let selectedIds = this.state.selectedSkills.map(skill => skill.id);
         return skills.filter(skill => !selectedIds.includes(skill.id))
-    }
-
-    findFilm(query){
-        if (query === ''){
-            return [];
-        }
-
-        const {skills} = this.state;
-        const regex = new RegExp(`${query.trim()}`, 'i');
-        return skills.filter(skill => skill.name.search(regex) >= 0);
     }
 
     queryChanged(query){
@@ -84,7 +85,7 @@ export default class SessionEditScreen extends React.Component {
         const {query} = this.state;
 
         return (
-                <View style={styles.container}>
+                <View >
                     <Autocomplete
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -117,48 +118,3 @@ export default class SessionEditScreen extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#F5FCFF',
-        flex: 1,
-        paddingTop: 25
-    },
-    autocompleteContainer: {
-        flex: 1,
-        left: 0,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        zIndex: 1
-    },
-    itemText: {
-        fontSize: 15,
-        margin: 2
-    },
-    descriptionContainer: {
-        // `backgroundColor` needs to be set otherwise the
-        // autocomplete input will disappear on text input.
-        backgroundColor: '#F5FCFF',
-        marginTop: 25
-    },
-    infoText: {
-        textAlign: 'center'
-    },
-    titleText: {
-        fontSize: 18,
-        fontWeight: '500',
-        marginBottom: 10,
-        marginTop: 10,
-        textAlign: 'center'
-    },
-    directorText: {
-        color: 'grey',
-        fontSize: 12,
-        marginBottom: 10,
-        textAlign: 'center'
-    },
-    openingText: {
-        textAlign: 'center'
-    }
-});
