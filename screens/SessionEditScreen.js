@@ -128,7 +128,7 @@ export default class SessionEditScreen extends React.Component {
                 <TextInput
                     placeholder="Description"
                     multiline={true}
-                    style={{height: 150, textAlignVertical: 'top'}}
+                    style={{height: 100, textAlignVertical: 'top'}}
                     onChangeText={(description) =>{
                         this.setState({
                             session: update(this.state.session, {description: {$set: description}})
@@ -142,7 +142,7 @@ export default class SessionEditScreen extends React.Component {
                 <Autocomplete
                     autoCapitalize="none"
                     autoCorrect={false}
-                    containerStyle={styles.autocompleteContainer}
+                    containerStyle={styles.autoCompleteContainer}
                     data={this.nonSelectedSkills(this.state.skills)}
                     defaultValue={query}
                     onChangeText={this.queryChanged}
@@ -162,7 +162,7 @@ export default class SessionEditScreen extends React.Component {
                     )}
                 />
 
-                <View style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8}}
+                <View style={{flexDirection: "row", flexWrap: "wrap", paddingLeft: 8, paddingRight: 8, marginBottom: 8, marginTop: 60}}
                 >
                     {this.state.session.skills.map(skill =>{
                         return <View key={skill.id} style={{marginRight: 8, marginBottom: 4}}>
