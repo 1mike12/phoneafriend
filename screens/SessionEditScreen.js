@@ -14,6 +14,7 @@ import {debounce} from "lodash";
 import Autocomplete from "react-native-autocomplete-input";
 
 const NAME = "SessionEditScreen";
+const DESCRIPTION_LIMIT = 250;
 export default class SessionEditScreen extends React.Component {
 
     constructor(props){
@@ -96,7 +97,7 @@ export default class SessionEditScreen extends React.Component {
         if (!session.title) errors.push({message: "no title", field: "title"});
         if (session.title.length > 127) errors.push({message: "title too long", field: "title"});
         if (!session.description) errors.push({message: "no description", field: "description"});
-        if (session.description.length > 250) errors.push({message: "description too long", field: "description"});
+        if (session.description.length > DESCRIPTION_LIMIT) errors.push({message: "description too long", field: "description"});
         return errors;
     }
 
@@ -130,14 +131,18 @@ export default class SessionEditScreen extends React.Component {
                     multiline={true}
                     style={{height: 100, textAlignVertical: 'top'}}
                     onChangeText={(description) =>{
-                        this.setState({
-                            session: update(this.state.session, {description: {$set: description}})
-                        })
+                        if (description.length > DESCRIPTION_LIMIT && description.length > this.state.session.description.length) {
+                            return;
+                        } else {
+                            this.setState({
+                                session: update(this.state.session, {description: {$set: description}})
+                            })
+                        }
                     }}
                     value={this.state.session.description}
                 />
 
-                <Text style={{textAlign: "right"}}>{this.state.session.description.length}/250</Text>
+                <Text style={{textAlign: "right"}}>{this.state.session.description.length}/{DESCRIPTION_LIMIT}</Text>
 
                 <Autocomplete
                     autoCapitalize="none"
