@@ -73,8 +73,8 @@ router.post("/", (req, res, next) =>{
         let insertingSkillIds = skillsArray.map(skill => skill.id);
         let existingSkillIds = session.related("skills").map(skill => skill.get("id"));
 
-        let toRemove = existingSkillIds.filter(skillId => !insertingSkillIds.includes(skillId) ? skillId : null);
-        let toInsert = insertingSkillIds.filter(skillId => !existingSkillIds.includes(skillId) ? skillId : null);
+        let toRemove = existingSkillIds.filter(skillId => !insertingSkillIds.includes(skillId));
+        let toInsert = insertingSkillIds.filter(skillId => !existingSkillIds.includes(skillId));
 
         return Promise.all([
             session.skills().detach(toRemove),

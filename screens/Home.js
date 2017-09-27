@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, FlatList, Text, TouchableHighlight, View} from "react-native";
+import {Button, FlatList, ScrollView, Text, TouchableHighlight, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import config from "../configReact";
@@ -87,7 +87,7 @@ export default class Home extends React.Component {
 
     render(){
         return (
-            <View style={{padding: 8}}>
+            <ScrollView style={{padding: 8}}>
                 <Button title="load" onPress={this.loadAll}/>
                 <View style={{flexDirection: "row"}}>
                     <TouchableHighlight onPress={this.goToMySkills} style={{flex: 1, marginRight: 8}}>
@@ -154,7 +154,7 @@ export default class Home extends React.Component {
                         }}
                     />
                 </View>
-            </View>
+            </ScrollView>
         );
     }
 }
