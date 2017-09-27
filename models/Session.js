@@ -8,7 +8,6 @@ export default class Session {
     constructor(obj){
         if (!obj){
             obj = {
-                id: null,
                 title: "",
                 description: "",
                 skills: []

@@ -65,6 +65,7 @@ router.post("/", (req, res, next) =>{
             res.sendStatus(400)
         })
     } else {
+        instance.set('pupil_id', req.userId);
         instance.save()
         .then(saved => res.send(saved))
     }
