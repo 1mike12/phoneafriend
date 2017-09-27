@@ -15,7 +15,7 @@ router.delete("/", (req, res, next) =>{
 });
 
 router.get("/", (req, res, next) =>{
-    Class.fetchAll({withRelated: ["teacher", "pupil"]})
+    Class.fetchAll({withRelated: ["teacher", "pupil", "skills"]})
     .then(collection => res.send(collection))
 });
 
@@ -49,9 +49,11 @@ router.get("/teachable", (req, res, next) =>{
 
 router.post("/", (req, res, next) =>{
     let instance = Class.forge(req.body);
+    let skillsArray = req.body.skills;
 
+    let promise;
     if (instance.get("id")){
-        Class.where({id: instance.get("id"), pupil_id: req.userId})
+        promise = Class.where({id: instance.get("id"), pupil_id: req.userId})
         .fetch()
         .then(session =>{
             if (session){
@@ -60,15 +62,27 @@ router.post("/", (req, res, next) =>{
                 throw new Error("couldn't save session")
             }
         })
-        .then(saved => res.send(saved))
-        .catch(e => {
-            res.sendStatus(400)
-        })
+
     } else {
         instance.set('pupil_id', req.userId);
-        instance.save()
-        .then(saved => res.send(saved))
+        promise = instance.save()
     }
+
+    promise.then(session => session.load("skills"))
+    .then(session =>{
+        let insertingSkillIds = skillsArray.map(skill => skill.id);
+        let existingSkillIds = session.related("skills").map(skill => skill.get("id"));
+
+        let toRemove = existingSkillIds.filter(skillId => !insertingSkillIds.includes(skillId) ? skillId : null);
+        let toInsert = insertingSkillIds.filter(skillId => !existingSkillIds.includes(skillId) ? skillId : null);
+
+        return Promise.all([
+            session.skills().detach(toRemove),
+            session.skills().attach(toInsert)
+        ])
+    })
+    .then(() => res.sendStatus(200))
+    .catch(e => res.send(e));
 });
 
 router.get("/:uuid", (req, res, next) =>{
