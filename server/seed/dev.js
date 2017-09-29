@@ -2,6 +2,7 @@ const User = require("./../models/User");
 const Skill = require("../models/Skill");
 const Promise = require('bluebird');
 const Session = require('../models/Session');
+const faker = require("faker");
 
 module.exports = dev = new function(){
     let self = this;
@@ -27,6 +28,40 @@ module.exports = dev = new function(){
         .then(() => brian.save())
     };
 
+    self.requesters = function(){
+        let usersArray = [];
+        for (let i = 0; i < 10; i++) {
+            usersArray.push({
+                email: faker.internet.email(),
+                first_name: faker.name.firstName(),
+                last_name: faker.name.lastName(),
+                profile_url: "https://media-exp1.licdn.com/media/p/5/000/1bd/26f/349c10e.jpg"
+            })
+        }
+        let skillsIds;
+        let users = User.forgeCollection(usersArray);
+        return Promise.join(
+            Skill.query(qb => qb.limit(3)).fetchAll(),
+            users.invokeThen("save"),
+            (s, users) =>{
+                skillsIds = s.map(skill => skill.id);
+                let sessions = Session.forgeCollection(users.map(user =>{
+                    return Session.forge({
+                        pupil_id: user.get("id"),
+                        title: "I need help with something",
+                        description: "something"
+                    })
+                }));
+                return sessions.invokeThen("save")
+            }
+        )
+        .then(sessions =>{
+            return Promise.all(sessions.map(session =>{
+                return session.skills().attach(skillsIds)
+            }))
+        })
+    };
+
     self.skills = () =>{
         let skillsArray = require("./skills");
         let skills = Skill.forgeCollection(skillsArray)
@@ -39,7 +74,6 @@ module.exports = dev = new function(){
             Skill.query(qb => qb.limit(15)).fetchAll(),
             (users, skills) =>{
                 return Promise.all(users.map(user =>{
-                    console.log("this part")
                     user.skills().attach(skills.map(skill => skill.id))
                 }))
             }
@@ -97,8 +131,9 @@ module.exports = dev = new function(){
         .then(() => self.skills())
         .then(() => self.setSkills())
         .then(() => self.createSessions())
+        .then(() => self.requesters())
     }
 };
 require("./_wiper").wipe()
 .then(() => dev.run())
-.then(() => process.exit())
+.then(() => process.exit());
