@@ -10,6 +10,7 @@ import Chip from "../components/Chip";
 import Session from "../models/Session";
 import config from "../configReact";
 import SessionEdit from "./SessionEditScreen";
+import SessionSummary from "../components/SessionSummary";
 
 const ta = timeAgo();
 
@@ -70,35 +71,7 @@ export default class SessionScreen extends React.Component {
                         <Button title="load" onPress={this.loadAll}/>
 
                         <View style={styles.card}>
-                            <Text style={[styles.h2, {marginBottom: 8}]}>{this.state.session.title}</Text>
-                            <View style={{flexDirection: "row", alignItems: "center", marginBottom: 16}}>
-
-                                <Image style={[styles.profilePic, {marginRight: 8}]}
-                                       source={{uri: this.state.session.pupil.profile_url}}/>
-                                <Text>{this.state.session.pupil.getFirstAndInitial()} |
-                                    Created {ta.ago(this.state.session.created_at)}</Text>
-                            </View>
-
-                            {this.state.session.teacher ?
-                                <View style={{flexDirection: "row", alignItems: "center", marginBottom: 16}}>
-
-                                    <Image style={[styles.profilePic, {marginRight: 8}]}
-                                           source={{uri: this.state.session.teacher.profile_url}}/>
-                                    <Text>{this.state.session.teacher.getFirstAndInitial()}</Text>
-                                </View> : null}
-
-
-                            <Text style={{marginBottom: 20}}>{this.state.session.description}</Text>
-
-                            <View style={{flexDirection: "row", flexWrap: "wrap"}}>
-                                {this.state.session.skills.map(skill =>{
-                                    return (
-                                        <View key={skill.id} style={{marginRight: 8, marginBottom: 8}}>
-                                            <Chip  text={"#" + skill.name}/>
-                                        </View>
-                                    )
-                                })}
-                            </View>
+                            <SessionSummary session={this.state.session}/>
                             <Button title="Edit" onPress={() =>{
                                 this.props.navigator.push({
                                     screen: SessionEdit.getName(),

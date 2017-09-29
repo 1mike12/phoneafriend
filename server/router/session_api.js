@@ -42,7 +42,7 @@ router.get("/teachable", (req, res, next) =>{
             qb.orderBy("sessions.created_at")
         })
         .fetchAll({
-            withRelated: ["skills"]
+            withRelated: ["skills", "pupil"]
         })
     })
     .then(collection => res.send(collection))
@@ -70,7 +70,7 @@ router.get('/teachable-single', (req, res, next) =>{
         .fetchPage({
             limit: 1,
             offset: after,
-            withRelated: ["skills"]
+            withRelated: ["skills", "pupil"]
         })
     })
     .then(result =>{

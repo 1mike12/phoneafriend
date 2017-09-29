@@ -146,25 +146,6 @@ export default class Home extends React.Component {
                         }}
                     />
                 </View>
-
-                <View style={styles.card}>
-                    <Text style={styles.h1}>Open Requests</Text>
-                    <FlatList
-                        data={this.state.requests}
-                        ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: '#CCC'}}/>}
-                        renderItem={({item}) =>{
-                            return (
-                                <Text onPress={() =>{
-                                    this.goToSession(item.uuid)
-                                }}
-                                      style={styles.listItem}
-                                >{item.title} | {ta.ago(item.created_at)}
-                                </Text>
-                            )
-
-                        }}
-                    />
-                </View>
             </ScrollView>
         );
     }

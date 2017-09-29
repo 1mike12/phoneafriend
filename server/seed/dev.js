@@ -48,8 +48,8 @@ module.exports = dev = new function(){
                 let sessions = Session.forgeCollection(users.map(user =>{
                     return Session.forge({
                         pupil_id: user.get("id"),
-                        title: "I need help with something",
-                        description: "something"
+                        title: faker.lorem.sentence(),
+                        description: faker.lorem.sentences(3)
                     })
                 }));
                 return sessions.invokeThen("save")
