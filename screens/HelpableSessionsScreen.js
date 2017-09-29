@@ -44,7 +44,7 @@ export default class HelpableSessionsScreen extends React.Component {
     }
 
     loadSession(){
-        if (this.state.ready === false) return; //clicking too fast
+        console.log("loadSession")
         this.setState({ready: false});
         return http.get("api/session/teachable-single", {
             params: {

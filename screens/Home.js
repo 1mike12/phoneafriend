@@ -17,12 +17,14 @@ export default class Home extends React.Component {
         super(props);
         this.state = {
             loading: true,
+            teachableCount: null,
             skills: [],
             requests: []
         };
 
         this.loadSkills = this.loadSkills.bind(this);
         this.loadRequests = this.loadRequests.bind(this);
+        this.loadTeachableCount = this.loadTeachableCount.bind(this);
         this.loadAll = this.loadAll.bind(this);
         this.goToSession = this.goToSession.bind(this);
         this.goToMySkills = this.goToMySkills.bind(this);
@@ -34,8 +36,14 @@ export default class Home extends React.Component {
     loadAll(){
         return Promise.all([
             this.loadSkills(),
-            this.loadRequests()
+            this.loadRequests(),
+            this.loadTeachableCount()
         ])
+    }
+
+    loadTeachableCount(){
+        return http.get("api/session/teachable/count")
+        .then(res => this.setState({teachableCount: res.data}))
     }
 
     loadSkills(){
@@ -113,7 +121,7 @@ export default class Home extends React.Component {
                         style={{flex: 1}}
                     >
                         <View style={styles.card}>
-                            <Text style={{fontSize: 48, fontWeight: "900"}}>913</Text>
+                            <Text style={{fontSize: 48, fontWeight: "900"}}>{this.state.teachableCount}</Text>
                             <Text style={styles.h1}>I Can Help</Text>
                         </View>
                     </TouchableHighlight>
