@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, FlatList, ScrollView, Text, TouchableHighlight, View} from "react-native";
+import {Button, FlatList, ScrollView, Text, TouchableHighlight, TouchableOpacity, View} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import config from "../configReact";
@@ -77,7 +77,7 @@ export default class Home extends React.Component {
             titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==', // iOS only. navigation bar title image instead of the title text of the pushed screen (optional)
             passProps: {uuid}, // Object that will be passed as props to the pushed screen (optional)
             animated: true, // does the push have transition animation or does it happen immediately (optional)
-            animationType: 'fade', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
+            animationType: 'slide-horizontal', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
         });
     }
 
@@ -86,7 +86,7 @@ export default class Home extends React.Component {
             screen: MySkills.getName(), // unique ID registered with Navigation.registerScreen
             titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==', // iOS only. navigation bar title image instead of the title text of the pushed screen (optional)
             animated: true, // does the push have transition animation or does it happen immediately (optional)
-            animationType: 'fade', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
+            animationType: 'slide-horizontal', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
         });
     }
 
@@ -99,7 +99,7 @@ export default class Home extends React.Component {
             <ScrollView style={{padding: 8}}>
                 <Button title="load" onPress={this.loadAll}/>
                 <View style={{flexDirection: "row"}}>
-                    <TouchableHighlight onPress={this.goToMySkills} style={{flex: 1, marginRight: 8}}>
+                    <TouchableOpacity onPress={this.goToMySkills} style={{flex: 1, marginRight: 8}}>
                         <View style={[styles.card, {backgroundColor: styles.primary}]}>
                             <Text style={{
                                 fontSize: 48,
@@ -108,14 +108,14 @@ export default class Home extends React.Component {
                             }}>{this.state.skills.length}</Text>
                             <Text style={[styles.h1, {color: "#FFF"}]}>skills</Text>
                         </View>
-                    </TouchableHighlight>
-                    <TouchableHighlight
+                    </TouchableOpacity>
+                    <TouchableOpacity
                         onPress={() =>{
                             this.props.navigator.push({
                                 screen: HelpableSessionsScreen.getName(),
                                 titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
                                 animated: true,
-                                animationType: 'fade',
+                                animationType: 'slide-horizontal',
                             });
                         }}
                         style={{flex: 1}}
@@ -124,7 +124,7 @@ export default class Home extends React.Component {
                             <Text style={{fontSize: 48, fontWeight: "900"}}>{this.state.teachableCount}</Text>
                             <Text style={styles.h1}>I Can Help</Text>
                         </View>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.card}>

@@ -9,6 +9,7 @@ import Util from "../Util";
 import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
+import ActiveSessionScreen from "./ActiveSessionScreen";
 
 const ta = timeAgo();
 const NAME = "HelpableSessionsScreen";
@@ -25,6 +26,7 @@ export default class HelpableSessionsScreen extends React.Component {
         this.loadNextSession = this.loadNextSession.bind(this);
         this.loadPreviousSession = this.loadPreviousSession.bind(this);
         this.loadSession = this.loadSession.bind(this);
+        this.helpSession = this.helpSession.bind(this);
     }
 
     componentDidMount(){
@@ -62,6 +64,16 @@ export default class HelpableSessionsScreen extends React.Component {
         })
     }
 
+    helpSession(){
+        this.props.navigator.push({
+            screen: ActiveSessionScreen.getName(),
+            titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+            animated: true,
+            animationType: 'slide-horizontal',
+            passProps: {session: this.state.session},
+        });
+    }
+
     static getName(){
         return `${config.name}.${NAME}`
     }
@@ -77,7 +89,10 @@ export default class HelpableSessionsScreen extends React.Component {
 
                 <View style={{flexDirection: "row", position: "absolute", bottom: 0}}>
                     <View style={{flex: 1, padding: 8}}>
-                        <Button title="Back" onPress={this.loadPreviousSession}/>
+                        <Button title="Prev" onPress={this.loadPreviousSession}/>
+                    </View>
+                    <View style={{flex: 2, padding: 8}}>
+                        <Button title="Help" onPress={this.helpSession}/>
                     </View>
                     <View style={{flex: 1, padding: 8}}>
                         <Button title="Next" onPress={this.loadNextSession}/>

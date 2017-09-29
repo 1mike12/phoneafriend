@@ -73,6 +73,21 @@ router.get("/teachable/count", (req, res, next) =>{
     .then(knexObj => res.send(knexObj.get("count")))
 });
 
+router.post("/session/help", (req, res, next) =>{
+    const {uuid} = req.body
+
+    return Class.where({uuid: uuid, teacher_id: null})
+    .fetch()
+    .then(session =>{
+        return session.set({teacher_id: req.userId}).save()
+    })
+    .then(()=> res.send(200))
+});
+
+router.post("/session/unhelp", (req, res, next) =>{
+
+});
+
 router.get('/teachable-single', (req, res, next) =>{
     let {after} = req.query;
     if (!after) after = 0;
