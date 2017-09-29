@@ -35,16 +35,54 @@ router.get("/teachable", (req, res, next) =>{
         return Class.query(qb =>{
             qb.whereNull("teacher_id");
             qb.whereNot("pupil_id", user.get('id'));
-            qb.distinct("sessions.id");
+            qb.distinct("sessions.*");
             qb.innerJoin("sessions_skills", "sessions.id", "sessions_skills.session_id");
             qb.innerJoin("skills", "skills.id", "sessions_skills.skill_id");
             qb.whereIn("skills.id", skillIds);
+            qb.orderBy("sessions.created_at")
         })
         .fetchAll({
             withRelated: ["skills"]
         })
     })
     .then(collection => res.send(collection))
+});
+
+router.get('/teachable-single', (req, res, next) =>{
+    let {after} = req.query;
+    if (!after) after = 0;
+
+    User.where({id: req.userId}).fetch({withRelated: "skills"})
+    .then(user =>{
+        let skillIds = user.related("skills").map(s => s.get("id"));
+
+        //todo optimize this many to many call
+        return Class.query(qb =>{
+            qb.distinct("sessions.*");
+            qb.whereNull("teacher_id");
+            qb.whereNot("pupil_id", user.get('id'));
+
+            qb.innerJoin("sessions_skills", "sessions.id", "sessions_skills.session_id");
+            qb.innerJoin("skills", "skills.id", "sessions_skills.skill_id");
+            qb.whereIn("skills.id", skillIds);
+            qb.orderBy("sessions.created_at")
+        })
+        .fetchPage({
+            limit: 1,
+            offset: after,
+            withRelated: ["skills"]
+        })
+    })
+    .then(result =>{
+        let session = (result.models && result.models[0]) ? result.models[0] : null;
+        let response = {
+            session: session,
+            rowCount: result.pagination.rowCount,
+            offset: result.pagination.offset,
+            limit: result.pagination.limit
+        };
+        res.send(response)
+    })
 });
 
 router.post("/", (req, res, next) =>{
