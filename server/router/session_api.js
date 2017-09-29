@@ -48,6 +48,31 @@ router.get("/teachable", (req, res, next) =>{
     .then(collection => res.send(collection))
 });
 
+router.get("/teachable/count", (req, res, next) =>{
+    User.where({id: req.userId}).fetch({withRelated: "skills"})
+    .then(user =>{
+        let skillIds = user.related("skills").map(s => s.get("id"));
+
+        return Class.query(qb =>{
+            qb.count("*").from(
+                function(){
+                    this.distinct("sessions.id")
+                    .from("sessions")
+                    .innerJoin("sessions_skills", "sessions.id", "sessions_skills.session_id")
+                    .innerJoin("skills", "skills.id", "sessions_skills.skill_id")
+
+                    .whereIn("skills.id", skillIds)
+                    .whereNull("teacher_id")
+                    .whereNot('pupil_id', user.get("id"))
+                    .as("X")
+                }
+            )
+        })
+        .fetch()
+    })
+    .then(knexObj => res.send(knexObj.get("count")))
+});
+
 router.get('/teachable-single', (req, res, next) =>{
     let {after} = req.query;
     if (!after) after = 0;
