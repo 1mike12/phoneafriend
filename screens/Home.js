@@ -7,6 +7,7 @@ import timeAgo from "time-ago";
 import Request from "./SessionScreen";
 import MySkills from "./MySkills";
 import SessionEditScreen from "./SessionEditScreen";
+import HelpableSessionsScreen from "./HelpableSessionsScreen";
 
 const ta = timeAgo();
 const NAME = "Home";
@@ -100,7 +101,17 @@ export default class Home extends React.Component {
                             <Text style={[styles.h1, {color: "#FFF"}]}>skills</Text>
                         </View>
                     </TouchableHighlight>
-                    <TouchableHighlight onPress={this.goToMySkills} style={{flex: 1}}>
+                    <TouchableHighlight
+                        onPress={() =>{
+                            this.props.navigator.push({
+                                screen: HelpableSessionsScreen.getName(),
+                                titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+                                animated: true,
+                                animationType: 'fade',
+                            });
+                        }}
+                        style={{flex: 1}}
+                    >
                         <View style={styles.card}>
                             <Text style={{fontSize: 48, fontWeight: "900"}}>913</Text>
                             <Text style={styles.h1}>I Can Help</Text>
@@ -111,7 +122,7 @@ export default class Home extends React.Component {
                 <View style={styles.card}>
                     <Text style={styles.h1}>My Requests </Text>
                     <Button title="I need help with _____"
-                            onPress={() => {
+                            onPress={() =>{
                                 this.props.navigator.push({
                                     screen: SessionEditScreen.getName(), // unique ID registered with Navigation.registerScreen
                                     title: "New Request", // navigation bar title of the pushed screen (optional)
