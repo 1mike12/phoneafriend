@@ -6,7 +6,7 @@ import {
 import http from '../services/http';
 import styles from "../styles";
 import Chip from "../components/Chip";
-import config from "../server/config";
+import config from "../configReact";
 import update from 'immutability-helper';
 import Session from "../models/Session";
 import {ToastAndroid} from "react-native";
