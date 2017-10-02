@@ -20,6 +20,7 @@ export default class AccountScreen extends React.Component {
             session: this.props.session,
             ready: false,
         };
+        this.load = this.load.bind(this);
         this.load();
     }
 

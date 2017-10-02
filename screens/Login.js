@@ -33,9 +33,6 @@ export default class Login extends React.Component {
     }
 
     login(){
-
-        const testUrl = "https://jsonplaceholder.typicode.com/posts";
-        const localServer = config.domain + "/api/public/login";
         this.setState({loading: true});
         return http.post("api/public/login", {
             email: this.state.email,
