@@ -8,6 +8,7 @@ import DeleteSkillModal from "./screens/DeleteSkillModal";
 import SessionEditScreen from "./screens/SessionEditScreen";
 import HelpableSessionsScreen from "./screens/HelpableSessionsScreen";
 import ActiveSessionScreen from "./screens/ActiveSessionScreen";
+import AccountScreen from "./screens/AccountScreen";
 
 // register all screens of the app (including internal ones)
 export function registerScreens(){
@@ -19,7 +20,8 @@ export function registerScreens(){
         MySkills,
         DeleteSkillModal,
         HelpableSessionsScreen,
-        ActiveSessionScreen
+        ActiveSessionScreen,
+        AccountScreen
     ]
     .forEach(register);
 }

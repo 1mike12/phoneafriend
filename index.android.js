@@ -6,6 +6,7 @@ import http from "./services/http";
 import Login from "./screens/Login";
 import Home from "./screens/Home";
 import MySkills from "./screens/MySkills";
+import AccountScreen from "./screens/AccountScreen";
 
 registerScreens();
 
@@ -41,11 +42,11 @@ function launchApp(){
                 title: 'Home'
             },
             {
-                label: 'Skills',
-                screen: MySkills.getName(), // this is a registered name for a screen
+                label: 'Account',
+                screen: AccountScreen.getName(), // this is a registered name for a screen
                 icon: icon,
                 selectedIcon: icon, // iOS only
-                title: 'Skills'
+                title: 'Account'
             },
         ],
         appStyle: {
