@@ -4,17 +4,23 @@ import Authentication from "./Authentication";
 
 class http {
     constructor(){
+
+        let baseURL = "http://phoneafriend.ngrok.io/";
+        let savedToken = Authentication.getToken();
+
         this.axios = axios.create({
-            baseURL: config.domain,
-            headers: {'Token': Authentication.getToken()}
-        })
+            headers: {'Token': savedToken ? savedToken : null},
+            baseURL: baseURL
+        });
+        //
+        // this.axios.interceptors.request.use(request => {
+        //     console.log('Request:', request)
+        //     return request
+        // })
     }
 
     setToken(token){
-        this.axios = axios.create({
-            baseURL: config.domain,
-            headers: {'Token': token}
-        })
+        this.axios.defaults.headers = {'Token': token}
     }
 
     get(url, data){
