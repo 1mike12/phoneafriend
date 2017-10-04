@@ -1,1 +1,1 @@
-ngrok http -subdomain=phoneafriend 8009
+./ngrok http -subdomain=phoneafriend 8009
