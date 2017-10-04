@@ -3,6 +3,9 @@ package com.phoneafriend;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.oney.WebRTCModule.WebRTCModulePackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.facebook.react.ReactNativeHost;
@@ -44,8 +47,9 @@ public class MainApplication extends NavigationApplication {
          // Add additional packages you require here
          // No need to add RnnPackage and MainReactPackage
          return Arrays.<ReactPackage>asList(
-             new WebRTCModulePackage(),
-             new ReactNativeConfigPackage()
+             new VectorIconsPackage(),
+             new ReactNativeConfigPackage(),
+             new WebRTCModulePackage()
          );
      }
 
