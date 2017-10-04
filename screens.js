@@ -10,6 +10,7 @@ import HelpableSessionsScreen from "./screens/HelpableSessionsScreen";
 import ActiveSessionScreen from "./screens/ActiveSessionScreen";
 import AccountScreen from "./screens/AccountScreen";
 import CallScreen from "./screens/CallScreen";
+import CreateAccountScreen from "./screens/CreateAccountScreen";
 
 // register all screens of the app (including internal ones)
 export function registerScreens(){
@@ -23,7 +24,8 @@ export function registerScreens(){
         HelpableSessionsScreen,
         ActiveSessionScreen,
         AccountScreen,
-        CallScreen
+        CallScreen,
+        CreateAccountScreen
     ]
     .forEach(register);
 }
