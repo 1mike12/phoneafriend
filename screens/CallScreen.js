@@ -29,6 +29,32 @@ const CAMERA_STATE_REAR = "rear";
 const CAMERA_STATE_FRONT = "front";
 const CAMERA_STATE_OFF = "off";
 
+const screenStyles = {
+    myImage: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        margin: 8,
+        height: 80,
+        width: 80,
+        borderRadius: 999,
+    },
+    chat: {
+        position: "absolute",
+        right: 0,
+        bottom: 80,
+        margin: 8,
+    },
+    chatText: {
+        color: "#FFF",
+        fontSize: 14,
+        textShadowColor: "#000",
+        textShadowOffset: {width: 1, height: 1},
+        textShadowRadius: 2,
+        textAlign: "right"
+    }
+};
+
 export default class CallScreen extends React.Component {
 
     constructor(props){
@@ -39,7 +65,15 @@ export default class CallScreen extends React.Component {
             cameraState: CAMERA_STATE_FRONT
         };
 
-        setTimeout(() => this.setState({ready: true}), 3000)
+        this.props.navigator.toggleTabs({
+            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
+            animated: true // does the toggle have transition animation or does it happen immediately (optional)
+        });
+
+        this.props.navigator.toggleNavBar({
+            to: 'hidden', // required, 'hidden' = hide navigation bar, 'shown' = show navigation bar
+            animated: true // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
+        });
 
         this.getCameraFab = this.getCameraFab.bind(this);
     }
@@ -49,9 +83,8 @@ export default class CallScreen extends React.Component {
     }
 
     getCameraFab(){
-        console.log("cameraState", this.state.cameraState)
         if (this.state.cameraState === CAMERA_STATE_REAR) {
-            return <Fab style={{backgroundColor: "#AAA", margin: 12}}
+            return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         onPress={() => this.setState({cameraState: CAMERA_STATE_FRONT})}
                         inside={<Icon name="camera-front-variant"
                                       size={32}
@@ -59,7 +92,7 @@ export default class CallScreen extends React.Component {
                         }
             />
         } else if (this.state.cameraState === CAMERA_STATE_FRONT) {
-            return <Fab style={{backgroundColor: "#AAA", margin: 12}}
+            return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         onPress={() => this.setState({cameraState: CAMERA_STATE_REAR})}
                         inside={<Icon name="camera-rear-variant"
                                       size={32}
@@ -67,7 +100,7 @@ export default class CallScreen extends React.Component {
                         }
             />
         } else {
-            return <Fab style={{backgroundColor: "#AAA", margin: 12}}
+            return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         inside={<Icon name="test-tube"
                                       size={32}
                                       color="white"/>}
@@ -87,22 +120,41 @@ export default class CallScreen extends React.Component {
                         <ActivityIndicator size="large"/>
                     </View> :
                     <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "#EEE"}}>
-                        <Text>Loaded</Text>
+                        <Image source={require('../images/bike.jpg')}
+                               resizeMode="cover"
+                               style={{width: "100%", height: "100%"}}
+                        />
+
+                        <Image style={[styles.profilePicLarge, screenStyles.myImage]}
+                               source={{uri: this.state.session.pupil.profile_url}}/>
+
+                        <View style={screenStyles.chat}>
+                            <Text style={screenStyles.chatText}>Lorem ipsum doloret</Text>
+                            <Text style={screenStyles.chatText}>LOL ok</Text>
+                            <Text style={screenStyles.chatText}>Yup that's it</Text>
+                        </View>
 
                         <View style={{
                             position: "absolute",
                             bottom: 0,
+                            right: 0,
                             flexDirection: 'row',
                             justifyContent: "space-between"
                         }}>
-                            <Fab style={{backgroundColor: "#AAA", margin: 12}}
+                            <Fab style={{backgroundColor: "#AAA", margin: 8}}
                                  inside={<Icon name="camera"
                                                size={32}
                                                color="white"/>
                                  }
                             />
+                            <Fab style={{backgroundColor: "#AAA", margin: 8}}
+                                 inside={<Icon name="lead-pencil"
+                                               size={32}
+                                               color="white"/>
+                                 }
+                            />
                             {this.getCameraFab()}
-                            <Fab style={{backgroundColor: "green", margin: 12}}
+                            <Fab style={{backgroundColor: "green", margin: 8}}
                                  inside={<Icon name="message-text"
                                                size={32}
                                                color="white"/>
