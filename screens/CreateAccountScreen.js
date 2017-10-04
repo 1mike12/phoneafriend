@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, Text, View, StyleSheet, Button, TextInput} from "react-native";
+import {FlatList, Text, View, StyleSheet, Button, TextInput, CheckBox} from "react-native";
 import config from "../configReact";
 import http from "../services/http"
 import Authentication from "../services/Authentication";
@@ -12,9 +12,9 @@ const screenStyles = StyleSheet.create({
         height: 48,  // have to do it on iOS
         marginTop: 10,
     },
-    multiLine:{
+    multiLine: {
         height: 100,
-        marginTop:10
+        marginTop: 10
     },
 });
 
@@ -26,13 +26,14 @@ export default class CreateAccountScreen extends React.Component {
         this.state = {
             loading: false,
             email: "",
-            password: ""
+            password: "",
+            isChecked: false,
         };
 
-        this.login = this.login.bind(this)
+        this.submit = this.submit.bind(this)
     }
 
-    login(){
+    submit(){
         this.setState({loading: true});
         return http.post("api/public/login", {
             email: this.state.email,
@@ -52,7 +53,7 @@ export default class CreateAccountScreen extends React.Component {
 
     valid(){
         const emailPattern = /.+\@.+\..+/;
-        return this.state.email.match(emailPattern) && this.state.password
+        return this.state.email.match(emailPattern) && this.state.password && this.state.isChecked
     }
 
     static getName(){
@@ -61,7 +62,7 @@ export default class CreateAccountScreen extends React.Component {
 
     render(){
         return (
-            <View>
+            <View style={{padding: 8}}>
                 <TextInput
                     placeholder="Email"
                     keyboardType="email-address"
@@ -84,8 +85,15 @@ export default class CreateAccountScreen extends React.Component {
                     secureTextEntry={true}
                 />
                 <View style={{marginTop: 24}}/>
+
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <CheckBox value={this.state.isChecked}
+                              onValueChange={() => this.setState({isChecked: !this.state.isChecked})}/>
+                    <Text>Accept Terms</Text>
+                </View>
+
                 <Button title="Create Account"
-                        onPress={this.login}
+                        onPress={this.submit}
                 />
 
                 {this.valid() ? <Text>Valid</Text> : <Text>Invalid</Text>}
