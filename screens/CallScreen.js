@@ -19,6 +19,8 @@ import Util from "../Util";
 import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
+import Fab from "../components/Fab";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -28,7 +30,7 @@ export default class CallScreen extends React.Component {
         super(props);
         this.state = {
             session: this.props.session,
-            ready: false,
+            ready: true,
         };
 
         setTimeout(() => this.setState({ready: true}), 3000)
@@ -42,15 +44,41 @@ export default class CallScreen extends React.Component {
         return (
             <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "#EEE"}}>
                 {!this.state.ready ?
-                    <View>
+                    <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "#EEE"}}>
                         <Image style={[styles.profilePicLarge, {marginRight: 8}]}
                                source={{uri: this.state.session.pupil.profile_url}}/>
                         <Text style={[styles.h1]}>Connecting
                             with {this.state.session.pupil.getFirstAndInitial()}...</Text>
                         <ActivityIndicator size="large"/>
                     </View> :
-                    <View>
+                    <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "#EEE"}}>
                         <Text>Loaded</Text>
+                        <View style={{position: "absolute", bottom: 0, flexDirection: 'row'}}>
+                            <Fab style={{backgroundColor: "#AAA", margin: 12}}
+                                 inside={<Icon name="camera"
+                                               size={32}
+                                               color="white"/>
+                                 }
+                            />
+                            <Fab style={{backgroundColor: "#AAA", margin: 12}}
+                                 inside={<Icon name="camera-front-variant"
+                                               size={32}
+                                               color="white"/>
+                                 }
+                            />
+                            <Fab style={{backgroundColor: "#AAA", margin: 12}}
+                                 inside={<Icon name="camera-rear-variant"
+                                               size={32}
+                                               color="white"/>
+                                 }
+                            />
+                            <Fab style={{backgroundColor: "#AAA", margin: 12}}
+                                 inside={<Icon name="message-text"
+                                               size={32}
+                                               color="white"/>
+                                 }
+                            />
+                        </View>
                     </View>
                 }
             </View>
