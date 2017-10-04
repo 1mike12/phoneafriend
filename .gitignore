@@ -127,6 +127,7 @@ fabric.properties
 # node_modules/,Xcode and Webstorm will spend lots of time for indexing this dir
 node_modules/
 yarn.lock
+.tmp/
 package-lock.json
 .env
 # ios/Pods,
