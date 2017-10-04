@@ -97,7 +97,6 @@ export default class Home extends React.Component {
     render(){
         return (
             <ScrollView style={{padding: 8}}>
-                <Button title="load" onPress={this.loadAll}/>
                 <View style={{flexDirection: "row"}}>
                     <TouchableOpacity onPress={this.goToMySkills} style={{flex: 1, marginRight: 8}}>
                         <View style={[styles.card, {backgroundColor: styles.primary}]}>
@@ -127,32 +126,37 @@ export default class Home extends React.Component {
                     </TouchableOpacity>
                 </View>
 
+                <Button title="Get Help"
+                        onPress={() =>{
+                            this.props.navigator.push({
+                                screen: SessionEditScreen.getName(), // unique ID registered with Navigation.registerScreen
+                                title: "New Request", // navigation bar title of the pushed screen (optional)
+                                titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+                            })
+                        }}
+                />
+
                 <View style={styles.card}>
                     <Text style={styles.h1}>My Requests </Text>
-                    <Button title="I need help with _____"
-                            onPress={() =>{
-                                this.props.navigator.push({
-                                    screen: SessionEditScreen.getName(), // unique ID registered with Navigation.registerScreen
-                                    title: "New Request", // navigation bar title of the pushed screen (optional)
-                                    titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
-                                })
-                            }}
-                    />
-                    <FlatList
-                        data={this.state.requests}
-                        ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: '#CCC'}}/>}
-                        renderItem={({item}) =>{
-                            return (
-                                <Text onPress={() =>{
-                                    this.goToSession(item.uuid)
-                                }}
-                                      style={styles.listItem}
-                                >{item.title} | {ta.ago(item.created_at)}
-                                </Text>
-                            )
+                    {this.state.requests.length === 0 ?
+                        <Text>No open requests, create one</Text> :
+                        <FlatList
+                            data={this.state.requests}
+                            ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: '#CCC'}}/>}
+                            renderItem={({item}) =>{
+                                return (
+                                    <Text onPress={() =>{
+                                        this.goToSession(item.uuid)
+                                    }}
+                                          style={styles.listItem}
+                                    >{item.title} | {ta.ago(item.created_at)}
+                                    </Text>
+                                )
 
-                        }}
-                    />
+                            }}
+                        />
+                    }
+
                 </View>
             </ScrollView>
         );
