@@ -1,5 +1,15 @@
 import React from 'react';
-import {Vibration, ActivityIndicator, Button, FlatList, Text, TextInput, View, ScrollView, ToastAndroid} from "react-native";
+import {
+    Vibration,
+    ActivityIndicator,
+    Button,
+    FlatList,
+    Text,
+    TextInput,
+    View,
+    ScrollView,
+    ToastAndroid
+} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -10,9 +20,11 @@ import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
 import ActiveSessionScreen from "./ActiveSessionScreen";
+import SwipeCards from "react-native-swipe-cards";
 
 const ta = timeAgo();
 const NAME = "HelpableSessionsScreen";
+
 export default class HelpableSessionsScreen extends React.Component {
 
     constructor(props){
@@ -22,6 +34,7 @@ export default class HelpableSessionsScreen extends React.Component {
         this.rowCount = 9999999999999;
         this.state = {
             ready: false,
+            cards: ["one"]
         };
         this.loadNextSession = this.loadNextSession.bind(this);
         this.loadPreviousSession = this.loadPreviousSession.bind(this);
@@ -60,7 +73,7 @@ export default class HelpableSessionsScreen extends React.Component {
 
             this.offset = res.data.offset;
             this.rowCount = rowCount;
-            this.setState({session, rowCount, ready: true}, ()=> console.log(this.state))
+            this.setState({session, rowCount, ready: true}, () => console.log(this.state))
         })
     }
 
@@ -82,23 +95,28 @@ export default class HelpableSessionsScreen extends React.Component {
         return (
             <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
                 {!this.state.ready ? <ActivityIndicator/> :
-                    <View style={styles.card}>
-                        <SessionSummary session={this.state.session}/>
-                    </View>}
+                    <SwipeCards
+                        cards={this.state.cards}
+                        loop={false}
 
-
-                <View style={{flexDirection: "row", position: "absolute", bottom: 0}}>
-                    <View style={{flex: 1, padding: 8}}>
-                        <Button title="Prev" onPress={this.loadPreviousSession}/>
-                    </View>
-                    <View style={{flex: 2, padding: 8}}>
-                        <Button title="Help" onPress={this.helpSession}/>
-                    </View>
-                    <View style={{flex: 1, padding: 8}}>
-                        <Button title="Next" onPress={this.loadNextSession}/>
-                    </View>
-                </View>
-
+                        renderCard={(cardData) => {
+                            return (<View style={[styles.card, {margin:8}]}>
+                                <SessionSummary session={this.state.session}/>
+                            </View>)
+                        }}
+                        onClickHandler={this.helpSession}
+                        showYup={true}
+                        yupText="Save for later"
+                        showNope={true}
+                        noText="Nayeth"
+                        hasMaybeAction
+                        showMaybe={true}
+                        maybeText="Accept"
+                        handleYup={this.loadNextSession}
+                        handleNope={this.loadNextSession}
+                        cardRemoved={this.loadNextSession}
+                    />
+                }
             </View>
         );
     }
