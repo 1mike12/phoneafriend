@@ -88,7 +88,9 @@ export default class MySkills extends React.Component {
                     <View>
                         <TextInput placeholder="Add"
                                    style={styles.textField}
-                                   onTextChange={(query) => this.setState({query})}
+                                   onChangeText={(query) => {
+                                       this.setState({query})
+                                   }}
                                    value={this.state.query}
                         />
                         <FlatList
