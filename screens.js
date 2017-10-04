@@ -9,6 +9,7 @@ import SessionEditScreen from "./screens/SessionEditScreen";
 import HelpableSessionsScreen from "./screens/HelpableSessionsScreen";
 import ActiveSessionScreen from "./screens/ActiveSessionScreen";
 import AccountScreen from "./screens/AccountScreen";
+import CallScreen from "./screens/CallScreen";
 
 // register all screens of the app (including internal ones)
 export function registerScreens(){
@@ -21,7 +22,8 @@ export function registerScreens(){
         DeleteSkillModal,
         HelpableSessionsScreen,
         ActiveSessionScreen,
-        AccountScreen
+        AccountScreen,
+        CallScreen
     ]
     .forEach(register);
 }

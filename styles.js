@@ -32,6 +32,11 @@ export default {
         height: 40,
         width: 40
     },
+    profilePicLarge: {
+        borderRadius: 900,
+        height: 100,
+        width: 100
+    },
     autoCompleteContainer: {
         left: 0,
         position: 'absolute',

@@ -9,6 +9,7 @@ import Util from "../Util";
 import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
+import CallScreen from "./CallScreen";
 
 const ta = timeAgo();
 const NAME = "ActiveSessionScreen";
@@ -20,14 +21,18 @@ export default class ActiveSessionScreen extends React.Component {
             session: this.props.session,
             ready: true,
         };
-    }
 
-    helpSession(){
-
+        this.call = this.call.bind(this);
     }
 
     call(){
-
+        this.props.navigator.push({
+            screen: CallScreen.getName(),
+            titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+            animated: true,
+            animationType: 'slide-horizontal',
+            passProps: {session: this.state.session},
+        });
     }
 
     static getName(){
@@ -40,7 +45,7 @@ export default class ActiveSessionScreen extends React.Component {
                 {!this.state.ready ? <ActivityIndicator/> :
                     <View style={styles.card}>
                         <SessionSummary session={this.state.session}/>
-                        <Button title="Call" onPress={this.call}/>
+                        <Button title="Connect" onPress={this.call}/>
                     </View>}
             </View>
         );
