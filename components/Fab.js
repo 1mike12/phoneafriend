@@ -33,7 +33,6 @@ export default class Fab extends React.Component {
      */
     constructor(props){
         super(props);
-        console.log(this.props.style);
         this.state = {
             icon: this.props.icon
         };
