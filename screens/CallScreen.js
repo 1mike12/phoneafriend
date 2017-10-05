@@ -21,6 +21,7 @@ import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
 import Fab from "../components/Fab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {MediaStreamTrack} from "react-native-webrtc";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -76,6 +77,13 @@ export default class CallScreen extends React.Component {
         });
 
         this.getCameraFab = this.getCameraFab.bind(this);
+    }
+
+    componentDidMount(){
+        MediaStreamTrack
+        .getSources(sourceInfos=> {
+            console.log(sourceInfos)
+        })
     }
 
     static getName(){
