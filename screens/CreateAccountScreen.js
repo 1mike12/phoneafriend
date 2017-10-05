@@ -38,15 +38,15 @@ export default class CreateAccountScreen extends React.Component {
 
     submit(){
         this.setState({loading: true});
-        return http.post("api/public/login", {
+        return http.post("api/public/register", {
             email: this.state.email,
             password: this.state.password
         })
         .then(res =>{
+            console.log(res.data);
             this.setState({loading: false});
             Authentication.commitToken(res.data.token);
             http.setToken(res.data.token);
-            console.log(res.data)
         })
         .catch(e =>{
             console.log(e);

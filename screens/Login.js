@@ -13,9 +13,9 @@ const styles = StyleSheet.create({
         height: 48,  // have to do it on iOS
         marginTop: 10,
     },
-    multiLine:{
+    multiLine: {
         height: 100,
-        marginTop:10
+        marginTop: 10
     },
 });
 
@@ -72,7 +72,7 @@ export default class Login extends React.Component {
 
     render(){
         return (
-            <View>
+            <View style={{margin: 8}}>
                 <TextInput
                     placeholder="Email"
                     keyboardType="email-address"
@@ -90,11 +90,11 @@ export default class Login extends React.Component {
                 <View style={{marginTop: 24}}/>
                 <Button title="Login"
                         onPress={this.login}
+                        disabled={!this.valid()}
                 />
                 <TouchableOpacity onPress={this.goToLogin}>
-                    <Text style={{padding: 16}}>Create account</Text>
+                    <Text style={{paddingTop: 16, paddingBottom: 16, textAlign : "center"}}>Create account</Text>
                 </TouchableOpacity>
-                {this.valid() ? <Text>Valid</Text> : <Text>Invalid</Text>}
             </View>
         );
     }

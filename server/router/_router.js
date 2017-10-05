@@ -22,7 +22,7 @@ app.use("/api/user/", require("./user_api"));
 /*
 PUBLIC APIS
  */
-app.use("/api/public/login", require("./public/api_login"));
+app.use("/api/public/", require("./public/api_public"));
 
 //Exception handler has to be last
 const PORT = process.env.NODE_ENV === "testing" ? config.testPort : config.port;
