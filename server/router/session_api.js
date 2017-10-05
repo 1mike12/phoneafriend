@@ -88,12 +88,14 @@ router.get("/teachable/count", (req, res, next) =>{
 router.post("/help", (req, res, next) =>{
     const {uuid} = req.body;
 
+    if (!uuid) return res.status(400).send("No uuid");
     return Class.where({uuid: uuid, teacher_id: null})
     .fetch()
     .then(session =>{
+        if (!session) throw new Error("no session found or session no longer available");
         return session.set({teacher_id: req.userId}).save()
     })
-    .then(() => res.send(200))
+    .then(() => res.sendStatus(200))
 });
 
 router.post("/decline", (req, res, next) =>{
@@ -103,9 +105,7 @@ router.post("/decline", (req, res, next) =>{
         return knex('declined_sessions').insert({user_id: req.userId, session_id: session.get("id")})
     })
     .then(() => res.sendStatus(200))
-    .catch(e =>{
-        console.log(e)
-    })
+    .catch(next)
 });
 
 router.get('/teachable-single', (req, res, next) =>{

@@ -1,5 +1,15 @@
 import React from 'react';
-import {Vibration, ActivityIndicator, Button, FlatList, Text, TextInput, View, ScrollView, ToastAndroid} from "react-native";
+import {
+    Vibration,
+    ActivityIndicator,
+    Button,
+    FlatList,
+    Text,
+    TextInput,
+    View,
+    ScrollView,
+    ToastAndroid
+} from "react-native";
 import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -22,10 +32,10 @@ export default class ActiveSessionScreen extends React.Component {
             ready: true,
         };
 
-        this.call = this.call.bind(this);
+        this.connect = this.connect.bind(this);
     }
 
-    call(){
+    connect(){
         this.props.navigator.push({
             screen: CallScreen.getName(),
             titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
@@ -33,6 +43,19 @@ export default class ActiveSessionScreen extends React.Component {
             animationType: 'slide-horizontal',
             passProps: {session: this.state.session},
         });
+
+        // return http.post("api/session/help", {
+        //     uuid: this.state.session.uuid
+        // })
+        // .then(() =>{
+        //     this.props.navigator.push({
+        //         screen: CallScreen.getName(),
+        //         titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+        //         animated: true,
+        //         animationType: 'slide-horizontal',
+        //         passProps: {session: this.state.session},
+        //     });
+        // })
     }
 
     static getName(){
@@ -45,7 +68,7 @@ export default class ActiveSessionScreen extends React.Component {
                 {!this.state.ready ? <ActivityIndicator/> :
                     <View style={styles.card}>
                         <SessionSummary session={this.state.session}/>
-                        <Button title="Connect" onPress={this.call}/>
+                        <Button title="Connect" onPress={this.connect}/>
                     </View>}
             </View>
         );
