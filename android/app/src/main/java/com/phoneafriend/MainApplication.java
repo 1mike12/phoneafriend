@@ -3,6 +3,7 @@ package com.phoneafriend;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
@@ -20,52 +21,54 @@ import java.util.List;
 
 public class MainApplication extends NavigationApplication {
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    @Override
-    public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+            return BuildConfig.DEBUG;
+        }
+
+        @Override
+        protected List < ReactPackage > getPackages() {
+            return Arrays. < ReactPackage > asList(
+                new MainReactPackage(),
+                new RCTCameraPackage(),
+                new VectorIconsPackage(),
+                new ReactNativeConfigPackage(),
+                new WebRTCModulePackage()
+            );
+        }
+    };
 
     @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
+    public boolean isDebug() {
+        // Make sure you are using BuildConfig from your own application
+        return BuildConfig.DEBUG;
+    }
+
+    protected List < ReactPackage > getPackages() {
+        // Add additional packages you require here
+        // No need to add RnnPackage and MainReactPackage
+        return Arrays. < ReactPackage > asList(
+            new RCTCameraPackage(),
             new VectorIconsPackage(),
             new ReactNativeConfigPackage(),
             new WebRTCModulePackage()
-      );
+        );
     }
-  };
 
     @Override
-     public boolean isDebug() {
-         // Make sure you are using BuildConfig from your own application
-         return BuildConfig.DEBUG;
-     }
+    public List < ReactPackage > createAdditionalReactPackages() {
+        return getPackages();
+    }
 
-     protected List<ReactPackage> getPackages() {
-         // Add additional packages you require here
-         // No need to add RnnPackage and MainReactPackage
-         return Arrays.<ReactPackage>asList(
-             new VectorIconsPackage(),
-             new ReactNativeConfigPackage(),
-             new WebRTCModulePackage()
-         );
-     }
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
+    }
 
-     @Override
-     public List<ReactPackage> createAdditionalReactPackages() {
-         return getPackages();
-     }
-
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-  }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        SoLoader.init(this, /* native exopackage */ false);
+    }
 }
