@@ -100,14 +100,14 @@ module.exports = dev = new function(){
                     teacher_id: user1.get("id"),
                     pupil_id: mike.get('id'),
                     title: "Need help with toyota corolla bearing replacement",
-                    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cill"
+                    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"
                 })
                 .save(),
                 Session.forge({
                     uuid: "2",
                     pupil_id: mike.get('id'),
                     title: "How to belay in lead climbing with gri gri",
-                    description: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum e"
+                    description: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti"
                 })
                 .save(),
                 Skill.query(qb => qb.limit(3)).fetchAll()
