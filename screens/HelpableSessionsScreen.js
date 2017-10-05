@@ -20,7 +20,7 @@ import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
 import ActiveSessionScreen from "./ActiveSessionScreen";
-// import SwipeCards from "react-native-swipe-cards";
+import SwipeCards from "react-native-swipe-cards";
 
 const ta = timeAgo();
 const NAME = "HelpableSessionsScreen";
@@ -94,28 +94,28 @@ export default class HelpableSessionsScreen extends React.Component {
     render(){
         return (
             <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
-                {!this.state.ready ? <ActivityIndicator/> : null
-                    // (<SwipeCards
-                    //     cards={this.state.cards}
-                    //     loop={false}
-                    //
-                    //     renderCard={(cardData) => {
-                    //         return (<View style={[styles.card, {margin:8}]}>
-                    //             <SessionSummary session={this.state.session}/>
-                    //         </View>)
-                    //     }}
-                    //     onClickHandler={this.helpSession}
-                    //     showYup={true}
-                    //     yupText="Save for later"
-                    //     showNope={true}
-                    //     noText="Nayeth"
-                    //     hasMaybeAction
-                    //     showMaybe={true}
-                    //     maybeText="Accept"
-                    //     handleYup={this.loadNextSession}
-                    //     handleNope={this.loadNextSession}
-                    //     cardRemoved={this.loadNextSession}
-                    // />)
+                {!this.state.ready ? <ActivityIndicator/> :
+                    <SwipeCards
+                        cards={this.state.cards}
+                        loop={false}
+
+                        renderCard={(cardData) => {
+                            return (<View style={[styles.card, {margin:8}]}>
+                                <SessionSummary session={this.state.session}/>
+                            </View>)
+                        }}
+                        onClickHandler={this.helpSession}
+                        showYup={true}
+                        yupText="Save for later"
+                        showNope={true}
+                        noText="Nayeth"
+                        hasMaybeAction
+                        showMaybe={true}
+                        maybeText="Accept"
+                        handleYup={this.loadNextSession}
+                        handleNope={this.loadNextSession}
+                        cardRemoved={this.loadNextSession}
+                    />
                 }
             </View>
         );
