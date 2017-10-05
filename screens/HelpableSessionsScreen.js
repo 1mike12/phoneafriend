@@ -21,6 +21,7 @@ import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
 import ActiveSessionScreen from "./ActiveSessionScreen";
 import SwipeCards from "react-native-swipe-cards";
+import Promise from "bluebird";
 
 const ta = timeAgo();
 const NAME = "HelpableSessionsScreen";
@@ -34,12 +35,15 @@ export default class HelpableSessionsScreen extends React.Component {
         this.rowCount = 9999999999999;
         this.state = {
             ready: false,
-            cards: ["one"]
+            cards: ["one"],
+            session: null,
+            rowCount: 0
         };
         this.loadNextSession = this.loadNextSession.bind(this);
         this.loadPreviousSession = this.loadPreviousSession.bind(this);
         this.loadSession = this.loadSession.bind(this);
         this.helpSession = this.helpSession.bind(this);
+        this.declineSession = this.declineSession.bind(this);
     }
 
     componentDidMount(){
@@ -58,8 +62,16 @@ export default class HelpableSessionsScreen extends React.Component {
         return this.loadSession();
     }
 
+    declineSession(){
+        return Promise.all([
+            http.post("api/session/decline", {
+                uuid: this.state.session.uuid
+            }),
+            this.loadSession()
+        ])
+    }
+
     loadSession(){
-        console.log("loadSession")
         this.setState({ready: false});
         return http.get("api/session/teachable-single", {
             params: {
@@ -67,7 +79,6 @@ export default class HelpableSessionsScreen extends React.Component {
             }
         })
         .then(res =>{
-            console.log(res.data)
             let session = new Session(res.data.session);
             let rowCount = res.data.rowCount;
 
@@ -113,7 +124,7 @@ export default class HelpableSessionsScreen extends React.Component {
                         showMaybe={true}
                         maybeText="Accept"
                         handleYup={this.loadNextSession}
-                        handleNope={this.loadNextSession}
+                        handleNope={this.declineSession}
                         cardRemoved={this.loadNextSession}
                     />
                 }

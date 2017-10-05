@@ -1,6 +1,8 @@
 let router = require("express").Router();
 let Class = require("../models/Session");
 let User = require("../models/User");
+const Session = require('../models/Session');
+const knex = require("../DB").knex;
 
 router.delete("/", (req, res, next) =>{
     Class.where({uuid: req.body.uuid, pupil_id: req.userId}).fetch()
@@ -27,7 +29,16 @@ router.get("/mine", (req, res, next) =>{
 });
 
 router.get("/teachable", (req, res, next) =>{
-    User.where({id: req.userId}).fetch({withRelated: "skills"})
+
+    let declinedSessionIds;
+    knex('declined_sessions').where({
+        user_id: req.userId,
+    })
+    .select('session_id')
+    .then(result =>{
+        declinedSessionIds = result.map(row=> row.session_id);
+        return User.where({id: req.userId}).fetch({withRelated: "skills"})
+    })
     .then(user =>{
         let skillIds = user.related("skills").map(s => s.get("id"));
 
@@ -38,7 +49,8 @@ router.get("/teachable", (req, res, next) =>{
             qb.distinct("sessions.*");
             qb.innerJoin("sessions_skills", "sessions.id", "sessions_skills.session_id");
             qb.innerJoin("skills", "skills.id", "sessions_skills.skill_id");
-            qb.whereIn("skills.id", skillIds);
+            qb.whereIn("skills.id", skillIds)
+            qb.whereNotIn("sessions.id", declinedSessionIds);
             qb.orderBy("sessions.created_at")
         })
         .fetchAll({
@@ -73,19 +85,27 @@ router.get("/teachable/count", (req, res, next) =>{
     .then(knexObj => res.send(knexObj.get("count")))
 });
 
-router.post("/session/help", (req, res, next) =>{
-    const {uuid} = req.body
+router.post("/help", (req, res, next) =>{
+    const {uuid} = req.body;
 
     return Class.where({uuid: uuid, teacher_id: null})
     .fetch()
     .then(session =>{
         return session.set({teacher_id: req.userId}).save()
     })
-    .then(()=> res.send(200))
+    .then(() => res.send(200))
 });
 
-router.post("/session/unhelp", (req, res, next) =>{
-
+router.post("/decline", (req, res, next) =>{
+    const {uuid} = req.body;
+    return Session.where({uuid}).fetch()
+    .then(session =>{
+        return knex('declined_sessions').insert({user_id: req.userId, session_id: session.get("id")})
+    })
+    .then(() => res.sendStatus(200))
+    .catch(e =>{
+        console.log(e)
+    })
 });
 
 router.get('/teachable-single', (req, res, next) =>{
