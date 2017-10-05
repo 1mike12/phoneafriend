@@ -77,14 +77,14 @@ export default class Login extends React.Component {
                     placeholder="Email"
                     keyboardType="email-address"
                     style={styles.textField}
-                    onTextChange={(email) => this.setState({email})}
+                    onChangeText={(email) => this.setState({email})}
                     value={this.state.email}
                 />
                 <TextInput
                     placeholder="Password"
                     style={styles.textField}
                     value={this.state.password}
-                    onTextChange={(password) => this.setState({password})}
+                    onChangeText={(password) => this.setState({password})}
                     secureTextEntry={true}
                 />
                 <View style={{marginTop: 24}}/>
