@@ -21,7 +21,7 @@ import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
 import Fab from "../components/Fab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {MediaStreamTrack} from "react-native-webrtc";
+import {MediaStreamTrack, getUserMedia, RTCPeerConnection, RTCView} from "react-native-webrtc";
 import RTC_Service from "../services/RTC_Service";
 
 const ta = timeAgo();
@@ -64,7 +64,8 @@ export default class CallScreen extends React.Component {
         this.state = {
             session: this.props.session,
             ready: true,
-            cameraState: CAMERA_STATE_FRONT
+            cameraState: CAMERA_STATE_FRONT,
+            videoURL: ""
         };
 
         this.props.navigator.toggleTabs({
@@ -81,12 +82,83 @@ export default class CallScreen extends React.Component {
     }
 
     componentDidMount(){
+        let isFront = true;
+
+        let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+        let pc = new RTCPeerConnection(configuration);
+
         console.log(RTC_Service.getStunServers());
         MediaStreamTrack
             .getSources()
             .then(sourceInfos =>{
-                console.log(sourceInfos)
+                let exampleSourceInfos = [{
+                    "kind": "video",
+                    "facing": "back",
+                    "id": "0",
+                    "label": "Camera 0, Facing back, Orientation 90"
+                }, {
+                    "kind": "video",
+                    "facing": "front",
+                    "id": "1",
+                    "label": "Camera 1, Facing front, Orientation 90"
+                }, {
+                    "kind": "audio", "facing": "", "id": "audio-1", "label": "Audio"
+                }];
+
+                let videoSourceId;
+                sourceInfos.forEach(source=> {
+                    if (source.kind === "video" && source.facing==="front"){
+                        videoSourceId = source.id;
+                    }
+                });
+
+                return getUserMedia({
+                    audio: true,
+                    video: {
+                        mandatory: {
+                            minWidth: 1280, // Provide your own width, height and frame rate here
+                            minHeight: 720,
+                            minFrameRate: 15
+                        },
+                        facingMode: (isFront ? "user" : "environment"),
+                        optional: (videoSourceId ? [{sourceId: videoSourceId}] : [])
+                    }
+                });
             })
+            .then(stream =>{
+                console.log('dddd', stream);
+
+                let exampleStream = {
+                    "active": true,
+                    "_tracks": [
+                        {
+                            "_enabled": true,
+                            "id": "3992baa2-d545-427f-b40f-1eef852bf5fc",
+                            "kind": "audio",
+                            "label": "audio",
+                            "muted": false,
+                            "readonly": true,
+                            "remote": false,
+                            "readyState": "live"
+                        },
+                        {
+                            "_enabled": true,
+                            "id": "55f758d5-75d7-4dcb-8e0a-68fdad59130a",
+                            "kind": "video",
+                            "label": "video",
+                            "muted": false,
+                            "readonly": true,
+                            "remote": false,
+                            "readyState": "live"
+                        }
+                    ],
+                    "id": "0407ff74-fa8b-4c64-a534-ae79b7eb9167",
+                    "reactTag": "0407ff74-fa8b-4c64-a534-ae79b7eb9167"
+                };
+
+                return stream
+            })
+            .catch(console.log);
     }
 
     static getName(){
@@ -131,10 +203,11 @@ export default class CallScreen extends React.Component {
                         <ActivityIndicator size="large"/>
                     </View> :
                     <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "#EEE"}}>
-                        <Image source={require('../images/bike.jpg')}
-                               resizeMode="cover"
-                               style={{width: "100%", height: "100%"}}
-                        />
+                        <RTCView streamURL={this.state.videoURL}/>
+                        {/*<Image source={require('../images/bike.jpg')}*/}
+                               {/*resizeMode="cover"*/}
+                               {/*style={{width: "100%", height: "100%"}}*/}
+                        {/*/>*/}
 
                         <Image style={[styles.profilePicLarge, screenStyles.myImage]}
                                source={{uri: this.state.session.pupil.profile_url}}/>
