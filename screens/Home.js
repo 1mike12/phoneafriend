@@ -61,7 +61,6 @@ export default class Home extends React.Component {
     loadRequests(){
         return http.get("api/session/mine")
         .then(res =>{
-            console.log(res.data);
             let requests = res.data.map(session =>{
                 session.key = session.id;
                 return session;

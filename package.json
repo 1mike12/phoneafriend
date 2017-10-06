@@ -33,6 +33,7 @@
     "cron": "^1.2.1",
     "express": "^4.15.2",
     "faker": "^4.1.0",
+    "freeice": "^2.2.0",
     "immutability-helper": "^2.4.0",
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.9",
@@ -49,7 +50,7 @@
     "react-native-navigation": "^1.1.228",
     "react-native-swipe-cards": "^0.1.0",
     "react-native-vector-icons": "^4.4.0",
-    "react-native-webrtc": "^1.58.2",
+    "react-native-webrtc": "^1.58.3",
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "time-ago": "^0.1.0"

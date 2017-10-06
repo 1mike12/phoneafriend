@@ -22,6 +22,7 @@ import SessionSummary from "../components/SessionSummary";
 import Fab from "../components/Fab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {MediaStreamTrack} from "react-native-webrtc";
+import RTC_Service from "../services/RTC_Service";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -80,10 +81,12 @@ export default class CallScreen extends React.Component {
     }
 
     componentDidMount(){
+        console.log(RTC_Service.getStunServers());
         MediaStreamTrack
-        .getSources(sourceInfos=> {
-            console.log(sourceInfos)
-        })
+            .getSources()
+            .then(sourceInfos =>{
+                console.log(sourceInfos)
+            })
     }
 
     static getName(){
