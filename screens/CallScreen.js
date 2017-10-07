@@ -28,7 +28,7 @@ import StreamService from "../services/StreamService";
 const ta = timeAgo();
 const NAME = "CallScreen";
 
-const CAMERA_STATE_REAR = "rear";
+const CAMERA_STATE_BACK = "back";
 const CAMERA_STATE_FRONT = "front";
 const CAMERA_STATE_OFF = "off";
 
@@ -65,7 +65,7 @@ export default class CallScreen extends React.Component {
         this.state = {
             session: this.props.session,
             ready: true,
-            cameraState: CAMERA_STATE_FRONT,
+            cameraState: CAMERA_STATE_BACK,
             videoURL: ""
         };
 
@@ -80,17 +80,28 @@ export default class CallScreen extends React.Component {
         });
 
         this.getCameraFab = this.getCameraFab.bind(this);
+        this.toggleCameraState = this.toggleCameraState.bind(this);
     }
 
     componentDidMount(){
 
         let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
         let pc = new RTCPeerConnection(configuration);
+        this.loadCamera()
+    }
 
-        console.log(RTC_Service.getStunServers());
+    loadCamera(){
+        let state = this.state.cameraState;
+        if (state !== CAMERA_STATE_OFF){
+            return StreamService.getStream(this.state.cameraState)
+            .then(stream => this.setState({videoURL: stream.toURL()}));
+        }
+    }
 
-        StreamService.getBackStream()
-        .then(stream=> this.setState({videoURL: stream.toURL()}));
+    toggleCameraState(cameraState){
+        this.setState({cameraState}, () =>{
+            this.loadCamera()
+        })
     }
 
     static getName(){
@@ -98,17 +109,17 @@ export default class CallScreen extends React.Component {
     }
 
     getCameraFab(){
-        if (this.state.cameraState === CAMERA_STATE_REAR) {
+        if (this.state.cameraState === CAMERA_STATE_BACK){
             return <Fab style={{backgroundColor: "#AAA", margin: 8}}
-                        onPress={() => this.setState({cameraState: CAMERA_STATE_FRONT})}
+                        onPress={() => this.toggleCameraState(CAMERA_STATE_FRONT)}
                         inside={<Icon name="camera-front-variant"
                                       size={32}
                                       color="white"/>
                         }
             />
-        } else if (this.state.cameraState === CAMERA_STATE_FRONT) {
+        } else if (this.state.cameraState === CAMERA_STATE_FRONT){
             return <Fab style={{backgroundColor: "#AAA", margin: 8}}
-                        onPress={() => this.setState({cameraState: CAMERA_STATE_REAR})}
+                        onPress={() => this.toggleCameraState(CAMERA_STATE_BACK)}
                         inside={<Icon name="camera-rear-variant"
                                       size={32}
                                       color="white"/>
@@ -135,7 +146,8 @@ export default class CallScreen extends React.Component {
                         <ActivityIndicator size="large"/>
                     </View> :
                     <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
-                        <RTCView style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}} streamURL={this.state.videoURL}/>
+                        <RTCView style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
+                                 streamURL={this.state.videoURL}/>
                         <Image style={[styles.profilePicLarge, screenStyles.myImage]}
                                source={{uri: this.state.session.pupil.profile_url}}/>
 

@@ -7,19 +7,11 @@ class StreamService {
         this.sources = null;
     }
 
-    getFrontStream(){
+    getStream(direction = "back"){
         return this.loadStreams()
-        .then(()=> {
-            let videoId = this.getFrontVideoIds()[0];
-            return this.getStream(videoId)
-        })
-    }
-
-    getBackStream(){
-        return this.loadStreams()
-        .then(()=> {
-            let videoId = this.getBackVideoIds()[0];
-            return this.getStream(videoId)
+        .then(() =>{
+            let videoId = direction === "back" ? this.getBackVideoIds()[0] : this.getFrontVideoIds()[0];
+            return this.getStreamByVideoId(videoId)
         })
     }
 
@@ -50,7 +42,7 @@ class StreamService {
     //     "id": "0407ff74-fa8b-4c64-a534-ae79b7eb9167",
     //     "reactTag": "0407ff74-fa8b-4c64-a534-ae79b7eb9167"
     // };
-    getStream(videoId){
+    getStreamByVideoId(videoId){
         let isFront = true;
 
         return this.loadStreams()
@@ -107,7 +99,7 @@ class StreamService {
      * @returns Promise
      */
     loadStreams(){
-        if(this.sources) return Promise.resolve(this.sources);
+        if (this.sources) return Promise.resolve(this.sources);
 
         return MediaStreamTrack
         .getSources()
