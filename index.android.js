@@ -7,6 +7,7 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import MySkills from "./screens/MySkills";
 import AccountScreen from "./screens/AccountScreen";
+import CallScreen from "./screens/CallScreen";
 
 registerScreens();
 

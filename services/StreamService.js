@@ -8,15 +8,48 @@ class StreamService {
     }
 
     getFrontStream(){
-        let videoId = this.getFrontVideoIds()[0];
-        return this.getStream(videoId)
+        return this.loadStreams()
+        .then(()=> {
+            let videoId = this.getFrontVideoIds()[0];
+            return this.getStream(videoId)
+        })
     }
 
     getBackStream(){
-        let videoId = this.getBackVideoIds()[0];
-        return this.getStream(videoId)
+        return this.loadStreams()
+        .then(()=> {
+            let videoId = this.getBackVideoIds()[0];
+            return this.getStream(videoId)
+        })
     }
 
+    // let exampleStream = {
+    //     "active": true,
+    //     "_tracks": [
+    //         {
+    //             "_enabled": true,
+    //             "id": "3992baa2-d545-427f-b40f-1eef852bf5fc",
+    //             "kind": "audio",
+    //             "label": "audio",
+    //             "muted": false,
+    //             "readonly": true,
+    //             "remote": false,
+    //             "readyState": "live"
+    //         },
+    //         {
+    //             "_enabled": true,
+    //             "id": "55f758d5-75d7-4dcb-8e0a-68fdad59130a",
+    //             "kind": "video",
+    //             "label": "video",
+    //             "muted": false,
+    //             "readonly": true,
+    //             "remote": false,
+    //             "readyState": "live"
+    //         }
+    //     ],
+    //     "id": "0407ff74-fa8b-4c64-a534-ae79b7eb9167",
+    //     "reactTag": "0407ff74-fa8b-4c64-a534-ae79b7eb9167"
+    // };
     getStream(videoId){
         let isFront = true;
 
@@ -33,36 +66,6 @@ class StreamService {
                 optional: (videoId ? [{sourceId: videoId}] : [])
             }
         }))
-        .then(stream =>{
-            let exampleStream = {
-                "active": true,
-                "_tracks": [
-                    {
-                        "_enabled": true,
-                        "id": "3992baa2-d545-427f-b40f-1eef852bf5fc",
-                        "kind": "audio",
-                        "label": "audio",
-                        "muted": false,
-                        "readonly": true,
-                        "remote": false,
-                        "readyState": "live"
-                    },
-                    {
-                        "_enabled": true,
-                        "id": "55f758d5-75d7-4dcb-8e0a-68fdad59130a",
-                        "kind": "video",
-                        "label": "video",
-                        "muted": false,
-                        "readonly": true,
-                        "remote": false,
-                        "readyState": "live"
-                    }
-                ],
-                "id": "0407ff74-fa8b-4c64-a534-ae79b7eb9167",
-                "reactTag": "0407ff74-fa8b-4c64-a534-ae79b7eb9167"
-            };
-            return stream
-        });
     }
 
     getFrontVideoIds(){
@@ -83,8 +86,25 @@ class StreamService {
         .map(source => source.id);
     }
 
+
+    // let exampleSourceInfos = [{
+    //     "kind": "video",
+    //     "facing": "back",
+    //     "id": "0",
+    //     "label": "Camera 0, Facing back, Orientation 90"
+    // }, {
+    //     "kind": "video",
+    //     "facing": "front",
+    //     "id": "1",
+    //     "label": "Camera 1, Facing front, Orientation 90"
+    // }, {
+    //     "kind": "audio", "facing": "", "id": "audio-1", "label": "Audio"
+    // }];
+
+
     /**
      * only runs once
+     * @returns Promise
      */
     loadStreams(){
         if(this.sources) return Promise.resolve(this.sources);
@@ -93,19 +113,6 @@ class StreamService {
         .getSources()
         .then(sourceInfos =>{
             this.sources = sourceInfos;
-            let exampleSourceInfos = [{
-                "kind": "video",
-                "facing": "back",
-                "id": "0",
-                "label": "Camera 0, Facing back, Orientation 90"
-            }, {
-                "kind": "video",
-                "facing": "front",
-                "id": "1",
-                "label": "Camera 1, Facing front, Orientation 90"
-            }, {
-                "kind": "audio", "facing": "", "id": "audio-1", "label": "Audio"
-            }];
             return this.sources;
         })
     }
