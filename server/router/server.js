@@ -4,6 +4,7 @@ const express = require("express");
 let app = express();
 const config = require("../config");
 const os = require("os");
+const http = require("http");
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(__dirname + '/public_dist'));
@@ -24,15 +25,14 @@ PUBLIC APIS
  */
 app.use("/api/public/", require("./public/api_public"));
 
-//Exception handler has to be last
-const PORT = process.env.NODE_ENV === "testing" ? config.testPort : config.port;
+let server = http.createServer(app);
 
-let server = app.listen(PORT, function () {
+const PORT = process.env.NODE_ENV === "testing" ? config.testPort : config.port;
+server.listen(PORT, function () {
     const port = server.address().port;
 
     console.log(`Started on ${getIpAddress()}:${port}`)
 });
-
 
 function getIpAddress() {
     let ifaces = os.networkInterfaces();
@@ -49,3 +49,6 @@ function getIpAddress() {
     });
     return address;
 }
+
+module.exports = server;
+

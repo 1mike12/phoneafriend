@@ -1,5 +1,6 @@
 //bootstrap routes
-require("./router/_router");
+require("./router/server");
+require("./websocket/_websocket");
 
 if (!('toJSON' in Error.prototype))
     Object.defineProperty(Error.prototype, 'toJSON', {
