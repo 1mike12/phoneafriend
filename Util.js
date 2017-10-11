@@ -1,6 +1,6 @@
-export default {
+module.exports = {
     /**
-     *
+     * changes the array in place ( no need to use return value)
      * @param element
      * @param array
      * @return {array} modified array

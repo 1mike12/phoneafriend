@@ -79,14 +79,22 @@ export default class CallScreen extends React.Component {
             animated: true // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
         });
 
+        let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+        this.peerConnection = new RTCPeerConnection(configuration);
+        this.peerConnection.onicecandidate = function(e){
+            console.log("onicecandidate", e);
+        };
+
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
     }
 
     componentDidMount(){
 
-        let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-        let pc = new RTCPeerConnection(configuration);
+        this.peerConnection.createOffer()
+        .then(this.peerConnection.setLocalDescription)
+        .then(console.log);
+
         this.loadCamera()
     }
 

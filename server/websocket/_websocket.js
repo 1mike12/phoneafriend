@@ -1,16 +1,31 @@
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({server: require("../router/server")});
 
-wss.on('connection', function connection(ws, req) {
+const userId_WS = new Map();
 
-    ws.on('message', function incoming(message) {
-        console.log('received: %s', message);
+wss.on('connection', function connection(ws, req){
+
+
+
+
+    /**
+     * all messages should be {token, data, message, status}
+     */
+    ws.on('message', function incoming(message){
+        message = JSON.parse(message);
+        console.log(`type: ${message.type}`);
+
+        if (message.type === "connection"){
+
+        }
+
     });
 
-    ws.send('something');
+
+    ws.send('connected');
 });
 
 
 function unauthorized(ws){
-    ws.send({message: "Unauthorized, no token"})
+    ws.send({status: 400, message: "Unauthorized, no token"})
 }
