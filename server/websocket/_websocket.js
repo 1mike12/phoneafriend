@@ -17,10 +17,14 @@ wss.on('connection', function connection(ws, req){
              */
             ws.on('message', function incoming(message){
                 message = JSON.parse(message);
-                console.log(`type: ${message.type}`);
 
-                if (message.type === "connection"){
+                switch(message.type){
+                    case "joinRoom":
+                        let roomUUID = message.uuid;
 
+                        break;
+                    case "leaveRoom":
+                        break;
                 }
 
             });
