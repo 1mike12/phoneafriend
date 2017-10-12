@@ -6,7 +6,7 @@ const userId_WS = new Map();
 wss.on('connection', function connection(ws, req){
 
 
-
+    //todo: websocket security
 
     /**
      * all messages should be {token, data, message, status}
