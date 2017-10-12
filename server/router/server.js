@@ -31,7 +31,8 @@ const PORT = process.env.NODE_ENV === "test" ? config.testPort : config.port;
 server.listen(PORT, function () {
     const port = server.address().port;
 
-    console.log(`Started on ${getIpAddress()}:${port}`)
+    console.log(`Started on ${getIpAddress()}:${port}`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
 });
 
 function getIpAddress() {
