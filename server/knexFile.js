@@ -45,7 +45,7 @@ module.exports = {
         debug: true
     },
 
-    testing: {
+    test: {
         client: 'pg',
         connection: {
             charset: 'utf8',

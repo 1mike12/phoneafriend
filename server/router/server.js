@@ -27,7 +27,7 @@ app.use("/api/public/", require("./public/api_public"));
 
 let server = http.createServer(app);
 
-const PORT = process.env.NODE_ENV === "testing" ? config.testPort : config.port;
+const PORT = process.env.NODE_ENV === "test" ? config.testPort : config.port;
 server.listen(PORT, function () {
     const port = server.address().port;
 
