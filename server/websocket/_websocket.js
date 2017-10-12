@@ -3,6 +3,7 @@ const wss = new WebSocket.Server({server: require("../router/server")});
 
 const SessionService = require("../services/SessionService");
 const AuthenticationService = require('../services/AuthenticationService');
+const Session = require("../models/Session");
 
 wss.on('connection', function connection(ws, req){
 
@@ -26,11 +27,24 @@ wss.on('connection', function connection(ws, req){
                 message = JSON.parse(message);
                 switch (message.type) {
 
-                    case "joinRoom":
-                        let roomUUID = message.uuid;
+                    case "joinSession":
+                        let uuid = message.uuid;
+                        if(!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
 
+                        return Session.where({uuid}).fetch()
+                        .then(session =>{
+                            if(!session) {
+                                ws.send(JSON.stringify({
+                                    status: 400,
+                                    message: `no session with uuid: ${uuid}`
+                                }))
+                            }
+
+
+
+                        });
                         break;
-                    case "leaveRoom":
+                    case "leaveSession":
                         break;
                 }
 

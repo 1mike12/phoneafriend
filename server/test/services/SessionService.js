@@ -25,11 +25,10 @@ describe("SessionService", function(){
         let socket1 = new TestWebSocket();
         let socket2 = new TestWebSocket();
 
-        room.addUserAndWebSocket(1, socket1);
-        room.addUserAndWebSocket(2, socket2);
-        room.addUserWithoutWebSocket(3);
+        room.addUser(1, socket1);
+        room.addUser(2, socket2);
 
-        expect(room.getUserIds()).to.deep.equal([1, 2, 3]);
+        expect(room.getUserIds()).to.deep.equal([1, 2]);
 
         room.sendMessageFromUserId(1, '{"key" : "value"}');
         expect(socket2.sent).to.be.true;
@@ -41,8 +40,8 @@ describe("SessionService", function(){
         let socket1 = new TestWebSocket();
         let socket2 = new TestWebSocket();
 
-        room.addUserAndWebSocket(1, socket1);
-        room.addUserAndWebSocket(2, socket2);
+        room.addUser(1, socket1);
+        room.addUser(2, socket2);
 
         room.removeUserById(1)
         expect(room.getUserIds()).to.deep.equal([2])
@@ -51,49 +50,72 @@ describe("SessionService", function(){
     });
 
     it("create rooms", () =>{
-        let uuid = SessionService.createRoom([1, 2]);
+        const roomUUID = "abc";
         let socket1 = new TestWebSocket();
         let socket2 = new TestWebSocket();
+        let socket3 = new TestWebSocket();
 
-        SessionService.addWebSocketForUserId(1, socket1);
-        SessionService.addWebSocketForUserId(2, socket2);
+        SessionService.joinSession(roomUUID, 1, socket1);
+        SessionService.joinSession(roomUUID, 2, socket2);
 
-        let room = SessionService.getRoomForUserId(1);
+        let room = SessionService.getRoomByUUID(roomUUID);
         expect(room).to.not.be.undefined;
-        expect(SessionService.getRoomForUserId(1)).to.equal(SessionService.getRoomForUserId(2))
 
-        SessionService.addUserToRoom(uuid, 3);
+        SessionService.joinSession(roomUUID, 3, socket3);
         expect(room.getUserIds().length).to.equal(3);
     });
 
-
-    it("messaging to rooms", () =>{
-        SessionService.createRoom([1, 2]);
+    it("can delete room when last person leaves", () =>{
+        const roomUUID = "abc";
         let socket1 = new TestWebSocket();
         let socket2 = new TestWebSocket();
-        SessionService.addWebSocketForUserId(1, socket1);
-        SessionService.addWebSocketForUserId(2, socket2);
 
-        SessionService.sendMessageFromUserId(1, '{"key" : "value"}');
+        SessionService.joinSession(roomUUID, 1, socket1);
+        SessionService.joinSession(roomUUID, 2, socket2);
+
+        let room = SessionService.getRoomByUUID(roomUUID);
+        expect(room).to.not.be.undefined;
+
+        SessionService.leaveSession(roomUUID, 1);
+        SessionService.leaveSession(roomUUID, 2);
+
+        room = SessionService.getRoomByUUID(roomUUID);
+
+        expect(room).to.be.undefined;
+    });
+
+
+
+
+    it("messaging to rooms", () =>{
+        const roomUUID = "abc";
+        let socket1 = new TestWebSocket();
+        let socket2 = new TestWebSocket();
+
+        SessionService.joinSession(roomUUID, 1, socket1);
+        SessionService.joinSession(roomUUID, 2, socket2);
+
+        SessionService.sendMessage(1, roomUUID, '{"key" : "value"}');
         expect(socket2.sent).to.be.true;
         expect(socket1.sent).to.be.false;
 
     });
 
     it("should remove user", () =>{
-        SessionService.createRoom([1, 2]);
+        const roomUUID = "abc";
         let socket1 = new TestWebSocket();
         let socket2 = new TestWebSocket();
-        SessionService.addWebSocketForUserId(1, socket1);
-        SessionService.addWebSocketForUserId(2, socket2);
+
+        SessionService.joinSession(roomUUID, 1, socket1);
+        SessionService.joinSession(roomUUID, 2, socket2);
 
         expect(SessionService.getUserIds().includes(1));
 
-        SessionService.removeUserId(1);
+        SessionService.leaveSession(roomUUID, 1);
 
         expect(socket1.closed).to.be.true;
         expect(socket2.closed).to.be.false;
-        expect(!SessionService.getUserIds().includes(1))
+        expect(SessionService.getUserIds().includes(1)).to.be.false;
     });
 });
 
