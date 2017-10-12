@@ -17,7 +17,7 @@ module.exports = dev = new function(){
         mike.setPassword("123");
 
         let brian = User.forge({
-            email: "bgioia@gmail.com",
+            email: "bgioia1@gmail.com",
             first_name: "Brian",
             last_name: "Gioia",
             profile_url: "https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAnyAAAAJGFmNWVlYzlhLTdjYzUtNDZjYS1iYTk2LTI2NzNkNTMwNjViMw.jpg"

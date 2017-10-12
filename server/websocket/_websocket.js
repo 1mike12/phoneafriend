@@ -9,22 +9,23 @@ wss.on('connection', function connection(ws, req){
     //store user's ws in room
     let token;
     try {
-        token = ws.upgradeReq.headers.token;
+        token = ws.upgradeReq.headers.token || null;
     } catch (e) {
         token = null;
     }
 
     if(token) {
         AuthenticationService.authenticate(token)
-        .then(() =>{
+        .then(payload =>{
+            ws.userId = payload.userId;
             ws.send('connected');
             /**
              * all messages should be {token, data, message, status}
              */
             ws.on('message', function incoming(message){
                 message = JSON.parse(message);
-
                 switch (message.type) {
+
                     case "joinRoom":
                         let roomUUID = message.uuid;
 
