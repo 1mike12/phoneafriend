@@ -31,17 +31,20 @@ wss.on('connection', function connection(ws, req){
                         let uuid = message.uuid;
                         if(!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
 
-                        return Session.where({uuid}).fetch()
+                        return Session.getByUUIDAsMember(uuid, ws.userId)
                         .then(session =>{
                             if(!session) {
                                 ws.send(JSON.stringify({
                                     status: 400,
                                     message: `no session with uuid: ${uuid}`
                                 }))
+                            } else {
+                                SessionService.joinSession(uuid, ws.userId, ws);
+                                ws.send(JSON.stringify({
+                                    status: 200,
+                                    message: `joined session ${uuid}`
+                                }))
                             }
-
-
-
                         });
                         break;
                     case "leaveSession":

@@ -32,6 +32,20 @@ let Instance = new function(){
 let Static = new function(){
     let self = this;
 
+    /**
+     * fetch a session only as a valid member of that session
+     */
+    self.getByUUIDAsMember = function (uuid, userId){
+        return  Session.query(qb=>{
+            qb.where("uuid", uuid);
+            qb.andWhere(function(){
+                this.where("teacher_id", userId);
+                this.orWhere("pupil_id", userId);
+            })
+        })
+        .fetch()
+    };
+
     self.MIGRATION = {
         up: (knex, Promise) =>{
             return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){
@@ -60,4 +74,4 @@ let Static = new function(){
     }
 };
 
-module.exports = User = BaseModel.extend(Instance, Static);
+module.exports = Session = BaseModel.extend(Instance, Static);
