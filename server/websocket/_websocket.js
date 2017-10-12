@@ -7,8 +7,14 @@ const AuthenticationService = require('../services/AuthenticationService');
 wss.on('connection', function connection(ws, req){
 
     //store user's ws in room
-    let token = req.headers['token'];
-    if (token){
+    let token;
+    try {
+        token = ws.upgradeReq.headers.token;
+    } catch (e) {
+        token = null;
+    }
+
+    if(token) {
         AuthenticationService.authenticate(token)
         .then(() =>{
             ws.send('connected');
@@ -18,7 +24,7 @@ wss.on('connection', function connection(ws, req){
             ws.on('message', function incoming(message){
                 message = JSON.parse(message);
 
-                switch(message.type){
+                switch (message.type) {
                     case "joinRoom":
                         let roomUUID = message.uuid;
 
@@ -30,11 +36,12 @@ wss.on('connection', function connection(ws, req){
             });
         })
         .catch((e) =>{
-            if (e.message = "not opened") return;
+            if(e.message = "not opened") return;
             ws.send("no token");
             ws.close();
         })
+    } else {
+        ws.send("no token");
+        ws.close();
     }
-    ws.send("no token");
-    ws.close();
 });

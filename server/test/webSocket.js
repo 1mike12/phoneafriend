@@ -3,7 +3,7 @@ const port = require("../config").port;
 
 describe("Socket", () =>{
 
-    it("authenticating", () =>{
+    it("authenticating", (done) =>{
         let ws = new WebSocket(`ws://localhost:${port}`, {
             headers: {
                 token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjF9.Lw1IFiHNoXYUyWUIWIMCunNAunPGFNtxGsK76oFClc8"
