@@ -44,6 +44,27 @@ describe("Socket Authentication", () =>{
         });
     });
 
+    it("Authentication with protocol", (done) =>{
+        let ws = new WebSocket(`ws://localhost:${port}`, token1);
+
+        ws.on('message', function incoming(data){
+            expect(data).to.equal("connected");
+            ws.close();
+            done();
+        });
+    });
+
+    it("Authentication with basic auth", (done) =>{
+        let ws = new WebSocket(`ws://${token1}@localhost:${port}`);
+
+        ws.on('message', function incoming(data){
+            expect(data).to.equal("connected");
+            ws.close();
+            done();
+        });
+    });
+
+
     it("Not authentiated", (done) =>{
         let ws = new WebSocket(`ws://localhost:${port}`, {});
 

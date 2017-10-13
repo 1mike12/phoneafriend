@@ -7,22 +7,8 @@ const Session = require("../models/Session");
 
 wss.on('connection', function connection(ws, req){
 
-    //store user's ws in room
-    let token;
-    try {
-        token = ws.upgradeReq.headers.token;
-    } catch (e) {
-        token = null;
-    }
+    let token = getToken(ws, req);
 
-    if (!token){
-        try {
-            token = req.headers['token'];
-        }
-        catch (e) {
-            token = null;
-        }
-    }
 
     if (token){
         AuthenticationService.authenticate(token)
@@ -69,9 +55,46 @@ wss.on('connection', function connection(ws, req){
             if (e.message = "not opened") return;
             ws.send("no token");
             ws.close();
+            throw e;
         })
     } else {
         ws.send("no token");
         ws.close();
     }
 });
+
+function getToken(ws, req){
+    //store user's ws in room
+    try {
+        let token = ws.upgradeReq.headers.token;
+        if (token) return token;
+    } catch (e) {
+    }
+
+    try {
+        let token = req.headers['token'];
+        if (token) return token;
+    } catch (e) {
+
+    }
+
+    try {
+        let token = ws.protocol;
+        if (token) return token;
+    } catch (e) {
+
+    }
+
+    try {
+        //ws://username:password@host.com
+        //interpreted server side as "Basic Base64(username:password)"
+        //Basic dXNlcm5hbWU6ZXlKaGJHY2lPaUpJVXpJ...
+        let basicString = req.headers.authorization;
+        let token64 = basicString.split(" ")[1];
+        let token = new Buffer(token64, 'base64').toString("ascii");
+        if(token) return token;
+    } catch (e) {
+
+    }
+    return null;
+}
