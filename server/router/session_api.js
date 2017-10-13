@@ -36,7 +36,7 @@ router.get("/teachable", (req, res, next) =>{
     })
     .select('session_id')
     .then(result =>{
-        declinedSessionIds = result.map(row=> row.session_id);
+        declinedSessionIds = result.map(row => row.session_id);
         return User.where({id: req.userId}).fetch({withRelated: "skills"})
     })
     .then(user =>{
@@ -188,5 +188,11 @@ router.get("/:uuid", (req, res, next) =>{
     .then(item => res.send(item))
 });
 
+router.get("/test/:uuid/:userId", (req, res, next) =>{
+    return Session.getByUUIDAsMember(req.params.uuid, req.params.userId)
+    .then(session =>{
+        res.send(session)
+    })
+});
 
 module.exports = router;

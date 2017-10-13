@@ -10,12 +10,21 @@ wss.on('connection', function connection(ws, req){
     //store user's ws in room
     let token;
     try {
-        token = ws.upgradeReq.headers.token || null;
+        token = ws.upgradeReq.headers.token;
     } catch (e) {
         token = null;
     }
 
-    if(token) {
+    if (!token){
+        try {
+            token = req.headers['token'];
+        }
+        catch (e) {
+            token = null;
+        }
+    }
+
+    if (token){
         AuthenticationService.authenticate(token)
         .then(payload =>{
             ws.userId = payload.userId;
@@ -25,15 +34,15 @@ wss.on('connection', function connection(ws, req){
              */
             ws.on('message', function incoming(message){
                 message = JSON.parse(message);
+                let uuid = message.uuid;
+                if (!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
+
                 switch (message.type) {
 
                     case "joinSession":
-                        let uuid = message.uuid;
-                        if(!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
-
                         return Session.getByUUIDAsMember(uuid, ws.userId)
                         .then(session =>{
-                            if(!session) {
+                            if (!session){
                                 ws.send(JSON.stringify({
                                     status: 400,
                                     message: `no session with uuid: ${uuid}`
@@ -48,13 +57,16 @@ wss.on('connection', function connection(ws, req){
                         });
                         break;
                     case "leaveSession":
+                        return SessionService.leaveSession(uuid, ws.userId);
                         break;
+                    case "sendMessage":
+                        return SessionService.sendMessage(ws.userId, uuid, message.message);
+                        break
                 }
-
             });
         })
         .catch((e) =>{
-            if(e.message = "not opened") return;
+            if (e.message = "not opened") return;
             ws.send("no token");
             ws.close();
         })

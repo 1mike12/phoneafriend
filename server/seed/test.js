@@ -1,10 +1,12 @@
+process.env.NODE_ENV = "test";
+
 const User = require("./../models/User");
 const Skill = require("../models/Skill");
 const Promise = require('bluebird');
 const Session = require('../models/Session');
 const faker = require("faker");
 
-module.exports = dev = new function(){
+module.exports = test = new function(){
     let self = this;
 
     self.users = function(){
@@ -63,8 +65,8 @@ module.exports = dev = new function(){
     };
 
     self.skills = () =>{
-        let skillsArray = require("./data/skills");
-        let skills = Skill.forgeCollection(skillsArray)
+        let skillsArray = require("./data/skills_lite");
+        let skills = Skill.forgeCollection(skillsArray);
         return skills.invokeThen("save");
     };
 
@@ -127,13 +129,11 @@ module.exports = dev = new function(){
     };
 
     self.run = function(){
-        return self.users()
+        return require("./_wiper").wipe()
+        .then(() => self.users())
         .then(() => self.skills())
         .then(() => self.setSkills())
         .then(() => self.createSessions())
         .then(() => self.requesters())
     }
 };
-require("./_wiper").wipe()
-.then(() => dev.run())
-.then(() => process.exit());

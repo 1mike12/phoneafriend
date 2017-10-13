@@ -62,7 +62,7 @@ module.exports = {
         seeds: {
             directory: './migrations/seeds'
         },
-        debug: false
+        debug: true
 
     },
     production: {
