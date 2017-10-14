@@ -36,13 +36,16 @@ export default class ActiveSessionScreen extends React.Component {
     }
 
     connect(){
-        this.props.navigator.push({
-            screen: CallScreen.getName(),
-            titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
-            animated: true,
-            animationType: 'slide-horizontal',
-            passProps: {session: this.state.session},
-        });
+        return http.post("api/session/accept", {uuid: this.state.session.uuid})
+        .then(()=>{
+            this.props.navigator.push({
+                screen: CallScreen.getName(),
+                titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+                animated: true,
+                animationType: 'slide-horizontal',
+                passProps: {session: this.state.session},
+            });
+        })
 
         // return http.post("api/session/help", {
         //     uuid: this.state.session.uuid
