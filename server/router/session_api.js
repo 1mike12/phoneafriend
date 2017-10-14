@@ -108,6 +108,25 @@ router.post("/decline", (req, res, next) =>{
     .catch(next)
 });
 
+router.post("/accept", (req, res, next) =>{
+    const {uuid} = req.body;
+    if (!uuid) throw new Error("no uuid");
+
+    return Session.where({uuid}).fetch()
+    .then(session =>{
+        if (!session) return res.setStatus(400).send("no session found");
+
+        if (session.get('teacher_id')){
+            return res.setStatus(400).send("session no longer available")
+        }
+
+        return session.set({teacher_id: req.userId}).save()
+        .then(() => res.sendStatus(200))
+
+    })
+    .catch(next)
+});
+
 router.get('/teachable-single', (req, res, next) =>{
     let {after} = req.query;
     if (!after) after = 0;
