@@ -27,7 +27,7 @@ import StreamService from "../services/StreamService";
 import Config from 'react-native-config'
 import Authentication from "../services/Authentication";
 import NonShitWebSocket from "../classes/NotShitWebsocket";
-import SocketResponse from "../shared/SocketResponse";
+import SocketActions from "../shared/SocketActions";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -99,7 +99,7 @@ export default class CallScreen extends React.Component {
             console.log(message)
         });
 
-        console.log(SocketResponse.JOIN_SESSION);
+        console.log(SocketActions.JOIN_SESSION);
         this.ws = ws;
 
         this.getCameraFab = this.getCameraFab.bind(this);
@@ -108,12 +108,12 @@ export default class CallScreen extends React.Component {
     }
 
     joinRoom(){
-        return new Promise((resolve, reject)=> {
-            this.ws.send({type: "joinSession", uuid: this.state.session.uuid});
-            this.ws.onMessage((message)=>{
-                if (message.status !== 200) reject(message);
+        return new Promise((resolve, reject) =>{
+            this.ws.send(SocketActions.JOIN_SESSION.request({uuid: this.state.session.uuid}));
+            this.ws.onMessage((res) =>{
+                if (res.status !== 200) reject(res);
 
-                resolve(message)
+                resolve(res)
             })
         })
     }

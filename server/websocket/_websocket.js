@@ -4,7 +4,8 @@ const wss = new WebSocket.Server({server: require("../router/server")});
 const SessionService = require("../services/SessionService");
 const AuthenticationService = require('../services/AuthenticationService');
 const Session = require("../models/Session");
-const SocketResponse = require("../../shared/SocketResponse");
+const SocketActions = require("../../shared/SocketActions");
+
 wss.on('connection', function connection(ws, req){
 
     let token = getToken(ws, req);
@@ -14,7 +15,7 @@ wss.on('connection', function connection(ws, req){
         AuthenticationService.authenticate(token)
         .then(payload =>{
             ws.userId = payload.userId;
-            ws.send('connected');
+            ws.send(SocketActions.CONNECT.success());
             /**
              * all messages should be {token, data, message, status}
              */
@@ -23,46 +24,52 @@ wss.on('connection', function connection(ws, req){
                 let uuid = message.uuid;
 
 
-                const request = SocketResponse.fromRequest(message);
+                const request = SocketActions.fromRequest(message);
                 switch (request) {
 
-                    case SocketResponse.JOIN_SESSION:
+                    case SocketActions.JOIN_SESSION:
                         if (!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
                         return Session.getByUUIDAsMember(uuid, ws.userId)
                         .then(session =>{
                             if (!session){
-                                ws.send(JSON.stringify({
-                                    status: 400,
-                                    message: `no session with uuid: ${uuid}`
-                                }))
+                                ws.send(SocketActions.JOIN_SESSION.error({message: `no valid session with uuid ${uuid}`}))
                             } else {
                                 SessionService.joinSession(uuid, ws.userId, ws);
-                                ws.send(JSON.stringify({
-                                    status: 200,
-                                    message: `joined session ${uuid}`
-                                }))
+                                ws.send(SocketActions.JOIN_SESSION.success())
                             }
+                        })
+                        .catch(e =>{
+                            ws.send(SocketActions.JOIN_SESSION.error());
+                            throw e;
                         });
                         break;
-                    case SocketResponse.LEAVE_SESSION:
-                        if (!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
-                        return SessionService.leaveSession(uuid, ws.userId);
+                    case SocketActions.LEAVE_SESSION:
+
+                        if (!uuid) return ws.send(SocketActions.LEAVE_SESSION.error({message: "no uuid specified"}));
+                        try {
+                            SessionService.leaveSession(uuid, ws.userId);
+                            ws.send(SocketActions.LEAVE_SESSION.success())
+                        } catch (e) {
+                            ws.send(SocketActions.LEAVE_SESSION.error({message: "unknown error"}));
+                            throw e;
+                        }
                         break;
-                    case SocketResponse.BROADCAST_TO_SESSION:
-                        if (!uuid) return ws.send(JSON.stringify({status: 400, message: "no uuid specified"}));
-                        return SessionService.sendMessage(ws.userId, uuid, message.message);
+                    case SocketActions.BROADCAST_TO_SESSION:
+
+                        if (!uuid) return ws.send(SocketActions.BROADCAST_TO_SESSION.error({message: "no uuid specified"}));
+                        SessionService.sendMessage(ws.userId, uuid, message.message);
                         break
                 }
             });
         })
         .catch((e) =>{
             if (e.message = "not opened") return;
-            ws.send("no token");
+            ws.send(SocketActions.CONNECT.error({message: "no token"}));
             ws.close();
             throw e;
         })
     } else {
-        ws.send("no token");
+        ws.send(SocketActions.CONNECT.error({message: "no token"}));
         ws.close();
     }
 });

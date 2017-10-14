@@ -14,12 +14,27 @@ class SocketAction {
     }
 
     success(params = {}){
-        return JSON.stringify(Object.assign(params, {type: this.type, successMessage: this.successMessage}))
+        return JSON.stringify(Object.assign(params, {
+            type: this.type,
+            successMessage: this.successMessage,
+            status: 200
+        }))
     }
 
     error(params = {}){
         return JSON.stringify(Object.assign(params, {type: this.type, status: 400}))
     }
+
+    isSuccess(message){
+        if (typeof message === "string") message = JSON.parse(message);
+        return message.type === this.type && message.status === 200
+    }
+
+    isError(message){
+        if (typeof message === "string") message = JSON.parse(message);
+        return message.type === this.type && message.status === 400
+    }
+
 }
 
 class SocketActions {
@@ -66,6 +81,7 @@ SocketActions.type_Response = null;
 SocketActions.JOIN_SESSION = new SocketAction("joinSession", "joinSessionSuccess");
 SocketActions.LEAVE_SESSION = new SocketAction("leaveSession", "leaveSessionSuccess");
 SocketActions.BROADCAST_TO_SESSION = new SocketAction("broadcastToSession", "broadcastToSessionSuccess");
+SocketActions.CONNECT = new SocketAction("connect", "connectSuccess");
 
 
 module.exports = SocketActions;

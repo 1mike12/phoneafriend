@@ -7,6 +7,7 @@ const Session = require("../models/Session");
 const User = require("../models/User");
 const test = require("../seed/test");
 const Promise = require('bluebird');
+const SocketActions = require("../../shared/SocketActions");
 
 let token1;
 let token2;
@@ -80,24 +81,17 @@ describe("Socket Stuff", () =>{
 
     it("should be able to join room", (done) =>{
 
-        let ws = new WebSocket(`ws://localhost:${port}`, {
-            headers: {
-                token: token1
-            }
-        });
+        let ws = new WebSocket(`ws://localhost:${port}`, token1);
 
         ws.on("open", () =>{
             User.where({email: "1mike12@gmail.com"}).fetch()
             .then(user => Session.where({pupil_id: user.get("id")}).fetch())
             .then(session =>{
-                ws.send(JSON.stringify({
-                    type: "joinSession",
-                    uuid: session.get("uuid")
-                }));
+                ws.send(SocketActions.JOIN_SESSION.request({uuid: session.get('uuid')}));
             });
 
             ws.on("message", (message) =>{
-                if (message.includes("joined session")){
+                if (SocketActions.JOIN_SESSION.isSuccess(message)){
                     ws.close();
                     done()
                 }
