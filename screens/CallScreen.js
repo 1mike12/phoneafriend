@@ -99,7 +99,7 @@ export default class CallScreen extends React.Component {
             console.log(message)
         });
 
-        console.log(SocketResponse.JOINED_ROOM)
+        console.log(SocketResponse.JOIN_SESSION);
         this.ws = ws;
 
         this.getCameraFab = this.getCameraFab.bind(this);
