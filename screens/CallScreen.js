@@ -28,6 +28,7 @@ import Config from 'react-native-config'
 import Authentication from "../services/Authentication";
 import NonShitWebSocket from "../classes/NotShitWebsocket";
 import SocketActions from "../shared/SocketActions";
+import Promise from "bluebird";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -83,48 +84,80 @@ export default class CallScreen extends React.Component {
             animated: true // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
         });
 
-        let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-        this.peerConnection = new RTCPeerConnection(configuration);
-        this.peerConnection.onicecandidate = function(e){
-            console.log("onicecandidate", e);
-        };
-        let wsURL = `ws://${Config.HOST}`;
-        let ws = new NonShitWebSocket(wsURL, Authentication.getToken());
-
-        ws.onOpen(() =>{
-            this.joinRoom()
-        });
-
-        ws.onMessage((message) =>{
-            console.log(message)
-        });
-
-        console.log(SocketActions.JOIN_SESSION);
-        this.ws = ws;
 
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
+        this.connect = this.connect.bind(this);
+        this.openSocket = this.openSocket.bind(this);
         this.joinRoom = this.joinRoom.bind(this);
+        this.setupWebRTC = this.setupWebRTC.bind(this);
+    }
+
+    connect(){
+        return Promise.all([
+            this.setupWebRTC(),
+            this.openSocket()
+            .then(()=> this.joinRoom())
+        ])
+        .then(() => this.loadCamera())
+        .then(() =>{
+            console.log("successfully connected all")
+        })
+        .catch(console.log)
+    }
+
+    setupWebRTC(){
+        return new Promise((resolve, reject) =>{
+            if (this.peerConnection) this.peerConnection.close();
+            let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+            this.peerConnection = new RTCPeerConnection(configuration);
+
+            this.peerConnection.createOffer()
+            .then(this.peerConnection.setLocalDescription)
+            .then(() => resolve());
+
+            this.peerConnection.onicecandidate = function(e){
+                // console.log(e)
+            };
+            this.peerConnection.onicecandidateerror = function(e){
+                reject(e)
+            }
+        })
+    }
+
+    openSocket(){
+        return new Promise((resolve, reject) =>{
+            if (this.ws) this.ws.close();
+            let wsURL = `ws://${Config.HOST}`;
+            this.ws = new NonShitWebSocket(wsURL, Authentication.getToken());
+            this.ws.onMessage((message) =>{
+                console.log(message)
+                if (SocketActions.CONNECT.isSuccess(message)){
+                    resolve();
+                }
+                else if (SocketActions.CONNECT.isError(message)) reject(message);
+            });
+        })
     }
 
     joinRoom(){
         return new Promise((resolve, reject) =>{
             this.ws.send(SocketActions.JOIN_SESSION.request({uuid: this.state.session.uuid}));
-            this.ws.onMessage((res) =>{
-                if (res.status !== 200) reject(res);
-
-                resolve(res)
+            this.ws.onMessage((message) =>{
+                if (SocketActions.JOIN_SESSION.isSuccess(message)) resolve();
+                else if (SocketActions.JOIN_SESSION.isError(message)) reject(message);
+                else reject();
             })
         })
     }
 
-    componentDidMount(){
+    componentWillUmount(){
+        if (this.ws) this.ws.close();
+        if (this.peerConnection) this.peerConnection.close();
+    }
 
-        this.peerConnection.createOffer()
-        .then(this.peerConnection.setLocalDescription)
-        .then(console.log);
+    negotiateConnection(){
 
-        this.loadCamera()
     }
 
     loadCamera(){
@@ -201,7 +234,7 @@ export default class CallScreen extends React.Component {
                             flexDirection: 'row',
                             justifyContent: "space-between"
                         }}>
-                            <Button title="join Room" onPress={this.joinRoom}/>
+                            <Button title="Open socket" onPress={this.connect}/>
                             <Fab style={{backgroundColor: "#AAA", margin: 8}}
                                  inside={<Icon name="camera"
                                                size={32}

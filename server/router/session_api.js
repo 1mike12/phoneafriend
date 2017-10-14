@@ -85,19 +85,6 @@ router.get("/teachable/count", (req, res, next) =>{
     .then(knexObj => res.send(knexObj.get("count")))
 });
 
-router.post("/help", (req, res, next) =>{
-    const {uuid} = req.body;
-
-    if (!uuid) return res.status(400).send("No uuid");
-    return Class.where({uuid: uuid, teacher_id: null})
-    .fetch()
-    .then(session =>{
-        if (!session) throw new Error("no session found or session no longer available");
-        return session.set({teacher_id: req.userId}).save()
-    })
-    .then(() => res.sendStatus(200))
-});
-
 router.post("/decline", (req, res, next) =>{
     const {uuid} = req.body;
     return Session.where({uuid}).fetch()
@@ -114,7 +101,7 @@ router.post("/accept", (req, res, next) =>{
 
     return Session.query(qb =>{
         qb.where({uuid})
-        .andWhere("pupil_id", "not", req.userId)
+        .andWhere("pupil_id", "!=", req.userId)
     }).fetch()
     .then(session =>{
         if (!session) return res.setStatus(400).send("no session found");

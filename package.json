@@ -14,7 +14,8 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "node node_modules/jest/bin/jest.js --watch"
+    "test": "node node_modules/jest/bin/jest.js --watch",
+    "endNode": "taskkill /f /im node.exe"
   },
   "jest": {
     "preset": "jest-expo"
