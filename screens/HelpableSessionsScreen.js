@@ -15,7 +15,7 @@ import styles from "../styles";
 import timeAgo from "time-ago";
 import Skill from "../models/Skill";
 import config from "../configReact";
-import Util from "../Util";
+import Util from "../shared/Util";
 import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";

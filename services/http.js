@@ -1,11 +1,12 @@
 import axios from 'axios'
 import config from "../configReact";
 import Authentication from "./Authentication";
+import Config from 'react-native-config';
 
 class http {
     constructor(){
 
-        let baseURL = "http://phoneafriend.ngrok.io/";
+        let baseURL = `http://${Config.HOST}`;
         let savedToken = Authentication.getToken();
 
         this.axios = axios.create({

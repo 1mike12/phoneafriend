@@ -15,7 +15,7 @@ import styles from "../styles";
 import timeAgo from "time-ago";
 import Skill from "../models/Skill";
 import config from "../configReact";
-import Util from "../Util";
+import Util from "../shared/Util";
 import DeleteSkillModal from "./DeleteSkillModal";
 import Session from "../models/Session";
 import SessionSummary from "../components/SessionSummary";
@@ -24,6 +24,10 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {MediaStreamTrack, getUserMedia, RTCPeerConnection, RTCView} from "react-native-webrtc";
 import RTC_Service from "../services/RTC_Service";
 import StreamService from "../services/StreamService";
+import Config from 'react-native-config'
+import Authentication from "../services/Authentication";
+import NonShitWebSocket from "../classes/NotShitWebsocket";
+import SocketResponse from "../shared/SocketResponse";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -84,9 +88,34 @@ export default class CallScreen extends React.Component {
         this.peerConnection.onicecandidate = function(e){
             console.log("onicecandidate", e);
         };
+        let wsURL = `ws://${Config.HOST}`;
+        let ws = new NonShitWebSocket(wsURL, Authentication.getToken());
+
+        ws.onOpen(() =>{
+            this.joinRoom()
+        });
+
+        ws.onMessage((message) =>{
+            console.log(message)
+        });
+
+        console.log(SocketResponse.JOINED_ROOM)
+        this.ws = ws;
 
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
+        this.joinRoom = this.joinRoom.bind(this);
+    }
+
+    joinRoom(){
+        return new Promise((resolve, reject)=> {
+            this.ws.send({type: "joinSession", uuid: this.state.session.uuid});
+            this.ws.onMessage((message)=>{
+                if (message.status !== 200) reject(message);
+
+                resolve(message)
+            })
+        })
     }
 
     componentDidMount(){
@@ -172,6 +201,7 @@ export default class CallScreen extends React.Component {
                             flexDirection: 'row',
                             justifyContent: "space-between"
                         }}>
+                            <Button title="join Room" onPress={this.joinRoom}/>
                             <Fab style={{backgroundColor: "#AAA", margin: 8}}
                                  inside={<Icon name="camera"
                                                size={32}

@@ -4,7 +4,7 @@ const wss = new WebSocket.Server({server: require("../router/server")});
 const SessionService = require("../services/SessionService");
 const AuthenticationService = require('../services/AuthenticationService');
 const Session = require("../models/Session");
-
+const SocketResponse = require("../../shared/SocketResponse");
 wss.on('connection', function connection(ws, req){
 
     let token = getToken(ws, req);

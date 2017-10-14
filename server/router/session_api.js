@@ -112,7 +112,10 @@ router.post("/accept", (req, res, next) =>{
     const {uuid} = req.body;
     if (!uuid) throw new Error("no uuid");
 
-    return Session.where({uuid}).fetch()
+    return Session.query(qb =>{
+        qb.where({uuid})
+        .andWhere("pupil_id", "not", req.userId)
+    }).fetch()
     .then(session =>{
         if (!session) return res.setStatus(400).send("no session found");
 
