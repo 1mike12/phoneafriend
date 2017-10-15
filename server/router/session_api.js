@@ -3,6 +3,7 @@ let Class = require("../models/Session");
 let User = require("../models/User");
 const Session = require('../models/Session');
 const knex = require("../DB").knex;
+const SessionService = require("../services/SessionService");
 
 router.delete("/", (req, res, next) =>{
     Class.where({uuid: req.body.uuid, pupil_id: req.userId}).fetch()
@@ -190,6 +191,10 @@ router.post("/", (req, res, next) =>{
     })
     .then(() => res.sendStatus(200))
     .catch(e => res.send(e));
+});
+
+router.get("/my-active-sessions", (req, res, next)=>{
+    res.send(SessionService.getRoomsForUserId(req.userId))
 });
 
 router.get("/:uuid", (req, res, next) =>{

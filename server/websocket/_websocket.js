@@ -61,6 +61,11 @@ wss.on('connection', function connection(ws, req){
                         break
                 }
             });
+
+            ws.on("close", ()=>{
+                SessionService.removeUser(ws.userId);
+                ws.close();
+            })
         })
         .catch((e) =>{
             if (e.message = "not opened") return;

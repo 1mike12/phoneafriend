@@ -83,5 +83,8 @@ SocketActions.LEAVE_SESSION = new SocketAction("leaveSession", "leaveSessionSucc
 SocketActions.BROADCAST_TO_SESSION = new SocketAction("broadcastToSession", "broadcastToSessionSuccess");
 SocketActions.CONNECT = new SocketAction("connect", "connectSuccess");
 
+//more events and not actions
+SocketActions.USER_JOINED = new SocketAction("userJoined");
+SocketActions.USER_DISCONNECTED = new SocketAction("userDisconnected");
 
 module.exports = SocketActions;
