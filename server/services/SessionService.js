@@ -69,8 +69,11 @@ class SessionService {
         this.createRoomIfNotExist(uuid);
         let room = this.uuid_Room.get(uuid);
 
-        if (this.userId_Rooms.get(userId)){
-            this.userId_Rooms.get(userId).push(room);
+        let usersRooms = this.userId_Rooms.get(userId);
+        if (usersRooms){
+            let usersRoomsUUID = usersRooms.map(room=> room.uuid);
+            if (usersRoomsUUID.includes(uuid)) throw new Error(`user already part of room ${uuid}`);
+            usersRooms.push(room);
         } else {
             this.userId_Rooms.set(userId, [room])
         }
