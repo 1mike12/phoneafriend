@@ -1,3 +1,2 @@
 --require ./test/_globals.js
 --recursive
---bail
