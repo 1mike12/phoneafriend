@@ -1,3 +1,5 @@
+const Util = require("../../shared/Util");
+
 class Room {
     constructor(uuid){
         this.uuid = uuid;
@@ -5,8 +7,6 @@ class Room {
     }
 
     removeUserById(userId){
-        let ws = this.userId_webSocket.get(userId);
-        ws.close();
         this.userId_webSocket.delete(userId)
     }
 
@@ -34,7 +34,7 @@ class Room {
      */
     sendMessageFromUserId(userId, message){
         this.userId_webSocket.forEach((ws, id) =>{
-            if(id !== userId && ws) ws.send(message);
+            if (id !== userId && ws) ws.send(message);
         })
     }
 }
@@ -47,14 +47,19 @@ class SessionService {
          * @type {Map}
          */
         this.uuid_Room = new Map();
+        /**
+         *
+         * @type {Map<integer, array<Room>>}
+         */
+        this.userId_Rooms = new Map();
     }
 
     getUserIds(){
-        return Array.from(this.uuid_Room.keys());
+        return Array.from(this.userId_Rooms.keys());
     }
 
     createRoomIfNotExist(uuid){
-        if(!this.uuid_Room.get(uuid)) {
+        if (!this.uuid_Room.get(uuid)){
             let room = new Room(uuid);
             this.uuid_Room.set(uuid, room)
         }
@@ -63,19 +68,49 @@ class SessionService {
     joinSession(uuid, userId, ws){
         this.createRoomIfNotExist(uuid);
         let room = this.uuid_Room.get(uuid);
+
+        if (this.userId_Rooms.get(userId)){
+            this.userId_Rooms.get(userId).push(room);
+        } else {
+            this.userId_Rooms.set(userId, [room])
+        }
         room.addUser(userId, ws);
+    }
+
+    getRoomsForUserId(userId){
+        return this.userId_Rooms.get(userId);
     }
 
     getRoomByUUID(uuid){
         return this.uuid_Room.get(uuid)
     }
 
+    /**
+     * removes user from room, and removes room if nobody left in room
+     * @param uuid
+     * @param userId
+     */
     leaveSession(uuid, userId){
         let room = this.uuid_Room.get(uuid);
         room.removeUserById(userId);
-        if(room.getUserCount() === 0) {
+        if (room.getUserCount() === 0){
             this.uuid_Room.delete(uuid);
         }
+
+        //remove room from user's Map
+        let userRooms = this.userId_Rooms.get(userId);
+        Util.removeFromArray(userRooms, room);
+
+        //drop user if no longer part of any other rooms
+        if (userRooms.length === 0){
+            this.removeUser(userId)
+        }
+    }
+
+    removeUser(userId){
+        let rooms = this.userId_Rooms.get(userId);
+        rooms.forEach(room => room.removeUserById(userId));
+        this.userId_Rooms.delete(userId)
     }
 
     sendMessage(userId, uuid, message){
@@ -84,7 +119,7 @@ class SessionService {
     }
 
     clear(){
-        this.userId_Room = new Map();
+        this.userId_Rooms = new Map();
         this.uuid_Room = new Map();
     }
 
