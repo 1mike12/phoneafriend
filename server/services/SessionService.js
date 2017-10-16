@@ -43,87 +43,43 @@ class SessionService {
 
     constructor(){
         /**
-         * uuid -< room -< (Map) userId_WebSocket
+         * uuid -< set
          * @type {Map}
          */
-        this.uuid_Room = new Map();
-        /**
-         *
-         * @type {Map<integer, array<Room>>}
-         */
-        this.userId_Rooms = new Map();
+        this.uuid_UserIDs = new Map();
     }
 
-    getUserIds(){
-        return Array.from(this.userId_Rooms.keys());
-    }
-
-    createRoomIfNotExist(uuid){
-        if (!this.uuid_Room.get(uuid)){
-            let room = new Room(uuid);
-            this.uuid_Room.set(uuid, room)
+    addUserToRoom(uuid, userId){
+        let set = this.uuid_UserIDs.get(uuid);
+        if (!set){
+            set = new Set();
+            this.uuid_UserIDs.set(uuid, set)
         }
+        set.add(userId);
     }
 
-    joinSession(uuid, userId, ws){
-        this.createRoomIfNotExist(uuid);
-        let room = this.uuid_Room.get(uuid);
-
-        let usersRooms = this.userId_Rooms.get(userId);
-        if (usersRooms){
-            let usersRoomsUUID = usersRooms.map(room=> room.uuid);
-            if (usersRoomsUUID.includes(uuid)) throw new Error(`user already part of room ${uuid}`);
-            usersRooms.push(room);
-        } else {
-            this.userId_Rooms.set(userId, [room])
+    getOtherUserIdsForRoom(uuid, userId){
+        if (typeof userId === "string") throw new Error("userId is string");
+        let set = this.uuid_UserIDs.get(uuid);
+        let array = [];
+        for (let id of set.entries()) {
+            if (id !== userId){
+                array.push(id)
+            }
         }
-        room.addUser(userId, ws);
+        return array
     }
 
-    getRoomsForUserId(userId){
-        return this.userId_Rooms.get(userId);
-    }
-
-    getRoomByUUID(uuid){
-        return this.uuid_Room.get(uuid)
-    }
-
-    /**
-     * removes user from room, and removes room if nobody left in room
-     * @param uuid
-     * @param userId
-     */
-    leaveSession(uuid, userId){
-        let room = this.uuid_Room.get(uuid);
-        room.removeUserById(userId);
-        if (room.getUserCount() === 0){
-            this.uuid_Room.delete(uuid);
+    removeUserFromRoom(uuid, userId){
+        let set = this.uuid_UserIDs.get(uuid);
+        set.delete(userId);
+        if (set.size === 0){
+            this.uuid_UserIDs.delete(uuid)
         }
-
-        //remove room from user's Map
-        let userRooms = this.userId_Rooms.get(userId);
-        Util.removeFromArray(userRooms, room);
-
-        //drop user if no longer part of any other rooms
-        if (userRooms.length === 0){
-            this.removeUser(userId)
-        }
-    }
-
-    removeUser(userId){
-        let rooms = this.userId_Rooms.get(userId);
-        rooms.forEach(room => room.removeUserById(userId));
-        this.userId_Rooms.delete(userId)
-    }
-
-    sendMessage(userId, uuid, message){
-        let room = this.uuid_Room.get(uuid);
-        room.sendMessageFromUserId(userId, message);
     }
 
     clear(){
-        this.userId_Rooms = new Map();
-        this.uuid_Room = new Map();
+        this.uuid_UserIDs.clear();
     }
 
 }

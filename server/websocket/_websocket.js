@@ -29,15 +29,27 @@ io.on("connect", socket =>{
 
     socket.on("joinRoom", (params, callback) =>{
         let uuid = params.uuid;
+        let userId = socket.userId;
         if (!uuid) return callback(400);
+
         socket.join(params.uuid);
-        callback(200)
+        SessionService.addUserToRoom(uuid, userId);
+        let othersInRoom = SessionService.getOtherUserIdsForRoom(uuid, userId);
+        callback(othersInRoom)
     });
 
+    /**
+     * remove self from room
+     * alert others that someone left room
+     */
     socket.on("leaveRoom", (params, callback) =>{
         let uuid = params.uuid;
         if (!uuid) return callback(400);
+
+        let userId = socket.userId;
         socket.leave(params.uuid);
+        io.to(uuid).emit("userLeftRoom", userId);
+        SessionService.removeUserFromRoom(uuid, socket.userId);
         callback(200)
     });
 

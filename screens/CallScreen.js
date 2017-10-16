@@ -10,25 +10,19 @@ import {
     ScrollView,
     ToastAndroid, Image
 } from "react-native";
-import http from '../services/http';
 import styles from "../styles";
 import timeAgo from "time-ago";
-import Skill from "../models/Skill";
 import config from "../configReact";
-import Util from "../shared/Util";
-import DeleteSkillModal from "./DeleteSkillModal";
-import Session from "../models/Session";
-import SessionSummary from "../components/SessionSummary";
 import Fab from "../components/Fab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {MediaStreamTrack, getUserMedia, RTCPeerConnection, RTCView} from "react-native-webrtc";
-import RTC_Service from "../services/RTC_Service";
 import StreamService from "../services/StreamService";
 import Config from 'react-native-config'
 import Authentication from "../services/Authentication";
 import NonShitWebSocket from "../classes/NotShitWebsocket";
 import SocketActions from "../shared/SocketActions";
 import Promise from "bluebird";
+import io from "socket.io-client";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -84,6 +78,8 @@ export default class CallScreen extends React.Component {
             animated: true // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
         });
 
+        this.userId_pc = new Map();
+
 
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
@@ -94,11 +90,8 @@ export default class CallScreen extends React.Component {
     }
 
     connect(){
-        return Promise.all([
-            this.setupWebRTC(),
-            this.openSocket()
-            .then(()=> this.joinRoom())
-        ])
+        return this.openSocket()
+        .then(this.setupWebRTC)
         .then(() => this.loadCamera())
         .then(() =>{
             console.log("successfully connected all")
@@ -106,38 +99,140 @@ export default class CallScreen extends React.Component {
         .catch(console.log)
     }
 
-    setupWebRTC(){
-        return new Promise((resolve, reject) =>{
-            if (this.peerConnection) this.peerConnection.close();
-            let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-            this.peerConnection = new RTCPeerConnection(configuration);
+    setupWebRTC(userIdsInRoom){
+        userIdsInRoom.forEach(userId =>{
 
-            this.peerConnection.createOffer()
-            .then(this.peerConnection.setLocalDescription)
-            .then(() => resolve());
+        });
 
-            this.peerConnection.onicecandidate = function(e){
-                // console.log(e)
-            };
-            this.peerConnection.onicecandidateerror = function(e){
-                reject(e)
-            }
-        })
+        if (this.peerConnection) this.peerConnection.close();
+        let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+        this.peerConnection = new RTCPeerConnection(configuration);
+
+
+        this.peerConnection.onicecandidate = function(e){
+
+        };
+        this.peerConnection.onicecandidateerror = function(e){
+            reject(e)
+        };
+
+        return this.peerConnection.createOffer()
+        .then(this.peerConnection.setLocalDescription)
+
     }
 
     openSocket(){
         return new Promise((resolve, reject) =>{
-            if (this.ws) this.ws.close();
             let wsURL = `ws://${Config.HOST}`;
-            this.ws = new NonShitWebSocket(wsURL, Authentication.getToken());
-            this.ws.onMessage((message) =>{
-                console.log(message)
-                if (SocketActions.CONNECT.isSuccess(message)){
-                    resolve();
+            let socket = io(wsURL, {
+                transportOptions: {
+                    polling: {
+                        extraHeaders: {
+                            'Token': Authentication.getToken()
+                        }
+                    }
                 }
-                else if (SocketActions.CONNECT.isError(message)) reject(message);
             });
+            socket.on("connect", resolve);
+            socket.on("error", reject);
+            socket.on("userLeftRoom", (userId) =>{
+                console.log('userLeftRoom', userId)
+                //find peerConnection and pc.close();
+            });
+
+            socket.on("userJoinedRoom", (userId) => this.createPeerConnection(userId));
+            this.socket = socket;
         })
+        .then(() =>{
+            return new Promise((resolve, reject) =>{
+                this.socket.emit("joinRoom", {uuid: this.state.session.uuid}, resolve)
+            })
+        })
+        .then(userIds =>{
+            return Promise.all(userIds.map(userId => this.createPeerConnection(userId)))
+        })
+    }
+
+    createPeerConnection(userId){
+        return Promise.resolve((resolve, reject) =>{
+            if (!userId) throw new Error("userId malformed");
+
+            const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+            const pc = new RTCPeerConnection(configuration);
+            this.userId_pc.set(userId, pc);
+
+            /**
+             * 1 after setLocalDescription
+             */
+            pc.onnegotiationneeded = function(){
+                pc.createOffer()
+                .then(description => pc.setLocalDescription(description))
+                .then(() =>{
+                    this.socket.emit("exchangeDescription", {
+                        uuid: this.state.session.uuid,
+                        description: pc.localDescription
+                    }, (status) =>{
+                        if (status === 200) resolve(pc);
+                        else reject("couldn't exchange description");
+                    })
+                })
+                .catch(console.log)
+            };
+
+            // //2, 5
+            // //called after setLocalDescription or setRemoteDescription
+            // pc.onsignalingstatechange = function(event){
+            //     console.log('onsignalingstatechange', event.target.signalingState);
+            // };
+
+
+            //3 x4
+            //local ice agent needs to send message to other peers through signaling server
+            pc.onicecandidate = function(event){
+                this.socket.emit("exchangeCandidate", {
+                    uuid: this.state.session.uuid,
+                    candidate: event.candidate
+                }, (status) =>{
+                    if (status === 200) resolve();
+                    else reject("couldn't exchange candidate");
+                })
+            };
+
+            //6,9
+            pc.oniceconnectionstatechange = function(event){
+                console.log('oniceconnectionstatechange', event.target.iceConnectionState);
+                if (event.target.iceConnectionState === 'completed'){
+                    setTimeout(() =>{
+                        getStats();
+                    }, 1000);
+                }
+                if (event.target.iceConnectionState === 'connected'){
+                    createDataChannel();
+                }
+            };
+
+
+            //7
+            //when remove peer adds a MediaStream to the connection
+            //called after setRemoteDescription()
+            pc.onaddstream = function(event){
+
+                // container.setState({info: 'One peer join!'});
+                //
+                // const remoteList = container.state.remoteList;
+                // remoteList[socketId] = event.stream.toURL();
+                // container.setState({remoteList: remoteList});
+            };
+
+            pc.onremovestream = function(event){
+                console.log('onremovestream', event.stream);
+            };
+
+
+            pc.addStream(localStream);
+
+        })
+
     }
 
     joinRoom(){
@@ -151,20 +246,17 @@ export default class CallScreen extends React.Component {
         })
     }
 
-    componentWillUmount(){
-        if (this.ws) this.ws.close();
-        if (this.peerConnection) this.peerConnection.close();
-    }
-
-    negotiateConnection(){
-
-    }
-
+    /**
+     * Promise<stream>
+     */
     loadCamera(){
         let state = this.state.cameraState;
         if (state !== CAMERA_STATE_OFF){
             return StreamService.getStream(this.state.cameraState)
-            .then(stream => this.setState({videoURL: stream.toURL()}));
+            .then(stream =>{
+                this.setState({videoURL: stream.toURL()});
+                return stream;
+            });
         }
     }
 
