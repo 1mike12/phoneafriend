@@ -25,7 +25,7 @@ PUBLIC APIS
  */
 app.use("/api/public/", require("./public/api_public"));
 
-let server = http.createServer(app);
+let server = http.Server(app);
 
 const PORT = process.env.NODE_ENV === "test" ? config.testPort : config.port;
 server.listen(PORT, function () {

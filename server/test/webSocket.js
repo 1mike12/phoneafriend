@@ -8,6 +8,7 @@ const User = require("../models/User");
 const test = require("../seed/test");
 const Promise = require('bluebird');
 const SocketActions = require("../../shared/SocketActions");
+const io = require("socket.io-client");
 
 let token1;
 let token2;
@@ -29,73 +30,74 @@ before(() =>{
     ))
 });
 
-describe("Socket Authentication", () =>{
+describe("socket io middleware authentication", () =>{
 
-    it("Authentication", (done) =>{
-        let ws = new WebSocket(`ws://localhost:${port}`, {
-            headers: {
-                token: token1
-            }
-        });
-
-        ws.on('message', function incoming(data){
-            expect(data).to.equal("connected");
-            ws.close();
-            done();
-        });
-    });
 
     it("Authentication with protocol", (done) =>{
-        let ws = new WebSocket(`ws://localhost:${port}`, token1);
-
-        ws.on('message', function incoming(data){
-            expect(data).to.equal("connected");
-            ws.close();
+        let socket = io('http://localhost:9009', {
+            transportOptions: {
+                polling: {
+                    extraHeaders: {
+                        'Token': token1
+                    }
+                }
+            }
+        });
+        socket.on('connect', function(data){
+            console.log(data);
+            socket.disconnect();
             done();
         });
+
+        socket.on("error", () =>{
+            socket.disconnect()
+            throw new Error("there was an error before connecting")
+        })
     });
 
-    it("Authentication with basic auth", (done) =>{
-        let ws = new WebSocket(`ws://${token1}@localhost:${port}`);
-
-        ws.on('message', function incoming(data){
-            expect(data).to.equal("connected");
-            ws.close();
-            done();
+    it("Authentication should fail without token", done =>{
+        let socket = io('http://localhost:9009', {
+            transportOptions: {
+                polling: {
+                    extraHeaders: {
+                        'Token': ""
+                    }
+                }
+            }
         });
+        socket.on('connect', function(data){
+            socket.disconnect();
+            throw new Error("connected even though not supposed to")
+        });
+
+        socket.on("error", data =>{
+            socket.disconnect()
+            done();
+        })
     });
 
-
-    it("Not authentiated", (done) =>{
-        let ws = new WebSocket(`ws://localhost:${port}`, {});
-
-        ws.on('message', function incoming(data){
-            expect(data).to.equal("no token");
-            ws.close();
-            done();
-        });
-    })
 });
 
 describe("Socket Stuff", () =>{
 
     it("should be able to join room", (done) =>{
 
-        let ws = new WebSocket(`ws://localhost:${port}`, token1);
+        let socket = io('http://localhost:9009', {
+            transportOptions: {polling: {extraHeaders: {'Token': token1}}}
+        });
 
-        ws.on("open", () =>{
+        socket.on("connect", () =>{
             User.where({email: "1mike12@gmail.com"}).fetch()
             .then(user => Session.where({pupil_id: user.get("id")}).fetch())
             .then(session =>{
-                ws.send(SocketActions.JOIN_SESSION.request({uuid: session.get('uuid')}));
+                socket.emit("joinRoom", {uuid: session.get('uuid')}, (response) =>{
+                    done();
+                });
             });
+        });
 
-            ws.on("message", (message) =>{
-                if (SocketActions.JOIN_SESSION.isSuccess(message)){
-                    ws.close();
-                    done()
-                }
-            })
+        socket.on("error", () =>{
+            throw new Error("socket error")
         })
     });
 
@@ -106,86 +108,42 @@ describe("Socket Stuff", () =>{
             if (!session) throw new Error("no session");
 
             let uuid = session.get("uuid");
-            let ws1 = new WebSocket(`ws://localhost:${port}`, {headers: {token: token1}});
-            let ws2 = new WebSocket(`ws://localhost:${port}`, {headers: {token: token2}});
-
-            let user1Joined = false;
-            let user2Joined = false;
-
-            const USER1_MESSAGE = "USER1_message";
-            const USER2_MESSAGE = "USER2_message";
-
-            function checkIfProceed(){
-                if (user1Joined && user2Joined){
-                    ws1.send(JSON.stringify({type: "sendMessage", uuid: uuid, message: USER1_MESSAGE}));
-                    ws2.send(JSON.stringify({type: "sendMessage", uuid: uuid, message: USER2_MESSAGE}));
-                }
-            }
-
-            let user1MessageReceived = false;
-            let user2MessageReceived = false;
-
-            let user1ReceivedSelfMessage = false;
-            let user2ReceivedSelfMessage = false;
-
-            function checkIfDone(){
-                if (user1MessageReceived && user2MessageReceived){
-
-                    expect(user1MessageReceived).to.be.true;
-                    expect(user2MessageReceived).to.be.true;
-                    expect(user1ReceivedSelfMessage).to.be.false;
-                    expect(user2ReceivedSelfMessage).to.be.false;
-
-                    ws1.close();
-                    ws2.close();
-                    done();
-                }
-            }
-
-            ws1.on("open", () =>{
-                ws1.send(JSON.stringify({
-                    type: "joinSession",
-                    uuid: uuid
-                }));
-
-                ws1.on("message", (message) =>{
-                    if (message.includes("joined session")){
-                        user1Joined = true;
-                        checkIfProceed()
-                    }
-
-                    if (message.includes(USER2_MESSAGE)){
-                        user2MessageReceived = true;
-                        checkIfDone()
-                    }
-
-                    if (message.includes(USER1_MESSAGE)){
-                        user1ReceivedSelfMessage = true;
-                    }
-                })
+            let ws1 = io('http://localhost:9009', {
+                transportOptions: {polling: {extraHeaders: {'Token': token1}}}
             });
 
-            ws2.on("open", () =>{
-                ws2.send(JSON.stringify({
-                    type: "joinSession",
-                    uuid: uuid
-                }));
 
-                ws2.on("message", (message) =>{
-                    if (message.includes("joined session")){
-                        user2Joined = true;
-                        checkIfProceed()
-                    }
-                    if (message.includes(USER1_MESSAGE)){
-                        user1MessageReceived = true;
-                        checkIfDone()
-                    }
+            let ws2 = io('http://localhost:9009', {
+                transportOptions: {polling: {extraHeaders: {'Token': token2}}}
+            });
 
-                    if (message.includes(USER2_MESSAGE)){
-                        user2ReceivedSelfMessage = true;
-                    }
-                })
-            })
+            ws1.on("connect", () =>{
+                ws1.emit("joinRoom", {uuid}, checkIfJoined);
+            });
+
+            ws2.on("connect", () =>{
+                ws2.emit("joinRoom", {uuid}, checkIfJoined)
+            });
+
+            let connectCount = 0;
+
+            function checkIfJoined(status){
+                connectCount++;
+                if (connectCount === 2){
+                    ws1.emit("exchangeDescription", {uuid, description: {foo: "bar"}}, checkIfSent);
+                    ws2.emit("exchangeDescription", {uuid, description: {foo: "bar"}}, checkIfSent);
+                }
+            }
+
+            let sentCount = 0;
+
+            function checkIfSent(){
+                sentCount++;
+                if (sentCount === 2){
+                    done()
+                }
+            }
+
         });
     })
 });
