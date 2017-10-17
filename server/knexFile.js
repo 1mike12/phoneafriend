@@ -71,9 +71,9 @@ module.exports = {
             charset: 'utf8',
             host: "localhost",
             port: "5432",
-            user: "mike",
-            password: "tracRAPr6!eR",
-            database: "ebay",
+            user: "root",
+            password: "ua84zz5UWQFz",
+            database: DB_NAME,
         },
         migrations: {
             tableName: 'migrations',
