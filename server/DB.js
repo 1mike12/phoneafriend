@@ -1,5 +1,3 @@
-const config = require("config");
-
 class DB {
   constructor() {
     this.knex = this.getKnex();
