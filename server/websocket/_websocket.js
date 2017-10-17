@@ -27,7 +27,7 @@ io.use((socket, next) =>{
 
 io.on("connect", socket =>{
 
-    socket.on("joinRoom", (params, callback) =>{
+    socket.on(SocketActions.JOIN_ROOM, (params, callback) =>{
         let uuid = params.uuid;
         let userId = socket.userId;
         if (!uuid) return callback(400);
@@ -42,30 +42,32 @@ io.on("connect", socket =>{
      * remove self from room
      * alert others that someone left room
      */
-    socket.on("leaveRoom", (params, callback) =>{
+    socket.on(SocketActions.LEAVE_ROOM, (params, callback) =>{
         let uuid = params.uuid;
         if (!uuid) return callback(400);
 
         let userId = socket.userId;
         socket.leave(params.uuid);
-        io.to(uuid).emit("userLeftRoom", userId);
+        io.to(uuid).emit(SocketActions.USER_LEFT_ROOM, userId);
         SessionService.removeUserFromRoom(uuid, socket.userId);
         callback(200)
     });
 
-    socket.on("exchangeDescription", (params, callback) =>{
+    socket.on(SocketActions.SEND_DESCRIPTION, (params, callback) =>{
         let {description, uuid} = params;
         if (!description || !uuid) return callback(400);
 
-        socket.broadcast.to(uuid).emit(description);
+        socket.broadcast.to(uuid)
+        .emit(SocketActions.RECEIVE_DESCRIPTION, {userId: socket.userId, description});
         callback(200)
     });
 
-    socket.on("exchangeCandidate", (params, callback) =>{
+    socket.on(SocketActions.SEND_CANDIDATE, (params, callback) =>{
         let {candidate, uuid} = params;
         if (!candidate || !uuid) return callback(400);
 
-        socket.broadcast.to(uuid).emit(candidate);
+        socket.broadcast.to(uuid)
+        .emit(SocketActions.RECEIVE_CANDIDATE, {userId: socket.userId, candidate});
         callback(200)
     });
 
@@ -75,7 +77,7 @@ io.on("connect", socket =>{
     // socket.leave("room uuid");
 
     //io.to("room uuid").emit("user connected");
-})
+});
 
 
 

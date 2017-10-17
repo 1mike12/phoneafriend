@@ -25,7 +25,7 @@ export default class VideoScreen extends React.Component {
     return (
       <View>
         <Text>ser</Text>
-        <RTCView streamURL={this.state.videoURL}/>
+        <RTCView streamURL={this.state.streamUrl}/>
       </View>
     );
   }
