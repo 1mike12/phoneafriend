@@ -22,7 +22,6 @@ import {
 import StreamService from "../services/StreamService";
 import Config from 'react-native-config'
 import Authentication from "../services/Authentication";
-import NonShitWebSocket from "../classes/NotShitWebsocket";
 import SocketActions from "../shared/SocketActions";
 import Promise from "bluebird";
 import io from "socket.io-client";
@@ -69,9 +68,8 @@ export default class CallScreen extends React.Component {
             ready: true,
             cameraState: CAMERA_STATE_BACK,
             streamUrl: "",
-            userId_streamUrl: new Map();
-    }
-        ;
+            userId_streamUrl: new Map()
+        };
 
         this.props.navigator.toggleTabs({
             to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
@@ -108,7 +106,7 @@ export default class CallScreen extends React.Component {
      */
     loadCamera(){
         let state = this.state.cameraState;
-        if (state !== CAMERA_STATE_OFF){
+        if(state !== CAMERA_STATE_OFF) {
             return StreamService.getStream(this.state.cameraState)
             .then(stream =>{
                 let streamUrl = stream.toURL();
@@ -165,7 +163,7 @@ export default class CallScreen extends React.Component {
     //first second 2
     createPeerConnection(userId){
         return Promise.resolve((resolve, reject) =>{
-            if (!userId) throw new Error("userId malformed");
+            if(!userId) throw new Error("userId malformed");
 
             const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
             const pc = new RTCPeerConnection(configuration);
@@ -173,7 +171,7 @@ export default class CallScreen extends React.Component {
             this.userId_pc.set(userId, pc);
 
             //1 called immediately
-            pc.onnegotiationneeded = function(){
+            pc.onnegotiationneeded = function (){
                 pc.createOffer()
                 .then(description => pc.setLocalDescription(description))
                 .then(() =>{
@@ -182,7 +180,7 @@ export default class CallScreen extends React.Component {
                             description: pc.localDescription
                         },
                         (status) =>{
-                            if (status !== 200) reject("couldn't exchange description");
+                            if(status !== 200) reject("couldn't exchange description");
                         })
                 })
                 .catch(reject)
@@ -197,19 +195,19 @@ export default class CallScreen extends React.Component {
 
             //3 x4
             //local ice agent needs to send message to other peers through signaling server
-            pc.onicecandidate = function(event){
+            pc.onicecandidate = function (event){
                 this.socket.emit(SocketActions.SEND_CANDIDATE, {
                         uuid: this.state.session.uuid,
                         candidate: event.candidate
                     },
                     (status) =>{
-                        if (status !== 200) reject("couldn't exchange candidate");
+                        if(status !== 200) reject("couldn't exchange candidate");
                     })
             };
 
             //6,9
-            pc.oniceconnectionstatechange = function(event){
-                if (event.target.iceConnectionState === 'connected'){
+            pc.oniceconnectionstatechange = function (event){
+                if(event.target.iceConnectionState === 'connected') {
                     createDataChannel();
                 }
             };
@@ -224,30 +222,30 @@ export default class CallScreen extends React.Component {
                 this.setState({userId_streamUrl: map});
             };
 
-            pc.onremovestream = function(event){
+            pc.onremovestream = function (event){
                 console.log('onremovestream', event.stream);
             };
 
             function createDataChannel(){
-                if (pc.textDataChannel){
+                if(pc.textDataChannel) {
                     return;
                 }
                 const dataChannel = pc.createDataChannel("text");
                 pc.textDataChannel = dataChannel;
 
-                dataChannel.onerror = function(error){
+                dataChannel.onerror = function (error){
                     console.log("dataChannel.onerror", error);
                 };
 
-                dataChannel.onmessage = function(event){
+                dataChannel.onmessage = function (event){
                     console.log("dataChannel.onmessage:", event.data);
                 };
 
-                dataChannel.onopen = function(){
+                dataChannel.onopen = function (){
                     console.log('dataChannel.onopen');
                 };
 
-                dataChannel.onclose = function(){
+                dataChannel.onclose = function (){
                     console.log("dataChannel.onclose");
                 };
 
@@ -261,10 +259,10 @@ export default class CallScreen extends React.Component {
     assignRemoteDescription(userId, description){
         return new Promise((resolve, reject) =>{
             let pc = this.userId_pc.get(userId);
-            if (!pc) throw new Error("no peer connection found");
+            if(!pc) throw new Error("no peer connection found");
             return pc.setRemoteDescription(new RTCSessionDescription(description))
             .then(() =>{
-                if (pc.remoteDescription.type.toLowerCase() === "offer"){
+                if(pc.remoteDescription.type.toLowerCase() === "offer") {
                     return pc.createAnswer()
                     .then(description => pc.setLocalDescription(description))
                     .then(() =>{
@@ -280,7 +278,7 @@ export default class CallScreen extends React.Component {
 
     assignCandidate(userId, candidate){
         let pc = this.userId_pc.get(userId);
-        if (!pc) throw new Error("no peer connection found");
+        if(!pc) throw new Error("no peer connection found");
         pc.addIceCandidate(new RTCIceCandidate(candidate))
     }
 
@@ -289,15 +287,15 @@ export default class CallScreen extends React.Component {
 
         });
 
-        if (this.peerConnection) this.peerConnection.close();
+        if(this.peerConnection) this.peerConnection.close();
         let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
         this.peerConnection = new RTCPeerConnection(configuration);
 
 
-        this.peerConnection.onicecandidate = function(e){
+        this.peerConnection.onicecandidate = function (e){
 
         };
-        this.peerConnection.onicecandidateerror = function(e){
+        this.peerConnection.onicecandidateerror = function (e){
             reject(e)
         };
 
@@ -317,7 +315,7 @@ export default class CallScreen extends React.Component {
     }
 
     getCameraFab(){
-        if (this.state.cameraState === CAMERA_STATE_BACK){
+        if(this.state.cameraState === CAMERA_STATE_BACK) {
             return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         onPress={() => this.toggleCameraState(CAMERA_STATE_FRONT)}
                         inside={<Icon name="camera-front-variant"
@@ -325,7 +323,7 @@ export default class CallScreen extends React.Component {
                                       color="white"/>
                         }
             />
-        } else if (this.state.cameraState === CAMERA_STATE_FRONT){
+        } else if(this.state.cameraState === CAMERA_STATE_FRONT) {
             return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         onPress={() => this.toggleCameraState(CAMERA_STATE_BACK)}
                         inside={<Icon name="camera-rear-variant"
