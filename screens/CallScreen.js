@@ -116,6 +116,15 @@ export default class CallScreen extends React.Component {
         }
     }
 
+    userLeft(userId){
+        let pc = this.userId_pc.get(userId);
+        pc.close();
+        this.userId_pc.delete(userId);
+        let streamMap = this.state.userId_streamUrl;
+        streamMap.delete(userId);
+        this.setState({userId_streamUrl: streamMap})
+    }
+
     setupSocket(){
         return new Promise((resolve, reject) =>{
             let wsURL = `ws://${Config.HOST}`;
@@ -131,9 +140,7 @@ export default class CallScreen extends React.Component {
             socket.on("connect", resolve);
             socket.on("error", reject);
 
-            socket.on(SocketActions.USER_LEFT_ROOM, (userId) =>{
-                //find peerConnection and pc.close();
-            });
+            socket.on(SocketActions.USER_LEFT_ROOM, (userId) => this.userLeft(userId));
 
             //first 1
             socket.on(SocketActions.USER_JOINED_ROOM, (userId) => this.createPeerConnection(userId));
