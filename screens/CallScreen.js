@@ -87,14 +87,12 @@ export default class CallScreen extends React.Component {
         this.toggleCameraState = this.toggleCameraState.bind(this);
         this.connect = this.connect.bind(this);
         this.setupSocket = this.setupSocket.bind(this);
-        this.joinRoom = this.joinRoom.bind(this);
-        this.setupWebRTC = this.setupWebRTC.bind(this);
+        this.createPeerConnection = this.createPeerConnection.bind(this);
     }
 
     connect(){
         return this.loadCamera()
         .then(() => this.setupSocket())
-        .then(() => this.setupWebRTC())
         .then(() =>{
             console.log("successfully connected all")
         })
@@ -125,7 +123,12 @@ export default class CallScreen extends React.Component {
         this.setState({userId_streamUrl: streamMap})
     }
 
+    /**
+     * sets up socket and joins room
+     * @returns Promise resolving in userIds of current members of room
+     */
     setupSocket(){
+        if (this.socket) this.socket.close();
         return new Promise((resolve, reject) =>{
             let wsURL = `ws://${Config.HOST}`;
             let socket = io(wsURL, {
@@ -161,37 +164,51 @@ export default class CallScreen extends React.Component {
                 this.socket.emit(SocketActions.JOIN_ROOM, {uuid: this.state.session.uuid}, resolve)
             })
         })
-        .then(userIds =>{
-            //second 1
-            return Promise.all(userIds.map(userId => this.createPeerConnection(userId)))
-        })
+        .then((userIds)=> Promise.all(userIds.map(userId => this.createPeerConnection(userId))))
     }
 
     //first second 2
     createPeerConnection(userId){
-        return Promise.resolve((resolve, reject) =>{
+        return new Promise((resolve, reject) =>{
             if(!userId) throw new Error("userId malformed");
 
             const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
             const pc = new RTCPeerConnection(configuration);
-            pc.addStream(this.state.streamURL);
+            pc.addStream(this.state.streamUrl);
             this.userId_pc.set(userId, pc);
 
+            pc.createOffer()
+            .then(description => pc.setLocalDescription(description))
+            .then(() =>{
+                this.socket.emit(SocketActions.SEND_DESCRIPTION, {
+                        uuid: this.state.session.uuid,
+                        description: pc.localDescription
+                    },
+                    (status) =>{
+                        if(status !== 200) reject("couldn't exchange description");
+                    })
+            })
+            .catch(reject);
+
+            pc.onnegotiationneeded = function(e){
+                var x = 0;
+            }
+
             //1 called immediately
-            pc.onnegotiationneeded = function (){
-                pc.createOffer()
-                .then(description => pc.setLocalDescription(description))
-                .then(() =>{
-                    this.socket.emit(SocketActions.SEND_DESCRIPTION, {
-                            uuid: this.state.session.uuid,
-                            description: pc.localDescription
-                        },
-                        (status) =>{
-                            if(status !== 200) reject("couldn't exchange description");
-                        })
-                })
-                .catch(reject)
-            };
+            // pc.onnegotiationneeded = function (){
+            //     pc.createOffer()
+            //     .then(description => pc.setLocalDescription(description))
+            //     .then(() =>{
+            //         this.socket.emit(SocketActions.SEND_DESCRIPTION, {
+            //                 uuid: this.state.session.uuid,
+            //                 description: pc.localDescription
+            //             },
+            //             (status) =>{
+            //                 if(status !== 200) reject("couldn't exchange description");
+            //             })
+            //     })
+            //     .catch(reject)
+            // };
 
             // //2, 5
             // //called after setLocalDescription or setRemoteDescription
@@ -289,33 +306,16 @@ export default class CallScreen extends React.Component {
         pc.addIceCandidate(new RTCIceCandidate(candidate))
     }
 
-    setupWebRTC(userIdsInRoom){
-        userIdsInRoom.forEach(userId =>{
-
-        });
-
-        if(this.peerConnection) this.peerConnection.close();
-        let configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-        this.peerConnection = new RTCPeerConnection(configuration);
-
-
-        this.peerConnection.onicecandidate = function (e){
-
-        };
-        this.peerConnection.onicecandidateerror = function (e){
-            reject(e)
-        };
-
-        return this.peerConnection.createOffer()
-        .then(this.peerConnection.setLocalDescription)
-
-    }
-
     toggleCameraState(cameraState){
         this.setState({cameraState}, () =>{
             this.loadCamera()
         })
     }
+
+    componentWillDismount(){
+        if (this.socket) this.socket.close();
+    }
+
 
     static getName(){
         return `${config.name}.${NAME}`

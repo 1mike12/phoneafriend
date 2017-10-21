@@ -1,3 +1,5 @@
 ./ngrok http -subdomain=phoneafriend 8009
 
 knex migrate:latest --env test
+
+taskkill /f /im node.exe
