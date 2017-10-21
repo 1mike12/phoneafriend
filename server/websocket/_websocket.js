@@ -7,7 +7,7 @@ const SocketActions = require("../../shared/SocketActions");
 
 io.use((socket, next) =>{
     try {
-        let token = socket.handshake.headers.token;
+        let token = socket.handshake.query.token;
 
         if (!token) return next(new Error("authentication error"));
 
@@ -79,5 +79,4 @@ io.on("connect", socket =>{
     //io.to("room uuid").emit("user connected");
 });
 
-
-
+module.exports = io;

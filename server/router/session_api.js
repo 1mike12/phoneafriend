@@ -12,7 +12,7 @@ router.delete("/", (req, res, next) =>{
     })
     .then(() => res.sendStatus(200))
     .catch(e =>{
-        res.sendStatus(400)
+        res.sendStatus(400);
         throw e;
     })
 });
@@ -193,13 +193,13 @@ router.post("/", (req, res, next) =>{
     .catch(e => res.send(e));
 });
 
-router.get("/my-active-sessions", (req, res, next)=>{
+router.get("/my-active-sessions", (req, res, next) =>{
     res.send(SessionService.getRoomsForUserId(req.userId))
 });
 
-router.get("/:uuid", (req, res, next) =>{
-    Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch({withRelated: ["skills", "pupil", "teacher"]})
-    .then(item => res.send(item))
+router.get("/rooms", (req, res, next) =>{
+    let io = require("../websocket/_websocket");
+    res.send(io.sockets.adapter.rooms);
 });
 
 router.get("/test/:uuid/:userId", (req, res, next) =>{
