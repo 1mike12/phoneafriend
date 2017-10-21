@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<video id="video1" autoplay style="width: 50%"></video>
+
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.0.3/dist/socket.io.js"></script>
+<script type="application/javascript">
+    let socket;
+    let localStream;
+    let pc = new RTCPeerConnection({"iceServers": [{"url": "stun:stun.l.google.com:19302"}]});
+    let video = document.getElementById('video1');
+    const UUID = 1;
+
+    function setVideo(){
+        return navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        })
+        .then(stream =>{
+            pc.addStream(stream);
+            localStream = stream;
+            video.srcObject = stream;
+        })
+    }
+
+    setVideo();
+
+    socket = io("http://localhost:8009", {
+        'query': 'token=' + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjJ9.7pWxwmRmTcOnCzrLd2brSrRxKuQuWSnp_X9ewmwJxk4"
+    });
+
+    socket.on("connect", function(){
+        socket.emit("joinRoom", {uuid: UUID}, function(){
+        })
+    });
+
+    socket.on("receiveDescription", function(res){
+        console.log("received Description:", res);
+        let {userId, description} = res;
+        let desc = new RTCSessionDescription(description);
+        pc.setRemoteDescription(desc);
+        pc.createAnswer()
+        .then(localDescription =>{
+            pc.setLocalDescription(localDescription)
+            socket.emit("sendDescription", {uuid: UUID, description: localDescription}, function(){
+                resolve()
+            })
+        })
+    })
+
+</script>
+</body>
+</html>
