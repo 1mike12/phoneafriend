@@ -5,6 +5,12 @@ const AuthenticationService = require('../services/AuthenticationService');
 const Session = require("../models/Session");
 const SocketActions = require("../../shared/SocketActions");
 
+/**
+ * to keep track of real rooms vs socket io's automatic rooms created for each user
+ * @type {Set}
+ */
+const roomUUIDs = new Set();
+
 io.use((socket, next) =>{
     try {
         let token = socket.handshake.query.token;
@@ -28,11 +34,12 @@ io.use((socket, next) =>{
 io.on("connect", socket =>{
 
     socket.on(SocketActions.JOIN_ROOM, (params, callback) =>{
-        let uuid = params.uuid;
+        let uuid = params.uuid + "";
         let userId = socket.userId;
         if (!uuid) return callback(400);
 
         socket.join(params.uuid);
+        roomUUIDs.add(uuid);
         SessionService.addUserToRoom(uuid, userId);
         let othersInRoom = SessionService.getOtherUserIdsForRoom(uuid, userId);
         callback(othersInRoom)
@@ -86,6 +93,7 @@ io.getRooms = function(){
 io.getInfo = function(){
     let rooms = io.sockets.adapter.rooms;
     let newObject = Object.keys(rooms)
+    .filter(roomUUID => roomUUIDs.has(roomUUID))
     .reduce((total, roomUUID) =>{
         let socketIds = rooms[roomUUID].sockets;
         let userIds = [];
