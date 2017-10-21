@@ -79,4 +79,28 @@ io.on("connect", socket =>{
     //io.to("room uuid").emit("user connected");
 });
 
+io.getRooms = function(){
+    return io.sockets.adapter.rooms;
+};
+
+io.getInfo = function(){
+    let rooms = io.sockets.adapter.rooms;
+    let newObject = Object.keys(rooms)
+    .reduce((total, roomUUID) =>{
+        let socketIds = rooms[roomUUID].sockets;
+        let userIds = [];
+        for (let socketId in socketIds) {
+            let socket = io.getSocketForSocketid(socketId);
+            if (socket) userIds.push(socket.userId)
+        }
+        total[roomUUID] = userIds;
+        return total;
+    }, {});
+    return newObject;
+};
+
+io.getSocketForSocketid = function(socketId){
+    return io.sockets.connected[socketId];
+};
+
 module.exports = io;

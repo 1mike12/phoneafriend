@@ -193,13 +193,10 @@ router.post("/", (req, res, next) =>{
     .catch(e => res.send(e));
 });
 
-router.get("/my-active-sessions", (req, res, next) =>{
-    res.send(SessionService.getRoomsForUserId(req.userId))
-});
-
-router.get("/rooms", (req, res, next) =>{
+router.get("/info", (req, res, next) =>{
     let io = require("../websocket/_websocket");
-    res.send(io.sockets.adapter.rooms);
+    let info = io.getInfo();
+    res.send(info);
 });
 
 router.get("/test/:uuid/:userId", (req, res, next) =>{
