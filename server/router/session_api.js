@@ -4,7 +4,6 @@ let User = require("../models/User");
 const Session = require('../models/Session');
 const knex = require("../DB").knex;
 const SessionService = require("../services/SessionService");
-const socketio = require("../websocket/_websocket");
 
 router.delete("/", (req, res, next) =>{
     Class.where({uuid: req.body.uuid, pupil_id: req.userId}).fetch()
@@ -106,10 +105,10 @@ router.post("/accept", (req, res, next) =>{
         .andWhere("pupil_id", "!=", req.userId)
     }).fetch()
     .then(session =>{
-        if (!session) return res.status(400).send("no session found");
+        if (!session) return res.setStatus(400).send("no session found");
 
         if (session.get('teacher_id')){
-            return res.status(400).send("session no longer available")
+            return res.setStatus(400).send("session no longer available")
         }
 
         return session.set({teacher_id: req.userId}).save()
@@ -198,14 +197,10 @@ router.get("/my-active-sessions", (req, res, next)=>{
     res.send(SessionService.getRoomsForUserId(req.userId))
 });
 
-router.get("/session-service", (req, res, next)=> {
-    res.send(socketio.sockets.adapter.rooms)
+router.get("/:uuid", (req, res, next) =>{
+    Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch({withRelated: ["skills", "pupil", "teacher"]})
+    .then(item => res.send(item))
 });
-
-// router.get("/:uuid", (req, res, next) =>{
-//     Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch({withRelated: ["skills", "pupil", "teacher"]})
-//     .then(item => res.send(item))
-// });
 
 router.get("/test/:uuid/:userId", (req, res, next) =>{
     return Session.getByUUIDAsMember(req.params.uuid, req.params.userId)
@@ -213,7 +208,5 @@ router.get("/test/:uuid/:userId", (req, res, next) =>{
         res.send(session)
     })
 });
-
-
 
 module.exports = router;
