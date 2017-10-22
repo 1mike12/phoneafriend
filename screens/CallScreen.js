@@ -58,11 +58,15 @@ const screenStyles = {
         textAlign: "right"
     }
 };
+const UUID = "1";
 
 export default class CallScreen extends React.Component {
 
     constructor(props){
         super(props);
+
+
+
         this.state = {
             session: this.props.session,
             ready: true,
@@ -83,30 +87,146 @@ export default class CallScreen extends React.Component {
 
         this.userId_pc = new Map();
 
+        let socket = io("http://phoneafriend.ngrok.io", {
+            query: `token=${Authentication.getToken()}`
+        });
+        this.socket = socket;
+
+        let pc = new RTCPeerConnection({"iceServers": [{"url": "stun:stun.l.google.com:19302"}]});
+        this.pc = pc;
+
+        const onOpen = (event) =>{
+            console.log("dataChannel.OnOpen");
+        };
+
+        const onMessage = (event) =>{
+            console.log("dataChannel.OnMessage:", event.data);
+        };
+
+        const onError = (error) =>{
+            console.log("dataChannel.OnError:", error);
+        };
+
+        const onClose = (event) =>{
+            console.log("dataChannel.OnClose", event);
+        };
+
+
+        let dataChannel = pc.createDataChannel('text', {});
+        dataChannel.onopen = onOpen;
+        dataChannel.onmessage = onMessage;
+        dataChannel.onerror = onError;
+        dataChannel.onclose = onClose;
+
+
+        pc.ondatachannel = (event) =>{
+            console.log("on data channel");
+            let receiveChannel = event.channel;
+            receiveChannel.onopen = onOpen;
+            receiveChannel.onmessage = onMessage;
+            receiveChannel.onerror = onError;
+            receiveChannel.onclose = onClose;
+        };
+
+        //when remote adds a MediaStream to PeerConnection
+        pc.onicecandidate = (e) =>{
+            socket.emit(SocketActions.NEW_ICE_CANDIDATE, {
+                candidate: e.candidate,
+                uuid: UUID
+            })
+        };
+
+        pc.onaddstream = (e) =>{
+            this.setState({streamUrl: e.stream.toURL()})
+        };
+
+        pc.onremovestream = function(event){
+            console.log('onremovestream', event.stream);
+        };
+
+        pc.oniceconnectionstatechange = (e) =>{
+            if (e.target.iceConnectionState === 'connected'){
+
+            }
+        };
+
+        socket.on("connect", () =>{
+            socket.emit(SocketActions.JOIN_ROOM, {uuid: UUID});
+
+            socket.on(SocketActions.USER_JOINED_ROOM, (othersInRoom) =>{
+                if (othersInRoom.length > 0){
+                    this.addVideo()
+                    .then(() => this.createOffer());
+                }
+            })
+        });
+
+        socket.on(SocketActions.VIDEO_OFFER, (res) =>{
+            let {userId, description} = res;
+            this.createAnswer(description)
+
+        });
+
+        socket.on(SocketActions.VIDEO_ANSWER, (res) =>{
+            this.receiveAnswer(res.description);
+        });
+
+        socket.on(SocketActions.NEW_ICE_CANDIDATE, (res) =>{
+            let {candidate} = res;
+            try {
+                let rtcCandidate = new RTCIceCandidate(candidate);
+                this.pc.addIceCandidate(rtcCandidate);
+            } catch (e) {
+                console.log(e)
+            }
+        });
+
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
         this.connect = this.connect.bind(this);
-        this.setupSocket = this.setupSocket.bind(this);
-        this.createPeerConnection = this.createPeerConnection.bind(this);
     }
 
     connect(){
-        return this.loadCamera()
-        .then(() => this.setupSocket())
-        .then(() =>{
-            console.log("successfully connected all")
+
+    }
+
+    createAnswer(description){
+        let desc = new RTCSessionDescription(description);
+        this.pc.setRemoteDescription(desc);
+
+        return this.addVideo()
+        .then(() => this.pc.createAnswer())
+        .then(localDescription =>{
+            this.pc.setLocalDescription(localDescription);
+            this.socket.emit("VIDEO_ANSWER", {uuid: UUID, description: localDescription})
         })
-        .catch(console.log)
+        .catch(e =>{
+            throw e;
+        })
+    }
+
+    receiveAnswer(desc){
+        let description = new RTCSessionDescription(desc);
+        this.pc.setRemoteDescription(description)
+    }
+
+    createOffer(){
+        return this.pc.createOffer()
+        .then(description =>{
+            this.pc.setLocalDescription(description);
+            this.socket.emit("VIDEO_OFFER", {uuid: UUID, description})
+        })
     }
 
     /**
      * Promise<streamURL>
      */
-    loadCamera(){
+    addVideo(){
         let state = this.state.cameraState;
-        if(state !== CAMERA_STATE_OFF) {
+        if (state !== CAMERA_STATE_OFF){
             return StreamService.getStream(this.state.cameraState)
             .then(stream =>{
+                this.pc.addStream(stream);
                 let streamUrl = stream.toURL();
                 this.setState({streamUrl});
                 return streamUrl;
@@ -114,201 +234,9 @@ export default class CallScreen extends React.Component {
         }
     }
 
-    userLeft(userId){
-        let pc = this.userId_pc.get(userId);
-        pc.close();
-        this.userId_pc.delete(userId);
-        let streamMap = this.state.userId_streamUrl;
-        streamMap.delete(userId);
-        this.setState({userId_streamUrl: streamMap})
-    }
-
-    /**
-     * sets up socket and joins room
-     * @returns Promise resolving in userIds of current members of room
-     */
-    setupSocket(){
-        if (this.socket) this.socket.close();
-        return new Promise((resolve, reject) =>{
-            let wsURL = `ws://${Config.HOST}`;
-            let socket = io(wsURL, {
-                transportOptions: {
-                    polling: {
-                        extraHeaders: {
-                            'Token': Authentication.getToken()
-                        }
-                    }
-                }
-            });
-            socket.on("connect", resolve);
-            socket.on("error", reject);
-
-            socket.on(SocketActions.USER_LEFT_ROOM, (userId) => this.userLeft(userId));
-
-            //first 1
-            socket.on(SocketActions.USER_JOINED_ROOM, (userId) => this.createPeerConnection(userId));
-
-            socket.on(SocketActions.VIDEO_ANSWER, (response) =>{
-                this.assignRemoteDescription(response.userId, response.description)
-            });
-
-            socket.on(SocketActions.RECEIVE_CANDIDATE, (response) =>{
-                let {userId, candidate} = response;
-                this.assignCandidate(userId, candidate)
-            });
-
-            this.socket = socket;
-        })
-        .then(() =>{
-            return new Promise((resolve, reject) =>{
-                this.socket.emit(SocketActions.JOIN_ROOM, {uuid: this.state.session.uuid}, resolve)
-            })
-        })
-        .then((userIds)=> Promise.all(userIds.map(userId => this.createPeerConnection(userId))))
-    }
-
-    //first second 2
-    createPeerConnection(userId){
-        return new Promise((resolve, reject) =>{
-            if(!userId) throw new Error("userId malformed");
-
-            const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-            const pc = new RTCPeerConnection(configuration);
-            pc.addStream(this.state.streamUrl);
-            this.userId_pc.set(userId, pc);
-
-            pc.createOffer()
-            .then(description => pc.setLocalDescription(description))
-            .then(() =>{
-                this.socket.emit(SocketActions.VIDEO_OFFER, {
-                        uuid: this.state.session.uuid,
-                        description: pc.localDescription
-                    },
-                    (status) =>{
-                        if(status !== 200) reject("couldn't exchange description");
-                    })
-            })
-            .catch(reject);
-
-            pc.onnegotiationneeded = function(e){
-                var x = 0;
-            }
-
-            //1 called immediately
-            // pc.onnegotiationneeded = function (){
-            //     pc.createOffer()
-            //     .then(description => pc.setLocalDescription(description))
-            //     .then(() =>{
-            //         this.socket.emit(SocketActions.VIDEO_OFFER, {
-            //                 uuid: this.state.session.uuid,
-            //                 description: pc.localDescription
-            //             },
-            //             (status) =>{
-            //                 if(status !== 200) reject("couldn't exchange description");
-            //             })
-            //     })
-            //     .catch(reject)
-            // };
-
-            // //2, 5
-            // //called after setLocalDescription or setRemoteDescription
-            // pc.onsignalingstatechange = function(event){
-            //     console.log('onsignalingstatechange', event.target.signalingState);
-            // };
-
-
-            //3 x4
-            //local ice agent needs to send message to other peers through signaling server
-            pc.onicecandidate = function (event){
-                this.socket.emit(SocketActions.SEND_CANDIDATE, {
-                        uuid: this.state.session.uuid,
-                        candidate: event.candidate
-                    },
-                    (status) =>{
-                        if(status !== 200) reject("couldn't exchange candidate");
-                    })
-            };
-
-            //6,9
-            pc.oniceconnectionstatechange = function (event){
-                if(event.target.iceConnectionState === 'connected') {
-                    createDataChannel();
-                }
-            };
-
-            //7
-            //when remote peer adds a MediaStream to the connection
-            //called after setRemoteDescription()
-            //update our Map with new stream, trigger rendering of view
-            pc.onaddstream = (event) =>{
-                let map = this.state.userId_streamUrl;
-                map.set(userId, event.stream.toURL());
-                this.setState({userId_streamUrl: map});
-            };
-
-            pc.onremovestream = function (event){
-                console.log('onremovestream', event.stream);
-            };
-
-            function createDataChannel(){
-                if(pc.textDataChannel) {
-                    return;
-                }
-                const dataChannel = pc.createDataChannel("text");
-                pc.textDataChannel = dataChannel;
-
-                dataChannel.onerror = function (error){
-                    console.log("sendChannel.onerror", error);
-                };
-
-                dataChannel.onmessage = function (event){
-                    console.log("sendChannel.onmessage:", event.data);
-                };
-
-                dataChannel.onopen = function (){
-                    console.log('sendChannel.onopen');
-                };
-
-                dataChannel.onclose = function (){
-                    console.log("sendChannel.onclose");
-                };
-
-                dataChannel.send("hello")
-            }
-        })
-
-    }
-
-
-    assignRemoteDescription(userId, description){
-        return new Promise((resolve, reject) =>{
-            let pc = this.userId_pc.get(userId);
-            if(!pc) throw new Error("no peer connection found");
-            return pc.setRemoteDescription(new RTCSessionDescription(description))
-            .then(() =>{
-                if(pc.remoteDescription.type.toLowerCase() === "offer") {
-                    return pc.createAnswer()
-                    .then(description => pc.setLocalDescription(description))
-                    .then(() =>{
-                        this.socket.emit(SocketActions.VIDEO_OFFER, description, resolve)
-                    })
-                } else {
-                    resolve()
-                }
-            })
-            .catch(reject)
-        })
-    }
-
-    assignCandidate(userId, candidate){
-        let pc = this.userId_pc.get(userId);
-        if(!pc) throw new Error("no peer connection found");
-        pc.addIceCandidate(new RTCIceCandidate(candidate))
-    }
-
     toggleCameraState(cameraState){
         this.setState({cameraState}, () =>{
-            this.loadCamera()
+            this.addVideo()
         })
     }
 
@@ -316,13 +244,12 @@ export default class CallScreen extends React.Component {
         if (this.socket) this.socket.close();
     }
 
-
     static getName(){
         return `${config.name}.${NAME}`
     }
 
     getCameraFab(){
-        if(this.state.cameraState === CAMERA_STATE_BACK) {
+        if (this.state.cameraState === CAMERA_STATE_BACK){
             return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         onPress={() => this.toggleCameraState(CAMERA_STATE_FRONT)}
                         inside={<Icon name="camera-front-variant"
@@ -330,7 +257,7 @@ export default class CallScreen extends React.Component {
                                       color="white"/>
                         }
             />
-        } else if(this.state.cameraState === CAMERA_STATE_FRONT) {
+        } else if (this.state.cameraState === CAMERA_STATE_FRONT){
             return <Fab style={{backgroundColor: "#AAA", margin: 8}}
                         onPress={() => this.toggleCameraState(CAMERA_STATE_BACK)}
                         inside={<Icon name="camera-rear-variant"

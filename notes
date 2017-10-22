@@ -1,4 +1,5 @@
 ./ngrok http -subdomain=phoneafriend 8009
+./ngrok http -subdomain=phoneafriend 9009
 
 knex migrate:latest --env test
 
