@@ -48,6 +48,15 @@ export default class HelpableSessionsScreen extends React.Component {
 
     componentDidMount(){
         this.loadSession();
+        this.props.navigator.toggleTabs({
+            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
+            animated: true // does the toggle have transition animation or does it happen immediately (optional)
+        });
+
+        this.props.navigator.setStyle({
+            drawUnderTabBar: true,
+            tabBarHidden: true,
+        });
     }
 
     loadNextSession(){

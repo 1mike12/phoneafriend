@@ -34,7 +34,7 @@ export default class SessionScreen extends React.Component {
 
     loadAll(){
         this.setState({ready: false});
-        return http.get("api/session/" + this.props.uuid)
+        return http.get("api/session/get/" + this.props.uuid)
         .then(res =>{
 
             let session = new Session(res.data);

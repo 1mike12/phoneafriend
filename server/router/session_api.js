@@ -107,10 +107,6 @@ router.post("/accept", (req, res, next) =>{
     .then(session =>{
         if (!session) return res.setStatus(400).send("no session found");
 
-        if (session.get('teacher_id')){
-            return res.setStatus(400).send("session no longer available")
-        }
-
         return session.set({teacher_id: req.userId}).save()
         .then(() => res.sendStatus(200))
 
@@ -204,6 +200,11 @@ router.get("/test/:uuid/:userId", (req, res, next) =>{
     .then(session =>{
         res.send(session)
     })
+});
+
+router.get("/get/:uuid", (req, res, next) =>{
+    Class.where({uuid: req.params.uuid, pupil_id: req.userId}).fetch({withRelated: ["skills", "pupil", "teacher"]})
+    .then(item => res.send(item))
 });
 
 module.exports = router;

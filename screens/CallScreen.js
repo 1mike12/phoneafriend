@@ -65,13 +65,17 @@ export default class CallScreen extends React.Component {
     constructor(props){
         super(props);
 
-
+        this.props.navigator.toggleTabs({
+            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
+            animated: false // does the toggle have transition animation or does it happen immediately (optional)
+        });
 
         this.state = {
             session: this.props.session,
             ready: true,
             cameraState: CAMERA_STATE_BACK,
             streamUrl: "",
+            myStreamUrl: "",
             userId_streamUrl: new Map()
         };
 
@@ -185,11 +189,13 @@ export default class CallScreen extends React.Component {
 
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
-        this.connect = this.connect.bind(this);
     }
 
-    connect(){
-
+    componentDidMount(){
+        this.props.navigator.toggleTabs({
+            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
+            animated: false // does the toggle have transition animation or does it happen immediately (optional)
+        });
     }
 
     createAnswer(description){
@@ -229,9 +235,9 @@ export default class CallScreen extends React.Component {
             return StreamService.getStream(this.state.cameraState)
             .then(stream =>{
                 this.pc.addStream(stream);
-                let streamUrl = stream.toURL();
-                this.setState({streamUrl});
-                return streamUrl;
+                let myStreamUrl = stream.toURL();
+                this.setState({myStreamUrl});
+                return myStreamUrl;
             });
         }
     }
@@ -244,6 +250,7 @@ export default class CallScreen extends React.Component {
 
     componentWillUnmount(){
         if (this.socket) this.socket.close();
+        if (this.pc) this.pc.close();
     }
 
     static getName(){
@@ -289,6 +296,8 @@ export default class CallScreen extends React.Component {
                     </View> :
                     <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
                         <RTCView style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
+                                 streamURL={this.state.myStreamUrl}/>
+                        <RTCView style={{position: "absolute", top: 0, bottom: 0, width: 120, height: 120}}
                                  streamURL={this.state.streamUrl}/>
                         <Image style={[styles.profilePicLarge, screenStyles.myImage]}
                                source={{uri: this.state.session.pupil.profile_url}}/>
@@ -306,7 +315,6 @@ export default class CallScreen extends React.Component {
                             flexDirection: 'row',
                             justifyContent: "space-between"
                         }}>
-                            <Button title="Open socket" onPress={this.connect}/>
                             <Fab style={{backgroundColor: "#AAA", margin: 8}}
                                  inside={<Icon name="camera"
                                                size={32}

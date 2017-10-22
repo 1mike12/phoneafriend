@@ -20,6 +20,11 @@ export default class SessionEditScreen extends React.Component {
     constructor(props){
         super(props);
 
+        this.props.navigator.toggleTabs({
+            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
+            animated: false // does the toggle have transition animation or does it happen immediately (optional)
+        });
+
         let isNew = true;
         let session;
         if (this.props.session && this.props.session.uuid){
@@ -56,10 +61,7 @@ export default class SessionEditScreen extends React.Component {
     }
 
     componentDidMount(){
-        this.props.navigator.toggleTabs({
-            to: 'hidden',
-            animated: true
-        });
+
     }
 
     nonSelectedSkills(skills){
