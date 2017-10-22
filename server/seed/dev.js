@@ -30,7 +30,7 @@ module.exports = dev = new function(){
 
     self.requesters = function(){
         let usersArray = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 30; i++) {
             usersArray.push({
                 email: faker.internet.email(),
                 first_name: faker.name.firstName(),
