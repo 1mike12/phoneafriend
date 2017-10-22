@@ -258,19 +258,19 @@ export default class CallScreen extends React.Component {
                 pc.textDataChannel = dataChannel;
 
                 dataChannel.onerror = function (error){
-                    console.log("dataChannel.onerror", error);
+                    console.log("sendChannel.onerror", error);
                 };
 
                 dataChannel.onmessage = function (event){
-                    console.log("dataChannel.onmessage:", event.data);
+                    console.log("sendChannel.onmessage:", event.data);
                 };
 
                 dataChannel.onopen = function (){
-                    console.log('dataChannel.onopen');
+                    console.log('sendChannel.onopen');
                 };
 
                 dataChannel.onclose = function (){
-                    console.log("dataChannel.onclose");
+                    console.log("sendChannel.onclose");
                 };
 
                 dataChannel.send("hello")
