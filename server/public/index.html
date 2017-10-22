@@ -10,6 +10,9 @@
 <video id="2" autoplay style="width: 25%"></video>
 <video id="2-other" autoplay style="width: 50%"></video>
 
+<button id="1-submit">1 Send Text</button>
+<button id="2-submit">2 Send Text</button>
+
 <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.0.3/dist/socket.io.js"></script>
 <script type="application/javascript">
     const UUID = 1;
@@ -18,6 +21,7 @@
         constructor(id, token){
             this.id = id;
             this.token = token;
+            this.caller = false;
 
             let socket = io("http://localhost:9009", {
                 query: `token=${this.token}`
@@ -34,12 +38,24 @@
                 remoteVideo.srcObject = e.stream;
             };
 
+            pc.oniceconnectionstatechange = (e) =>{
+                if (e.target.iceConnectionState === 'connected'){
+                    if (this.caller) this.createDataChannel();
+
+                }
+            };
+
+            pc.ondatachannel = (e) =>{
+                console.log("on data channel", e)
+            };
+
             this.pc = pc;
 
             socket.on("connect", () =>{
                 socket.emit("joinRoom", {uuid: UUID});
 
                 socket.on("userJoinedRoom", (othersInRoom) =>{
+                    this.caller = true;
                     if (othersInRoom.length > 0){
                         this.addVideo()
                         .then(() => this.createOffer());
@@ -89,6 +105,39 @@
         handleAnswer(desc){
             let description = new RTCSessionDescription(desc);
             this.pc.setRemoteDescription(description)
+        }
+
+        createDataChannel(){
+            console.log("createDataChannel")
+            let pc = this.pc;
+            if (pc.textDataChannel){
+                return;
+            }
+
+            let dataChannel = pc.createDataChannel("text", {});
+
+            dataChannel.onerror = function(error){
+                console.log("dataChannel.onerror", error);
+            };
+
+            dataChannel.onmessage = function(event){
+                console.log("dataChannel.onmessage:", event.data);
+            };
+
+            dataChannel.onopen = function(){
+                console.log('dataChannel.onopen');
+            };
+
+            dataChannel.onclose = function(){
+                console.log("dataChannel.onclose");
+            };
+
+            pc.textDataChannel = dataChannel;
+
+            let button = document.getElementById(this.id + "-submit");
+            button.onclick = () =>{
+                pc.textDataChannel.send("hello")
+            }
         }
 
         createOffer(){
