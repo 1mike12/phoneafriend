@@ -5,53 +5,116 @@
     <title>Title</title>
 </head>
 <body>
-<video id="video1" autoplay style="width: 50%"></video>
+<video id="1" autoplay style="width: 25%"></video>
+<video id="1-other" autoplay style="width: 50%"></video>
+<video id="2" autoplay style="width: 25%"></video>
+<video id="2-other" autoplay style="width: 50%"></video>
 
 <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2.0.3/dist/socket.io.js"></script>
 <script type="application/javascript">
-    let socket;
-    let localStream;
-    let pc = new RTCPeerConnection({"iceServers": [{"url": "stun:stun.l.google.com:19302"}]});
-    let video = document.getElementById('video1');
     const UUID = 1;
 
-    function setVideo(){
-        return navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: true
-        })
-        .then(stream =>{
-            pc.addStream(stream);
-            localStream = stream;
-            video.srcObject = stream;
-        })
+    class Socket {
+        constructor(id, token){
+            this.id = id;
+            this.token = token;
+
+            let socket = io("http://localhost:9009", {
+                query: `token=${this.token}`
+            });
+
+            let pc = new RTCPeerConnection({"iceServers": [{"url": "stun:stun.l.google.com:19302"}]});
+
+            pc.onicecandidate = (e) =>{
+                socket.emit('NEW_ICE_CANDIDATE', {candidate: e.candidate, userId: this.id, uuid: UUID})
+            };
+
+            pc.onaddstream = (e) =>{
+                let remoteVideo = document.getElementById(this.id + "-other");
+                remoteVideo.srcObject = e.stream;
+            };
+
+            this.pc = pc;
+
+            socket.on("connect", () =>{
+                socket.emit("joinRoom", {uuid: UUID});
+
+                socket.on("userJoinedRoom", (othersInRoom) =>{
+                    if (othersInRoom.length > 0){
+                        this.addVideo()
+                        .then(() => this.createOffer());
+                    }
+                })
+            });
+
+            socket.on('VIDEO_OFFER', (res) =>{
+                let {userId, description} = res;
+                this.createAnswer(userId, description)
+
+            });
+
+            socket.on("VIDEO_ANSWER", (res) =>{
+                this.handleAnswer(res.description);
+            });
+
+            socket.on("NEW_ICE_CANDIDATE", (res) =>{
+                let {candidate} = res;
+                try {
+                    let rtcCandidate = new RTCIceCandidate(candidate);
+                    this.pc.addIceCandidate(rtcCandidate);
+                } catch (e) {
+                    console.log(e)
+                }
+
+            });
+
+            this.socket = socket;
+        }
+
+        createAnswer(userId, description){
+            let desc = new RTCSessionDescription(description);
+            this.pc.setRemoteDescription(desc);
+
+            return this.addVideo()
+            .then(() => this.pc.createAnswer())
+            .then(localDescription =>{
+                this.pc.setLocalDescription(localDescription);
+                this.socket.emit("VIDEO_ANSWER", {uuid: UUID, description: localDescription})
+            })
+            .catch(e =>{
+                throw e;
+            })
+        }
+
+        handleAnswer(desc){
+            let description = new RTCSessionDescription(desc);
+            this.pc.setRemoteDescription(description)
+        }
+
+        createOffer(){
+            return this.pc.createOffer()
+            .then(description =>{
+                this.pc.setLocalDescription(description);
+                this.socket.emit("VIDEO_OFFER", {uuid: UUID, description})
+            })
+        }
+
+        addVideo(){
+            return navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: true
+            })
+            .then(stream =>{
+                this.pc.addStream(stream);
+                let video = document.getElementById(this.id);
+                video.srcObject = stream;
+            })
+        }
+
     }
 
-    setVideo();
-
-    socket = io("http://localhost:9009", {
-        'query': 'token=' + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjJ9.7pWxwmRmTcOnCzrLd2brSrRxKuQuWSnp_X9ewmwJxk4"
-    });
-
-    socket.on("connect", function(){
-        socket.emit("joinRoom", {uuid: UUID}, function(){
-        })
-    });
-
-    socket.on("receiveDescription", function(res){
-        console.log("received Description:", res);
-        let {userId, description} = res;
-        let desc = new RTCSessionDescription(description);
-        pc.setRemoteDescription(desc);
-        pc.createAnswer()
-        .then(localDescription =>{
-            pc.setLocalDescription(localDescription)
-            socket.emit("sendDescription", {uuid: UUID, description: localDescription}, function(){
-                resolve()
-            })
-        })
-    })
-
+    let socket1 = new Socket("1", "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExNDF9.FhKsOogaLFJBixiZWOZWnZDyfPXMANSG7dBA96CyhIM");
+    let socket2 = new Socket('2', "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjJ9.7pWxwmRmTcOnCzrLd2brSrRxKuQuWSnp_X9ewmwJxk4")
 </script>
 </body>
 </html>

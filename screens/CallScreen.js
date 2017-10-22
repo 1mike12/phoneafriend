@@ -148,7 +148,7 @@ export default class CallScreen extends React.Component {
             //first 1
             socket.on(SocketActions.USER_JOINED_ROOM, (userId) => this.createPeerConnection(userId));
 
-            socket.on(SocketActions.RECEIVE_DESCRIPTION, (response) =>{
+            socket.on(SocketActions.VIDEO_ANSWER, (response) =>{
                 this.assignRemoteDescription(response.userId, response.description)
             });
 
@@ -180,7 +180,7 @@ export default class CallScreen extends React.Component {
             pc.createOffer()
             .then(description => pc.setLocalDescription(description))
             .then(() =>{
-                this.socket.emit(SocketActions.SEND_DESCRIPTION, {
+                this.socket.emit(SocketActions.VIDEO_OFFER, {
                         uuid: this.state.session.uuid,
                         description: pc.localDescription
                     },
@@ -199,7 +199,7 @@ export default class CallScreen extends React.Component {
             //     pc.createOffer()
             //     .then(description => pc.setLocalDescription(description))
             //     .then(() =>{
-            //         this.socket.emit(SocketActions.SEND_DESCRIPTION, {
+            //         this.socket.emit(SocketActions.VIDEO_OFFER, {
             //                 uuid: this.state.session.uuid,
             //                 description: pc.localDescription
             //             },
@@ -290,7 +290,7 @@ export default class CallScreen extends React.Component {
                     return pc.createAnswer()
                     .then(description => pc.setLocalDescription(description))
                     .then(() =>{
-                        this.socket.emit(SocketActions.SEND_DESCRIPTION, description, resolve)
+                        this.socket.emit(SocketActions.VIDEO_OFFER, description, resolve)
                     })
                 } else {
                     resolve()
