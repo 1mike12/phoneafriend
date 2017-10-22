@@ -156,7 +156,9 @@ export default class CallScreen extends React.Component {
             socket.on(SocketActions.USER_JOINED_ROOM, (othersInRoom) =>{
                 if (othersInRoom.length > 0){
                     this.addVideo()
-                    .then(() => this.createOffer());
+                    .then(() => {
+                        this.createOffer()
+                    });
                 }
             })
         });
@@ -198,7 +200,7 @@ export default class CallScreen extends React.Component {
         .then(() => this.pc.createAnswer())
         .then(localDescription =>{
             this.pc.setLocalDescription(localDescription);
-            this.socket.emit("VIDEO_ANSWER", {uuid: UUID, description: localDescription})
+            this.socket.emit(SocketActions.VIDEO_ANSWER, {uuid: UUID, description: localDescription})
         })
         .catch(e =>{
             throw e;
@@ -214,7 +216,7 @@ export default class CallScreen extends React.Component {
         return this.pc.createOffer()
         .then(description =>{
             this.pc.setLocalDescription(description);
-            this.socket.emit("VIDEO_OFFER", {uuid: UUID, description})
+            this.socket.emit(SocketActions.VIDEO_OFFER, {uuid: UUID, description})
         })
     }
 
@@ -240,7 +242,7 @@ export default class CallScreen extends React.Component {
         })
     }
 
-    componentWillDismount(){
+    componentWillUnmount(){
         if (this.socket) this.socket.close();
     }
 

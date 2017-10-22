@@ -12,7 +12,7 @@ module.exports = {
             port: "5432",
             user: "mike",
             password: "123",
-            database: DB_NAME
+            database: DB_NAME_TEST
         },
         migrations: {
             tableName: 'migrations',
