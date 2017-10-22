@@ -1,4 +1,7 @@
-const io = require('socket.io')(require("../router/server"));
+const io = require('socket.io')(require("../router/server"), {
+    pingInterval: 5000,
+    pingTimeout: 10000
+});
 
 const SessionService = require("../services/SessionService");
 const AuthenticationService = require('../services/AuthenticationService');
@@ -42,7 +45,7 @@ io.on("connect", socket =>{
         roomUUIDs.add(uuid);
         SessionService.addUserToRoom(uuid, userId);
         let othersInRoom = SessionService.getOtherUserIdsForRoom(uuid, userId);
-        callback(othersInRoom)
+        if (callback) callback(othersInRoom)
     });
 
     /**
@@ -57,7 +60,7 @@ io.on("connect", socket =>{
         socket.leave(params.uuid);
         io.to(uuid).emit(SocketActions.USER_LEFT_ROOM, userId);
         SessionService.removeUserFromRoom(uuid, socket.userId);
-        callback(200)
+        if (callback) callback(200)
     });
 
     socket.on(SocketActions.SEND_DESCRIPTION, (params, callback) =>{
@@ -66,7 +69,7 @@ io.on("connect", socket =>{
 
         socket.broadcast.to(uuid)
         .emit(SocketActions.RECEIVE_DESCRIPTION, {userId: socket.userId, description});
-        callback(200)
+        if (callback) callback(200)
     });
 
     socket.on(SocketActions.SEND_CANDIDATE, (params, callback) =>{
@@ -75,7 +78,7 @@ io.on("connect", socket =>{
 
         socket.broadcast.to(uuid)
         .emit(SocketActions.RECEIVE_CANDIDATE, {userId: socket.userId, candidate});
-        callback(200)
+        if (callback) callback(200)
     });
 
 
