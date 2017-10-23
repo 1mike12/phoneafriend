@@ -69,6 +69,14 @@ export default class CallScreen extends React.Component {
             to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
             animated: false // does the toggle have transition animation or does it happen immediately (optional)
         });
+        this.props.navigator.toggleNavBar({
+            to: 'hidden', // required, 'hidden' = hide navigation bar, 'shown' = show navigation bar
+            animated: false // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
+        });
+
+        console.ignoredYellowBox = [
+            'Setting a timer'
+        ];
 
         this.state = {
             session: this.props.session,
@@ -76,22 +84,13 @@ export default class CallScreen extends React.Component {
             cameraState: CAMERA_STATE_BACK,
             streamUrl: "",
             myStreamUrl: "",
-            userId_streamUrl: new Map()
+            userId_streamUrl: new Map(),
+            messages : []
         };
-
-        this.props.navigator.toggleTabs({
-            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
-            animated: true // does the toggle have transition animation or does it happen immediately (optional)
-        });
-
-        this.props.navigator.toggleNavBar({
-            to: 'hidden', // required, 'hidden' = hide navigation bar, 'shown' = show navigation bar
-            animated: true // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
-        });
 
         this.userId_pc = new Map();
 
-        let socket = io("http://phoneafriend.ngrok.io", {
+        let socket = io(Config.HOST, {
             query: `token=${Authentication.getToken()}`
         });
         this.socket = socket;
@@ -116,16 +115,17 @@ export default class CallScreen extends React.Component {
         };
 
 
-        let dataChannel = pc.createDataChannel('text', {});
-        dataChannel.onopen = onOpen;
-        dataChannel.onmessage = onMessage;
-        dataChannel.onerror = onError;
-        dataChannel.onclose = onClose;
+        let sendChannel = pc.createDataChannel('text', {});
+        sendChannel.onopen = onOpen;
+        sendChannel.onmessage = onMessage;
+        sendChannel.onerror = onError;
+        sendChannel.onclose = onClose;
+        this.sendChannel = sendChannel;
 
 
         pc.ondatachannel = (event) =>{
-            console.log("on data channel");
             let receiveChannel = event.channel;
+            this.receiveChannel = receiveChannel;
             receiveChannel.onopen = onOpen;
             receiveChannel.onmessage = onMessage;
             receiveChannel.onerror = onError;
@@ -160,7 +160,7 @@ export default class CallScreen extends React.Component {
             socket.on(SocketActions.USER_JOINED_ROOM, (othersInRoom) =>{
                 if (othersInRoom.length > 0){
                     this.addVideo()
-                    .then(() => {
+                    .then(() =>{
                         this.createOffer()
                     });
                 }
@@ -189,6 +189,7 @@ export default class CallScreen extends React.Component {
 
         this.getCameraFab = this.getCameraFab.bind(this);
         this.toggleCameraState = this.toggleCameraState.bind(this);
+        this.sendMessage = this.sendMessage.bind(this);
     }
 
     componentDidMount(){
@@ -283,6 +284,11 @@ export default class CallScreen extends React.Component {
         }
     }
 
+    sendMessage(){
+        console.log("send message")
+        this.sendChannel.send("lololol");
+    }
+
     render(){
         return (
             <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "#000"}}>
@@ -295,10 +301,12 @@ export default class CallScreen extends React.Component {
                         <ActivityIndicator size="large"/>
                     </View> :
                     <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
-                        <RTCView style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
-                                 streamURL={this.state.myStreamUrl}/>
+
                         <RTCView style={{position: "absolute", top: 0, bottom: 0, width: 120, height: 120}}
                                  streamURL={this.state.streamUrl}/>
+
+                        <RTCView style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
+                                 streamURL={this.state.myStreamUrl}/>
                         <Image style={[styles.profilePicLarge, screenStyles.myImage]}
                                source={{uri: this.state.session.pupil.profile_url}}/>
 
@@ -329,6 +337,7 @@ export default class CallScreen extends React.Component {
                             />
                             {this.getCameraFab()}
                             <Fab style={{backgroundColor: "green", margin: 8}}
+                                 onPress={this.sendMessage}
                                  inside={<Icon name="message-text"
                                                size={32}
                                                color="white"/>

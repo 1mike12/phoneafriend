@@ -17,6 +17,7 @@
 <script type="application/javascript">
     const UUID = 1;
 
+    const VIDEO_SIZE = {width: {exact: 320}, height: {exact: 240}};
     class Socket {
         constructor(id, token){
             this.id = id;
@@ -47,11 +48,11 @@
             };
 
 
-            let dataChannel = pc.createDataChannel('text', {});
-            dataChannel.onopen = onOpen;
-            dataChannel.onmessage = onMessage;
-            dataChannel.onerror = onError;
-            dataChannel.onclose = onClose;
+            let sendChannel = pc.createDataChannel('text', {});
+            sendChannel.onopen = onOpen;
+            sendChannel.onmessage = onMessage;
+            sendChannel.onerror = onError;
+            sendChannel.onclose = onClose;
 
 
             pc.ondatachannel = (event) =>{
@@ -64,7 +65,7 @@
 
                 let button = document.getElementById(this.id + "-submit");
                 button.onclick = () =>{
-                    receiveChannel.send("hello from " + this.id)
+                    sendChannel.send("hello from " + this.id)
                 };
             };
 
@@ -148,7 +149,7 @@
         addVideo(){
             return navigator.mediaDevices.getUserMedia({
                 audio: true,
-                video: true
+                video: VIDEO_SIZE
             })
             .then(stream =>{
                 this.pc.addStream(stream);
