@@ -143,14 +143,17 @@ router.post("/accept", (req, res, next) =>{
     .catch(next)
 });
 
-router.get("/in-progress/", (req, res, next) =>{
+router.get("/active", (req, res, next) =>{
 
     return Session.query(qb =>{
         qb.where("pupil_id", "!=", req.userId)
-        .andWhere("teacher_id", req.userId)
+        .andWhere(function(){
+            this.where("teacher_id", req.userId)
+            .orWhere("pupil_id", req.userId)
+        })
         .andWhere("completed", false)
     })
-    .fetchAll()
+    .fetchAll({withRelated: ["skills", "pupil", "teacher"]})
     .then(sessions =>{
         res.send(sessions)
 
@@ -165,7 +168,7 @@ router.get("/completed", (req, res, next) =>{
         .andWhere("teacher_id", req.userId)
         .andWhere("completed", true)
     })
-    .fetchAll()
+    .fetchAll({withRelated: ["skills", "pupil", "teacher"]})
     .then(sessions =>{
         res.send(sessions)
 

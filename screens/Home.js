@@ -8,6 +8,8 @@ import Request from "./SessionScreen";
 import MySkills from "./MySkills";
 import SessionEditScreen from "./SessionEditScreen";
 import HelpableSessionsScreen from "./HelpableSessionsScreen";
+import Session from "../models/Session";
+import CallScreen from "./CallScreen";
 
 const ta = timeAgo();
 const NAME = "Home";
@@ -19,15 +21,18 @@ export default class Home extends React.Component {
             loading: true,
             teachableCount: null,
             skills: [],
-            requests: []
+            requests: [],
+            activeSessions: []
         };
 
         this.loadSkills = this.loadSkills.bind(this);
         this.loadRequests = this.loadRequests.bind(this);
         this.loadTeachableCount = this.loadTeachableCount.bind(this);
+        this.loadActiveSessions = this.loadActiveSessions.bind(this);
         this.loadAll = this.loadAll.bind(this);
         this.goToSession = this.goToSession.bind(this);
         this.goToMySkills = this.goToMySkills.bind(this);
+        this.goToCall = this.goToCall.bind(this);
 
         this.loadAll()
         .then(() => this.setState({loading: false}))
@@ -37,8 +42,19 @@ export default class Home extends React.Component {
         return Promise.all([
             this.loadSkills(),
             this.loadRequests(),
-            this.loadTeachableCount()
+            this.loadTeachableCount(),
+            this.loadActiveSessions()
         ])
+    }
+
+    loadActiveSessions(){
+        return http.get("api/session/active")
+        .then(res=> {
+            if (res.data.length > 0){
+                let activeSessions = res.data.map(sessionJson => new Session(sessionJson));
+                this.setState({activeSessions});
+            }
+        })
     }
 
     loadTeachableCount(){
@@ -86,6 +102,16 @@ export default class Home extends React.Component {
             titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==', // iOS only. navigation bar title image instead of the title text of the pushed screen (optional)
             animated: true, // does the push have transition animation or does it happen immediately (optional)
             animationType: 'slide-horizontal', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
+        });
+    }
+
+    goToCall(session){
+        this.props.navigator.push({
+            screen: CallScreen.getName(),
+            titleImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+            animated: true,
+            animationType: 'slide-horizontal',
+            passProps: {session},
         });
     }
 
@@ -152,6 +178,28 @@ export default class Home extends React.Component {
                                     </Text>
                                 )
 
+                            }}
+                        />
+                    }
+
+                </View>
+
+                <View style={styles.card}>
+                    <Text style={styles.h1}>Active sessions</Text>
+                    {this.state.activeSessions.length === 0 ?
+                        <Text>No Active Sessions</Text> :
+                        <FlatList
+                            data={this.state.activeSessions}
+                            ItemSeparatorComponent={() => <View style={{height: 1, backgroundColor: '#CCC'}}/>}
+                            renderItem={({item}) =>{
+                                return (
+                                    <Text onPress={() =>{
+                                        this.goToCall(item)
+                                    }}
+                                          style={styles.listItem}
+                                    >{item.title} | {ta.ago(item.created_at)}
+                                    </Text>
+                                )
                             }}
                         />
                     }
