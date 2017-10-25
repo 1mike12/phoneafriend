@@ -12,18 +12,14 @@ import Session from "../models/Session";
 import {ToastAndroid} from "react-native";
 import {debounce} from "lodash";
 import Autocomplete from "react-native-autocomplete-input";
+import _MinimalScreen from "./_MinimalScreen";
 
 const NAME = "SessionEditScreen";
 const DESCRIPTION_LIMIT = 250;
-export default class SessionEditScreen extends React.Component {
+export default class SessionEditScreen extends _MinimalScreen {
 
     constructor(props){
         super(props);
-
-        this.props.navigator.toggleTabs({
-            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
-            animated: false // does the toggle have transition animation or does it happen immediately (optional)
-        });
 
         let isNew = true;
         let session;

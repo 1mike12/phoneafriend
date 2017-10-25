@@ -25,6 +25,7 @@ import Authentication from "../services/Authentication";
 import SocketActions from "../shared/SocketActions";
 import Promise from "bluebird";
 import io from "socket.io-client";
+import _MinimalScreen from "./_MinimalScreen";
 
 const ta = timeAgo();
 const NAME = "CallScreen";
@@ -60,19 +61,10 @@ const screenStyles = {
 };
 const UUID = "1";
 
-export default class CallScreen extends React.Component {
+export default class CallScreen extends _MinimalScreen {
 
     constructor(props){
         super(props);
-
-        this.props.navigator.toggleTabs({
-            to: 'hidden', // required, 'hidden' = hide tab bar, 'shown' = show tab bar
-            animated: false // does the toggle have transition animation or does it happen immediately (optional)
-        });
-        this.props.navigator.toggleNavBar({
-            to: 'hidden', // required, 'hidden' = hide navigation bar, 'shown' = show navigation bar
-            animated: false // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
-        });
 
         console.ignoredYellowBox = [
             'Setting a timer'
