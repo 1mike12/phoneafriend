@@ -63,6 +63,7 @@ let Static = new function(){
                 .unsigned().index()
                 .references("id").inTable("users");
 
+                table.boolean("completed").default(false);
                 table.specificType("rating", "smallint");
                 table.timestamps();
                 table.dateTime("deleted_at");

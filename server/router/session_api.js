@@ -114,6 +114,36 @@ router.post("/accept", (req, res, next) =>{
     .catch(next)
 });
 
+router.get("/in-progress/", (req, res, next) =>{
+
+    return Session.query(qb =>{
+        qb.where("pupil_id", "!=", req.userId)
+        .andWhere("teacher_id", req.userId)
+        .andWhere("completed", false)
+    })
+    .fetchAll()
+    .then(sessions =>{
+        res.send(sessions)
+
+    })
+    .catch(next)
+});
+
+router.get("/completed", (req, res, next) =>{
+
+    return Session.query(qb =>{
+        qb.where("pupil_id", "!=", req.userId)
+        .andWhere("teacher_id", req.userId)
+        .andWhere("completed", true)
+    })
+    .fetchAll()
+    .then(sessions =>{
+        res.send(sessions)
+
+    })
+    .catch(next)
+});
+
 router.get('/teachable-single', (req, res, next) =>{
     let {after} = req.query;
     if (!after) after = 0;
