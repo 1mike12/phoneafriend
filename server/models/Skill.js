@@ -23,9 +23,6 @@ let Static = new function() {
                 table.increments().primary();
                 table.string("name");
 
-                table.integer("skill_id")
-                .unsigned().index()
-                .references("id").inTable("skills");
                 table.timestamps();
                 table.dateTime("deleted_at");
             });
@@ -36,4 +33,4 @@ let Static = new function() {
     }
 };
 
-module.exports = User = BaseModel.extend(Instance, Static);
+module.exports = Skill = BaseModel.extend(Instance, Static);
