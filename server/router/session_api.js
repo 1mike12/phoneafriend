@@ -3,7 +3,6 @@ let Class = require("../models/Session");
 let User = require("../models/User");
 const Session = require('../models/Session');
 const knex = require("../DB").knex;
-const SessionService = require("../services/SessionService");
 
 router.delete("/", (req, res, next) =>{
     Class.where({uuid: req.body.uuid, pupil_id: req.userId}).fetch()
@@ -84,6 +83,36 @@ router.get("/teachable/count", (req, res, next) =>{
         .fetch()
     })
     .then(knexObj => res.send(knexObj.get("count")))
+});
+
+router.post("/rate", (req, res, next) =>{
+    let {uuid, pupil_rating, teacher_rating} = req.body;
+
+    if (typeof pupil_rating === "string") pupil_rating = parseInt(pupil_rating);
+
+    if (pupil_rating === undefined || pupil_rating < 0 || pupil_rating > 5){
+        throw new Error('rating out of bounds')
+    }
+
+    return Session.query(q =>{
+        q.where({uuid})
+        .andWhere(function(){
+            this.where("teacher_id", req.userId)
+            .orWhere("pupil_id", req.userId)
+        })
+    })
+    .fetch()
+    .then(session =>{
+        if (!session){
+            res.setStatus(400).send("no session found");
+        } else {
+            if (pupil_rating !== undefined) session.set({pupil_rating});
+            else if (teacher_rating !== undefined) session.set({pupil_rating});
+            session
+            .save()
+            .then(() => res.sendStatus(200))
+        }
+    })
 });
 
 router.post("/decline", (req, res, next) =>{

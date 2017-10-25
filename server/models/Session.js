@@ -64,7 +64,8 @@ let Static = new function(){
                 .references("id").inTable("users");
 
                 table.boolean("completed").default(false);
-                table.specificType("rating", "smallint");
+                table.specificType("teacher_rating", "smallint");
+                table.specificType("pupil_rating", "smallint");
                 table.timestamps();
                 table.dateTime("deleted_at");
             });
