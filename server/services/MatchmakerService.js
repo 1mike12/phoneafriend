@@ -48,7 +48,7 @@ class MatchMakerService {
         .groupBy("user_id")
         .orderBy(COUNT_NAME, "DESC")
         .select('user_id')
-        .limit(10)
+        .limit(limit)
         .then(rows =>{
             let result = new Map();
             rows.forEach(row =>{
