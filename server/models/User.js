@@ -82,6 +82,7 @@ let Static = new function(){
                 table.string("carrier");
                 table.string("country");
                 table.boolean("premium").defaultTo(false);
+                table.decimal("credits");
 
                 table.json("settings");
 
