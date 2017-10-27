@@ -63,7 +63,7 @@ describe("SessionService", function(){
             expect(room).to.not.be.undefined;
 
             SessionService.joinSession(roomUUID, 3, socket3);
-            expect(room.getUserIds().length).to.equal(3);
+            expect(room.getUserSkillCount().length).to.equal(3);
         });
 
         it("should be able to get all user's rooms", ()=>{
