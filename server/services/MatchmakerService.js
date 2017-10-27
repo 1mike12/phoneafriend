@@ -5,6 +5,15 @@ const User = require("../models/User");
 
 class MatchMakerService {
 
+    static findMatchForSession(session){
+        //while session not active
+        //send match for following users=>
+    }
+
+    /**
+     * gets 4 users
+     * @param session
+     */
     static getMatchedUsersForSession(session){
         return Promise.join(
             session.load("skills"),
@@ -37,7 +46,7 @@ class MatchMakerService {
         .whereIn("skill_id", skillIds)
         .whereNotIn("user_id", declinedUserIds)
         .groupBy("user_id")
-        .orderBy(COUNT_NAME)
+        .orderBy(COUNT_NAME, "DESC")
         .select('user_id')
         .limit(10)
         .then(rows =>{
