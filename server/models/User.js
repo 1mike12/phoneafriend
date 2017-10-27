@@ -51,6 +51,10 @@ let Instance = new function(){
 
     self.skills = function(){
         return this.belongsToMany(require('./Skill'))
+    };
+
+    self.alertSessionAsTeacher = function(session){
+        console.log("ok")
     }
 };
 

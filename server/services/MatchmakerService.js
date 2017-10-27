@@ -5,16 +5,37 @@ const User = require("../models/User");
 
 class MatchMakerService {
 
-    static findMatchForSession(session){
+    static findMatchForSession(session, attempts = 0){
         //while session not active
         //send match for following users=>
+
+        if (attempts >= 5){
+            console.log("fail");
+        } else {
+            MatchMakerService.getMatchedUsersForSession(session)
+            .then(users =>{
+                if (users === null){
+                    console.log("fail")
+                }
+
+                let promises = [];
+                users.forEach(user => promises.push(user.alertSessionAsTeacher(session)));
+            })
+            .timeout(30 * 1000)
+            .then(() =>{
+                MatchMakerService.findMatchForSession(session, attempts + 1)
+            })
+        }
     }
 
     /**
-     * gets 4 users
+     * gets 4 users that haven't already been contacted
      * @param session
+     * @returns Promise < [user] > | Promise < null> if no more users
      */
     static getMatchedUsersForSession(session){
+        let users;
+
         return Promise.join(
             session.load("skills"),
             DeclinedSession.where({session_id: session.get("id")}).fetchAll(),
@@ -27,8 +48,22 @@ class MatchMakerService {
             }
         )
         .then(userId_match =>{
-            let userIds = Array.from(userId_match.keys());
-            return User.where("id", "in", userIds).fetchAll()
+            if (userId_match.length === 0){
+                return Promise.resolve(null);
+            } else {
+                let userIds = Array.from(userId_match.keys());
+                return User.where("id", "in", userIds).fetchAll()
+                .then(u =>{
+                    users = u;
+                    let data = users.map(user =>{
+                        return {user_id: user.get("id"), session_id: session.get("id")}
+                    });
+                    let newDeclined = DeclinedSession.forgeCollection(data);
+                    return newDeclined.invokeThen("save");
+                })
+                .then(() => Promise.resolve(users))
+            }
+
         })
     }
 
