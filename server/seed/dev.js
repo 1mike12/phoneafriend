@@ -8,6 +8,11 @@ module.exports = dev = new function(){
     let self = this;
 
     self.users = function(){
+
+        let admin = User.forge({
+            email: "admin"
+        });
+
         let mike = User.forge({
             email: "1mike12@gmail.com",
             first_name: "Mike",
@@ -26,6 +31,7 @@ module.exports = dev = new function(){
 
         return mike.save()
         .then(() => brian.save())
+        .then(() => admin.save());
     };
 
     self.requesters = function(){
@@ -35,7 +41,7 @@ module.exports = dev = new function(){
                 email: faker.internet.email(),
                 first_name: faker.name.firstName(),
                 last_name: faker.name.lastName(),
-                profile_url: "https://media-exp1.licdn.com/media/p/5/000/1bd/26f/349c10e.jpg"
+                profile_url: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 98) + 1}.jpg`
             })
         }
         let skillsIds;
