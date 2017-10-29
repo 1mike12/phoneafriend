@@ -2,6 +2,7 @@ const BaseModel = require("./BaseModel");
 const TABLE_NAME = "transactions";
 const TransactionEntry = require("./TransactionEntry");
 const User = require("./User");
+const Bookshelf = require("../DB").bookshelf;
 
 let Instance = new function(){
     let self = this;
@@ -19,7 +20,12 @@ let Static = new function(){
     let self = this;
 
 
-    self.insertTransaction = function(session_id, userId_Amount){
+    /**
+     * @param session_id
+     * @param userId_Amount
+     * @return {Promise.<transaction|Promise.<mixed>>} -inserted transaction
+     */
+    self.insertTransaction = async function(session_id, userId_Amount){
         //ensure balanced;
         let sum = 0;
         let entries = [];
@@ -37,26 +43,27 @@ let Static = new function(){
             }
 
         }
-        if (Math.abs(sum) > 0.00001) throw new Error(`inserting transaction that doesn't balance ${userId_Amount}`);
 
-        return Transaction.forge({session_id}).save()
-        .then(transaction =>{
+        return Bookshelf.transaction(async (transacting) =>{
+            if (Math.abs(sum) > 0.00001) throw new Error(`inserting transaction that doesn't balance ${userId_Amount}`);
+
+            let transaction = await Transaction.forge({session_id}).save(null, {transacting});
+
             let promises = [];
             entries.forEach(entry =>{
-                promises.push(transaction.related("transactionEntries").create(entry))
+                promises.push(transaction.related("transactionEntries").create(entry, {transacting}))
             });
-            return Promise.all(promises);
-        })
-        .then(() => User.where("id", 'in', userIds).fetchAll())
-        .then(users =>{
-            users.forEach(user => user.set({credits: user.get("credits") + userId_Amount[user.get("id")]}));
-            return users.invokeThen("save")
-        })
+            await Promise.all(promises);
+            let users = await User.where("id", 'in', userIds).fetchAll();
+            users.forEach(user => user.set({credits: parseFloat(user.get("credits")) + userId_Amount[user.get("id")]}));
+            await users.invokeThen("save", null, {transacting});
+            return transaction;
+        });
     };
 
     self.MIGRATION = {
         up: (knex, Promise) =>{
-            return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){
+            return knex.schema.createTableIfNotExists(TABLE_NAME, (table) =>{
                 table.increments().primary();
 
                 table.integer("session_id")
