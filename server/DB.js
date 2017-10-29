@@ -18,7 +18,9 @@ class DB {
     }
 
     getKnex(){
-        const knexfile = require("./knexFile")[DB.getAppliedEnvironment()];
+        const env = DB.getAppliedEnvironment();
+        console.log(env);
+        const knexfile = require("./knexFile")[env];
         if (!knexfile) throw new Error(`couldn't find knexfile for environment: ${DB.getAppliedEnvironment()}`);
         return require('knex')(knexfile);
     }

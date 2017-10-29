@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "refresh": "knex migrate:rollback && knex migrate:latest && node ./seed/dev"
+    "refresh": "knex migrate:rollback --env test && knex migrate:latest --env test && node ./seed/dev"
   },
   "dependencies": {
     "body-parser": "^1.17.1",
