@@ -27,6 +27,12 @@ let Instance = new function(){
     self.skills = function(){
         return this.belongsToMany(require("./Skill"))
     }
+
+    self.addSkills = async function(skills){
+        if (skills.length === undefined) skills = [skills];
+        return await this.skills().attach(skills.map(skill => skill.get("id")))
+    };
+
 };
 
 let Static = new function(){
@@ -35,8 +41,8 @@ let Static = new function(){
     /**
      * fetch a session only as a valid member of that session
      */
-    self.getByUUIDAsMember = function (uuid, userId){
-        return  Session.query(qb=>{
+    self.getByUUIDAsMember = function(uuid, userId){
+        return Session.query(qb =>{
             qb.where("uuid", uuid);
             qb.andWhere(function(){
                 this.where("teacher_id", userId);

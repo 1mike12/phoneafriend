@@ -54,6 +54,12 @@ let Instance = new function(){
         return this.belongsToMany(require('./Skill'))
     };
 
+    self.addSkills = async function(skills){
+        if (skills.length === undefined) skills = [skills];
+        return await this.skills().attach(skills.map(skill => skill.get("id")))
+    };
+
+
     self.alertSessionAsTeacher = function(session){
         console.log("ok")
     }

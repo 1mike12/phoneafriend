@@ -34,13 +34,9 @@ describe("_sample 2", function(){
 describe("async await and fake timers", () =>{
 
     async function asyncAwait(){
-        await new Promise(function(resolve){
-            setTimeout(() => resolve(2), 5000);
-        })
-
         let x = 1;
         await new Promise(function(resolve){
-            setTimeout(() => resolve(2), 5000);
+            setTimeout(() => resolve(), 5000);
         })
         return x;
     }
@@ -67,7 +63,7 @@ describe("async await and fake timers", () =>{
             expect(x).to.equal(1)
         })
 
-        clock.tick(1001);
+        clock.tick(5000);
         clock.restore();
     })
 
