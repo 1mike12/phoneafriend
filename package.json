@@ -6,9 +6,9 @@
     "babel-preset-react-native-stage-0": "^1.0.1",
     "chai": "^3.5.0",
     "jest-expo": "~20.0.0",
-    "mocha": "^3.2.0",
     "react-test-renderer": "16.0.0-alpha.12",
-    "sinon": "^2.3.5"
+    "mocha": "^4.0.1",
+    "sinon": "^4.0.2"
   },
   "scripts": {
     "start": "react-native start",
