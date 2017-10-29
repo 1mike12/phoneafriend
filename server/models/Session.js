@@ -50,7 +50,7 @@ let Static = new function(){
         up: (knex, Promise) =>{
             return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){
                 table.increments().primary();
-                table.string("uuid");
+                table.specificType("uuid", "uuid").unique();
 
                 table.string("title");
                 table.text("description");

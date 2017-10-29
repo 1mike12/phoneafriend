@@ -1,4 +1,4 @@
-const TABLE_NAME = "accpeted_sessions";
+const TABLE_NAME = "accepted_sessions";
 
 exports.up = function(knex, Promise){
     return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){

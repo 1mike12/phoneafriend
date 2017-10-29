@@ -67,7 +67,7 @@ let Static = new function(){
                 table.increments();
                 table.string("email", 127).unique();
                 table.boolean("email_verified").defaultTo(false);
-                table.string("uuid").unique();
+                table.specificType("uuid", "uuid").unique();
                 table.string("first_name");
                 table.string("last_name");
                 table.string("profile_url");
@@ -82,7 +82,7 @@ let Static = new function(){
                 table.string("carrier");
                 table.string("country");
                 table.boolean("premium").defaultTo(false);
-                table.decimal("credits");
+                table.decimal("credits").defaultTo(0);
 
                 table.json("settings");
 
