@@ -19,4 +19,4 @@ describe("should be able to wipe the user table", () =>{
             expect(users.length).to.equal(0)
         })
     })
-})
+});
