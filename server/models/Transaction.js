@@ -1,7 +1,6 @@
 const BaseModel = require("./BaseModel");
 const TABLE_NAME = "transactions";
 const TransactionEntry = require("./TransactionEntry");
-const User = require("./User");
 const Bookshelf = require("../DB").bookshelf;
 
 let Instance = new function(){
@@ -21,8 +20,8 @@ let Static = new function(){
 
 
     /**
-     * @param session_id
-     * @param userId_Amount
+     * @param [session_id]
+     * @param {object} userId_Amount
      * @return {Promise.<transaction|Promise.<mixed>>} -inserted transaction
      */
     self.insertTransaction = async function(session_id, userId_Amount){
@@ -54,7 +53,7 @@ let Static = new function(){
                 promises.push(transaction.related("transactionEntries").create(entry, {transacting}))
             });
             await Promise.all(promises);
-            let users = await User.where("id", 'in', userIds).fetchAll();
+            let users = await require("./User").where("id", 'in', userIds).fetchAll();
             users.forEach(user => user.set({credits: parseFloat(user.get("credits")) + userId_Amount[user.get("id")]}));
             await users.invokeThen("save", null, {transacting});
             return transaction;

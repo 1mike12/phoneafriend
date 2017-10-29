@@ -18,6 +18,8 @@ app.use("/api/test/", require("./test_api"));
 app.use("/api/session/", require("./session_api"));
 app.use("/api/skill/", require("./skill_api"));
 app.use("/api/user/", require("./user_api"));
+app.use("/api/transaction/", require("./transaction_api"));
+app.use("/api/transaction-entry/", require("./transaction_entry_api"));
 /*
 PUBLIC APIS
  */

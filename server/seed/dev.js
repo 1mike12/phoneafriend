@@ -7,19 +7,17 @@ const faker = require("faker");
 module.exports = dev = new function(){
     let self = this;
 
-    self.users = function(){
+    self.users = async function(){
 
-        let admin = User.forge({
-            email: "admin"
-        });
 
         let mike = User.forge({
             email: "1mike12@gmail.com",
             first_name: "Mike",
             last_name: "Qin",
             profile_url: "https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAA3mAAAAJDMzN2UxOWE4LTAyMjAtNDI4Ni04MjM0LTI5ODJhY2EwZTQ0OA.jpg"
-        });
+        })
         mike.setPassword("123");
+        mike = await mike.save();
 
         let brian = User.forge({
             email: "bgioia1@gmail.com",
@@ -28,10 +26,13 @@ module.exports = dev = new function(){
             profile_url: "https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAnyAAAAJGFmNWVlYzlhLTdjYzUtNDZjYS1iYTk2LTI2NzNkNTMwNjViMw.jpg"
         });
         brian.setPassword("123");
+        brian = await brian.save();
 
-        return mike.save()
-        .then(() => brian.save())
-        .then(() => admin.save());
+        let admin = await User.forge({
+            email: "admin"
+        }).save()
+
+        await Promise.all([mike.giftCredits(100), brian.giftCredits(200)])
     };
 
     self.requesters = function(){

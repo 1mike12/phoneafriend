@@ -6,6 +6,7 @@ const passwordHash = require("password-hash");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 const uuid1 = require("uuid/v1");
+const Transaction = require("./Transaction");
 
 const TABLE_NAME = "users";
 let Instance = new function(){
@@ -55,6 +56,17 @@ let Instance = new function(){
 
     self.alertSessionAsTeacher = function(session){
         console.log("ok")
+    }
+
+    /**
+     * deposits credits against system account
+     * @param credits
+     */
+    self.giftCredits = function(credits){
+        let obj = {};
+        obj[this.get("id")] = credits;
+        obj[3] = -1 * credits;
+        return Transaction.insertTransaction(null, obj)
     }
 };
 

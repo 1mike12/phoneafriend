@@ -14,6 +14,10 @@ let Instance = new function(){
     self.user = function(){
         return this.belongsTo(require("./User"));
     }
+
+    self.transaction = function(){
+        return this.belongsTo(require("./Transaction"))
+    }
 };
 
 let Static = new function(){
