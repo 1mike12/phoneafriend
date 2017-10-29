@@ -1,5 +1,6 @@
 //bootstrap routes
 process.env.NODE_ENV = require("./env");
+global.Promise=require("bluebird");
 
 require("./router/server");
 require("./websocket/_websocket");
