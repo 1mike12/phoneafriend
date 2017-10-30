@@ -34,14 +34,8 @@ describe("socket io middleware authentication", () =>{
 
 
     it("Authentication with protocol", (done) =>{
-        let socket = io('http://localhost:9009', {
-            transportOptions: {
-                polling: {
-                    extraHeaders: {
-                        'Token': token1
-                    }
-                }
-            }
+        let socket = io("http://localhost:9009", {
+            query: `token=${token1}`
         });
         socket.on('connect', function(data){
             console.log(data);
@@ -56,14 +50,8 @@ describe("socket io middleware authentication", () =>{
     });
 
     it("Authentication should fail without token", done =>{
-        let socket = io('http://localhost:9009', {
-            transportOptions: {
-                polling: {
-                    extraHeaders: {
-                        'Token': ""
-                    }
-                }
-            }
+        let socket = io("http://localhost:9009", {
+            query: ``
         });
         socket.on('connect', function(data){
             socket.disconnect();
@@ -82,8 +70,8 @@ describe("Socket Stuff", () =>{
 
     it("should be able to join room", (done) =>{
 
-        let socket = io('http://localhost:9009', {
-            transportOptions: {polling: {extraHeaders: {'Token': token1}}}
+        let socket = io("http://localhost:9009", {
+            query: `token=${token1}`
         });
 
         socket.on("connect", () =>{
@@ -108,13 +96,13 @@ describe("Socket Stuff", () =>{
             if (!session) throw new Error("no session");
 
             let uuid = session.get("uuid");
-            let ws1 = io('http://localhost:9009', {
-                transportOptions: {polling: {extraHeaders: {'Token': token1}}}
+            let ws1 = io("http://localhost:9009", {
+                query: `token=${token1}`
             });
 
 
-            let ws2 = io('http://localhost:9009', {
-                transportOptions: {polling: {extraHeaders: {'Token': token2}}}
+            let ws2 = io("http://localhost:9009", {
+                query: `token=${token2}`
             });
 
             ws1.on("connect", () =>{
@@ -127,23 +115,15 @@ describe("Socket Stuff", () =>{
 
             let connectCount = 0;
 
+            //todo should be testing entire websocket, WEBRTC signaling procedure
             function checkIfJoined(status){
                 connectCount++;
                 if (connectCount === 2){
-                    ws1.emit("exchangeDescription", {uuid, description: {foo: "bar"}}, checkIfSent);
-                    ws2.emit("exchangeDescription", {uuid, description: {foo: "bar"}}, checkIfSent);
-                }
-            }
-
-            let sentCount = 0;
-
-            function checkIfSent(){
-                sentCount++;
-                if (sentCount === 2){
+                    ws1.disconnect();
+                    ws2.disconnect();
                     done()
                 }
             }
-
         });
     })
 });

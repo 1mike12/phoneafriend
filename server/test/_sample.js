@@ -67,33 +67,20 @@ describe("async await and fake timers", () =>{
         clock.restore();
     })
 
-    it(`takes 2 real seconds`, async function(){
-        let x = await new Promise((resolve) =>{
-            setTimeout(() => resolve(1), 2000);
-        })
-        expect(x).to.equal(1)
-    });
-
-    it(`takes 0 seconds`, async function(){
-        let clock = sinon.useFakeTimers();
-        let x = await  new Promise((resolve) =>{
-            setTimeout(() => resolve(1), 2000);
-            clock.tick(2000)
-        })
-        clock.restore()
-        expect(x).to.equal(1)
-    });
-
-    it(`doesnt work Process finished with exit code 0`, async function(){
-        let clock = sinon.useFakeTimers();
-        //does not run past next call
-        let x = await  new Promise((resolve) =>{
-            setTimeout(() =>{
-                resolve(1)
-            }, 2000);
-        })
-        clock.tick(2000)
-        clock.restore()
-        expect(x).to.equal(1)
-    });
+    // it(`takes 2 real seconds`, async function(){
+    //     let x = await new Promise((resolve) =>{
+    //         setTimeout(() => resolve(1), 2000);
+    //     })
+    //     expect(x).to.equal(1)
+    // });
+    //
+    // it(`takes 0 seconds`, async function(){
+    //     let clock = sinon.useFakeTimers();
+    //     let x = await  new Promise((resolve) =>{
+    //         setTimeout(() => resolve(1), 2000);
+    //         clock.tick(2000)
+    //     })
+    //     clock.restore()
+    //     expect(x).to.equal(1)
+    // });
 })
