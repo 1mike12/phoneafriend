@@ -7,7 +7,7 @@ router.get("/", async (req, res, next) =>{
     let transactions = await Class
     .where({user_id: req.userId})
     .where("created_at", ">", last30Days)
-    .fetchAll({withRelated: ["transaction"]});
+    .fetchAll({withRelated: ["transaction.session"]});
     res.send(transactions);
 });
 
@@ -15,7 +15,7 @@ router.get("/all", async (req, res, next) =>{
     let transactions = await Class.where({
         user_id: req.userId,
     })
-    .fetchAll({withRelated: ["transaction"]});
+    .fetchAll({withRelated: ["transaction.session"]});
     res.send(transactions);
 });
 

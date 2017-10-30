@@ -14,6 +14,10 @@ let Instance = new function(){
         return this.hasMany(require('./TransactionEntry'))
     };
 
+    self.session = function(){
+        return this.belongsTo(require("./Session"))
+    }
+
 };
 
 let Static = new function(){
