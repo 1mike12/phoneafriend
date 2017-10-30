@@ -2,6 +2,7 @@ const BaseModel = require("./BaseModel");
 const TABLE_NAME = "transactions";
 const TransactionEntry = require("./TransactionEntry");
 const Bookshelf = require("../DB").bookshelf;
+const TransactionTypes = require("../../shared/TransactionTypes");
 
 let Instance = new function(){
     let self = this;
@@ -69,6 +70,8 @@ let Static = new function(){
                 .unsigned().index()
                 .references("id").inTable("sessions")
                 .onUpdate("cascade").onDelete("cascade");
+
+                table.enu("type", TransactionTypes);
 
                 table.timestamps();
             });
