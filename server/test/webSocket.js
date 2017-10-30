@@ -75,12 +75,14 @@ describe("Socket Stuff", () =>{
             .then(user => Session.where({pupil_id: user.get("id")}).fetch())
             .then(session =>{
                 socket.emit("joinRoom", {uuid: session.get('uuid')}, (response) =>{
+                    socket.disconnect()
                     done();
                 });
             });
         });
 
         socket.on("error", () =>{
+            socket.disconnect()
             throw new Error("socket error")
         })
     });
