@@ -1,33 +1,29 @@
-const WebSocket = require("ws");
-const config = require("../config");
-
-const port = process.env.NODE_ENV === "test" ? config.testPort : config.port;
-
 const Session = require("../models/Session");
 const User = require("../models/User");
-const test = require("../seed/test");
 const Promise = require('bluebird');
-const SocketActions = require("../../shared/SocketActions");
 const io = require("socket.io-client");
 
 let token1;
 let token2;
 
-let userId1;
-let userId2;
+let session;
+let user1;
+let user2;
 
-before(() =>{
-    return test.run()
-    .then(() => Promise.join(
-        User.where({email: "1mike12@gmail.com"}).fetch(),
-        User.where({email: "bgioia1@gmail.com"}).fetch(),
-        (user1, user2) =>{
-            token1 = user1.getTokenForPassword("123");
-            userId1 = user1.get("id");
-            token2 = user2.getTokenForPassword("123");
-            userId2 = user2.get("id");
-        }
-    ))
+before(async () =>{
+
+    let u1 = User.forge();
+    u1.setPassword("123");
+    let u2 = User.forge();
+    u2.setPassword("123");
+
+    [user1, user2] = await Promise.all([
+        u1.save(),
+        u2.save()
+    ])
+    token1 = user1.getTokenForPassword("123");
+    token2 = user2.getTokenForPassword("123");
+    session = await Session.forge({pupil_id: user1.get("id"), teacher_id: user2.get("id")}).save()
 });
 
 describe("socket io middleware authentication", () =>{
@@ -91,39 +87,42 @@ describe("Socket Stuff", () =>{
 
     it("should be able to send message to room", (done) =>{
 
-        Session.where({pupil_id: userId1, teacher_id: userId2}).fetch()
-        .then(session =>{
-            if (!session) throw new Error("no session");
+        if (!session) throw new Error("no session");
 
-            let uuid = session.get("uuid");
-            let ws1 = io("http://localhost:9009", {
-                query: `token=${token1}`
-            });
-
-
-            let ws2 = io("http://localhost:9009", {
-                query: `token=${token2}`
-            });
-
-            ws1.on("connect", () =>{
-                ws1.emit("joinRoom", {uuid}, checkIfJoined);
-            });
-
-            ws2.on("connect", () =>{
-                ws2.emit("joinRoom", {uuid}, checkIfJoined)
-            });
-
-            let connectCount = 0;
-
-            //todo should be testing entire websocket, WEBRTC signaling procedure
-            function checkIfJoined(status){
-                connectCount++;
-                if (connectCount === 2){
-                    ws1.disconnect();
-                    ws2.disconnect();
-                    done()
-                }
-            }
+        let uuid = session.get("uuid");
+        let ws1 = io("http://localhost:9009", {
+            query: `token=${token1}`
         });
+
+
+        let ws2 = io("http://localhost:9009", {
+            query: `token=${token2}`
+        });
+
+        ws1.on("connect", () =>{
+            ws1.emit("joinRoom", {uuid}, checkIfJoined);
+        });
+
+        ws2.on("connect", () =>{
+            ws2.emit("joinRoom", {uuid}, checkIfJoined)
+        });
+
+        let connectCount = 0;
+
+        //todo should be testing entire websocket, WEBRTC signaling procedure
+        function checkIfJoined(status){
+            connectCount++;
+            if (connectCount === 2){
+                ws1.disconnect();
+                ws2.disconnect();
+                done()
+            }
+        }
+
     })
 });
+
+after(async () =>{
+    await session.destroy({softDelete: false})
+    await Promise.all([user1.destroy({softDelete: false}), user2.destroy({softDelete: false})])
+})

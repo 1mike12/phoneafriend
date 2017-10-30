@@ -61,16 +61,16 @@ describe("MatchMakingService", () =>{
     })
 
     it("should find match", async () =>{
-        await session.set({teacher_id: 1}).save()
+        await session.set({teacher_id: users[0].get("id")}).save()
         let foundMatch = await MatchMakingService.findMatchForSession(session, 1)
         expect(foundMatch).to.be.true;
     })
 })
 
 afterEach(async () =>{
-    await Promise.all(users.map(user => user.destroy({softDelete: false})));
     await Promise.all([
         session.destroy({softDelete: false}),
         skill.destroy({softDelete: false})
     ]);
+    await Promise.all(users.map(user => user.destroy({softDelete: false})));
 });
