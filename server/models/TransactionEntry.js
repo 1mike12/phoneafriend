@@ -7,7 +7,6 @@ const TABLE_NAME = "transaction_entries";
 let Instance = new function(){
     let self = this;
     self.soft = false;
-    self.hasTimestamps = false;
 
     self.tableName = TABLE_NAME;
 
@@ -38,6 +37,7 @@ let Static = new function(){
                 .references("id").inTable("users")
                 .onUpdate("cascade").onDelete("cascade");
 
+                table.timestamps();
                 table.decimal("amount");
             });
         },
