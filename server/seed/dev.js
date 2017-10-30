@@ -10,6 +10,10 @@ module.exports = dev = new function(){
     self.users = async function(){
 
 
+        let admin = await User.forge({
+            email: "admin"
+        }).save()
+
         let mike = User.forge({
             email: "1mike12@gmail.com",
             first_name: "Mike",
@@ -28,11 +32,12 @@ module.exports = dev = new function(){
         brian.setPassword("123");
         brian = await brian.save();
 
-        let admin = await User.forge({
-            email: "admin"
-        }).save()
-
-        await Promise.all([mike.giftCredits(100), brian.giftCredits(200)])
+        await Promise.all([
+            mike.giftCredits(100),
+            mike.giftCredits(200),
+            brian.giftCredits(200),
+            brian.giftCredits(50)
+        ])
     };
 
     self.requesters = function(){

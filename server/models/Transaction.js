@@ -23,9 +23,13 @@ let Static = new function(){
     /**
      * @param [session_id]
      * @param {object} userId_Amount
+     * @param transactionType
      * @return {Promise.<transaction|Promise.<mixed>>} -inserted transaction
      */
-    self.insertTransaction = async function(session_id, userId_Amount){
+    self.insertTransaction = async function(session_id, userId_Amount, transactionType){
+
+        if (!transactionType || !userId_Amount) throw new Error("missing required params")
+
         //ensure balanced;
         let sum = 0;
         let entries = [];
@@ -47,7 +51,7 @@ let Static = new function(){
         return Bookshelf.transaction(async (transacting) =>{
             if (Math.abs(sum) > 0.00001) throw new Error(`inserting transaction that doesn't balance ${userId_Amount}`);
 
-            let transaction = await Transaction.forge({session_id}).save(null, {transacting});
+            let transaction = await Transaction.forge({session_id, type: transactionType}).save(null, {transacting});
 
             let promises = [];
             entries.forEach(entry =>{
@@ -71,7 +75,7 @@ let Static = new function(){
                 .references("id").inTable("sessions")
                 .onUpdate("cascade").onDelete("cascade");
 
-                table.enu("type", TransactionTypes);
+                table.enu("type", TransactionTypes.getTypesAsArray());
 
                 table.timestamps();
             });

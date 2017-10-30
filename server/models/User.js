@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 const uuid1 = require("uuid/v1");
 const Transaction = require("./Transaction");
+const TransactionTypes = require("../../shared/TransactionTypes")
 
 const TABLE_NAME = "users";
 let Instance = new function(){
@@ -17,6 +18,8 @@ let Instance = new function(){
 
     self.virtuals = {
         last_initial: function(){
+            let lastName = this.get("last_name");
+            if (!lastName) return "";
             return this.get("last_name").substring(0, 1)
         }
     };
@@ -68,11 +71,13 @@ let Instance = new function(){
      * deposits credits against system account
      * @param credits
      */
-    self.giftCredits = function(credits){
+    self.giftCredits = async function(credits){
         let obj = {};
         obj[this.get("id")] = credits;
-        obj[3] = -1 * credits;
-        return Transaction.insertTransaction(null, obj)
+        //todo admin should always have the same id
+        let admin = await User.where({email: "admin"}).fetch()
+        obj[admin.get("id")] = -1 * credits;
+        return Transaction.insertTransaction(null, obj, TransactionTypes.GIFT)
     }
 };
 
