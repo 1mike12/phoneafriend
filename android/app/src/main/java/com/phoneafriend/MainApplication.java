@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.oney.WebRTCModule.WebRTCModulePackage;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -30,6 +31,7 @@ public class MainApplication extends NavigationApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativePushNotificationPackage(),
             new VectorIconsPackage(),
             new ReactNativeConfigPackage(),
             new WebRTCModulePackage()
@@ -47,6 +49,7 @@ public class MainApplication extends NavigationApplication {
          // Add additional packages you require here
          // No need to add RnnPackage and MainReactPackage
          return Arrays.<ReactPackage>asList(
+             new ReactNativePushNotificationPackage(),
              new VectorIconsPackage(),
              new ReactNativeConfigPackage(),
              new WebRTCModulePackage()

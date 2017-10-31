@@ -16,6 +16,7 @@
     "fs-promise": "^2.0.3",
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.9",
+    "node-env-file": "^0.1.8",
     "password-hash": "^1.2.2",
     "pg": "^6.1.5",
     "request": "^2.81.0",
