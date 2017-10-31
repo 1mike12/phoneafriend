@@ -32,6 +32,7 @@ export default class RTC_Wrapper {
                 }
             })
         });
+
         socket.on(SocketActions.VIDEO_ANSWER, (res) =>{
             let {userUUID, description} = res;
             this.receiveAnswer(userUUID, description);
@@ -86,7 +87,7 @@ export default class RTC_Wrapper {
         pc.setRemoteDescription(description)
     }
 
-    connect(userUUID){
+    connect(userUUID, localStream){
         let pc = new RTCPeerConnection(RTC_PEER_CONFIG);
         this.userUUID_PC.set(userUUID, pc);
         pc.createDataChannel("text");
@@ -104,11 +105,8 @@ export default class RTC_Wrapper {
 
         };
 
-        this.getUserMedia()
-        .then(stream =>{
-            pc.addStream(stream);
-            return pc.createOffer()
-        })
+        pc.addStream(localStream);
+        return pc.createOffer()
         .then(description =>{
             pc.setLocalDescription(description);
             this.socket.emit(SocketActions.VIDEO_OFFER, {uuid: this.roomUUID, description})

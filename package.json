@@ -24,6 +24,7 @@
     "axios": "^0.16.2",
     "bluebird": "^3.5.0",
     "config": "git+ssh://git@github.com:1mike12/config.git",
+    "css-loader": "^0.28.7",
     "freeice": "^2.2.0",
     "immutability-helper": "^2.4.0",
     "lodash": "^4.17.4",
