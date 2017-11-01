@@ -1,6 +1,5 @@
 require("!style-loader!css-loader!./styles/styles.css");
-import RTC_Wrapper from "../shared/RTC_Wrapper";
-import Socket from "./WebRTC_Wrapper";
+import WebRTC_Wrapper from "../shared/WebRTC_Wrapper";
 
 const VIDEO_SIZE = {width: {exact: 320}, height: {exact: 240}};
 let stream;
@@ -22,7 +21,7 @@ navigator.mediaDevices.getUserMedia({
             remoteVideo.srcObject = stream;
         }
     }
-    let socket1 = new Socket(params);
+    let socket1 = new WebRTC_Wrapper(params);
     let video1 = document.getElementById("1");
     video1.srcObject = stream;
 
@@ -46,7 +45,7 @@ navigator.mediaDevices.getUserMedia({
             remoteVideo.srcObject = stream;
         }
     }
-    let socket2 = new Socket(params);
+    let socket2 = new WebRTC_Wrapper(params);
 
     let video2 = document.getElementById("2");
     video2.srcObject = stream;

@@ -1,25 +1,11 @@
 import io from "socket.io-client";
-import SocketActions from "../shared/SocketActions";
+import SocketActions from "./SocketActions";
 
 const RTC_PEER_CONFIG = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
 
-const onOpen = (event) =>{
-    console.log("dataChannel.OnOpen");
-};
 
-const onMessage = (event) =>{
-    console.log("dataChannel.OnMessage:", event.data);
-};
+export default class WebRTC_Wrapper {
 
-const onError = (error) =>{
-    console.log("dataChannel.OnError:", error);
-};
-
-const onClose = (event) =>{
-    console.log("dataChannel.OnClose", event);
-};
-
-export default class Socket {
     constructor(params){
 
         for (let key in params) {
@@ -104,11 +90,8 @@ export default class Socket {
         pc.ondatachannel = (e) =>{
             if (!pc.text){
                 let text = e.channel;
+                WebRTC_Wrapper.attachDataChannelFunctions(text);
                 pc.text = text;
-                text.onopen = onOpen;
-                text.onmessage = onMessage;
-                text.onerror = onError;
-                text.onclose = onClose;
             }
         };
         return pc;
@@ -121,10 +104,7 @@ export default class Socket {
         let text = pc.createDataChannel("text");
         pc.text = text;
 
-        text.onopen = onOpen;
-        text.onmessage = onMessage;
-        text.onerror = onError;
-        text.onclose = onClose;
+        WebRTC_Wrapper.attachDataChannelFunctions(text);
 
         pc.addStream(this.localStream);
         return pc.createOffer()
@@ -172,5 +152,20 @@ export default class Socket {
         for (let pc of this.userUUID_PC.values()) {
             pc.text.send(message)
         }
+    }
+
+    static attachDataChannelFunctions(dataChannel){
+        dataChannel.onopen = (event) =>{
+            console.log("dataChannel.OnOpen");
+        };
+        dataChannel.onmessage = (event) =>{
+            console.log("dataChannel.OnMessage:", event.data);
+        };
+        dataChannel.onerror = (error) =>{
+            console.log("dataChannel.OnError:", error);
+        };
+        dataChannel.onclose = (event) =>{
+            console.log("dataChannel.OnClose", event);
+        };
     }
 }
