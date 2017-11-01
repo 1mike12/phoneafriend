@@ -40,13 +40,10 @@ io.on("connect", socket =>{
 
     socket.on(SocketActions.JOIN_ROOM, (params, callback) =>{
         let uuid = params.uuid + "";
-        let userId = socket.userId;
         if (!uuid) return callback(400);
 
         socket.join(uuid);
         roomUUIDs.add(uuid);
-        SessionService.addUserToRoom(uuid, userId);
-
 
         let othersInRoom = io.getSocketIdsForRoom(uuid, socket.id);
         socket.broadcast.to(uuid).emit(SocketActions.USER_JOINED_ROOM, othersInRoom);
@@ -62,42 +59,41 @@ io.on("connect", socket =>{
         let uuid = params.uuid;
         if (!uuid) return callback(400);
 
-        let userId = socket.userId;
+        let userId = socket.id;
         socket.leave(params.uuid);
         io.to(uuid).emit(SocketActions.USER_LEFT_ROOM, userId);
-        SessionService.removeUserFromRoom(uuid, socket.userId);
         if (callback) callback(200)
     });
 
     socket.on(SocketActions.VIDEO_OFFER, (params, callback) =>{
-        let {description, uuid} = params;
-        if (!description || !uuid) return callback(400);
+        let {description, roomUUID} = params;
+        if (!description || !roomUUID) return callback(400);
 
-        socket.broadcast.to(uuid)
+        socket.broadcast.to(roomUUID)
         .emit(SocketActions.VIDEO_OFFER, {
-            userId: socket.userId,
-            uuid,
+            userUUID: socket.id,
+            roomUUID,
             description
         });
         if (callback) callback(200)
     });
 
     socket.on(SocketActions.VIDEO_ANSWER, (params) =>{
-        let {uuid, description} = params;
-        socket.broadcast.to(uuid)
+        let {userUUID, roomUUID, description} = params;
+        socket.broadcast.to(roomUUID)
         .emit(SocketActions.VIDEO_ANSWER, {
-            userId: socket.userId,
-            uuid,
+            userUUID: socket.id,
+            roomUUID,
             description
         });
     });
 
     socket.on(SocketActions.NEW_ICE_CANDIDATE, (params) =>{
-        let {candidate, uuid} = params;
+        let {candidate, roomUUID} = params;
 
         if (candidate){
-            socket.broadcast.to(uuid)
-            .emit(SocketActions.NEW_ICE_CANDIDATE, {userId: socket.userId, uuid, candidate});
+            socket.broadcast.to(roomUUID)
+            .emit(SocketActions.NEW_ICE_CANDIDATE, {userUUID: socket.id, candidate});
         }
     })
 
@@ -150,3 +146,5 @@ io.getSocketIdsForRoom = function(roomUUID, exceptSocketId){
 };
 
 module.exports = io;
+
+//todo disable direct messaging given socket.id A to socket.id B

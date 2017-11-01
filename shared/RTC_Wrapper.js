@@ -9,21 +9,21 @@ export default class RTC_Wrapper {
      * @param socketUrl
      * @param token
      * @param roomUUID
-     * @param getUserMedia
+     * @param localStream
      */
-    constructor(socketUrl, token, roomUUID, getUserMedia){
-
+    constructor(socketUrl, token, roomUUID, localStream){
         this.userUUID_PC = new Map();
-        this.getUserMedia = getUserMedia;
         this.roomUUID = roomUUID;
+        this.localStream = localStream;
 
         let socket = io(socketUrl, {
             query: `token=${token}`
         });
         this.socket = socket;
-
+        console.log(socket)
         //caller
         socket.on("connected", () =>{
+            console.log("connected");
             socket.emit(SocketActions.JOIN_ROOM, roomUUID, (userUUIDs) =>{
                 if(userUUIDs.length > 0) {
                     userUUIDs.forEach(userUUID => this.connect(userUUID))
@@ -87,7 +87,7 @@ export default class RTC_Wrapper {
         pc.setRemoteDescription(description)
     }
 
-    connect(userUUID, localStream){
+    connect(userUUID){
         let pc = new RTCPeerConnection(RTC_PEER_CONFIG);
         this.userUUID_PC.set(userUUID, pc);
         pc.createDataChannel("text");
@@ -105,7 +105,7 @@ export default class RTC_Wrapper {
 
         };
 
-        pc.addStream(localStream);
+        pc.addStream(this.localStream);
         return pc.createOffer()
         .then(description =>{
             pc.setLocalDescription(description);
