@@ -133,12 +133,14 @@ export default class Socket {
     }
 
     answer(userUUID, description){
+        console.log("send answer to userUUID:", userUUID)
+
         let desc = new RTCSessionDescription(description);
         let pc = this.getPeerConnection(userUUID)
-
-        console.log("send answer to userUUID:", userUUID)
-        pc.setRemoteDescription(desc);
         this.userUUID_PC.set(userUUID, pc);
+
+        pc.setRemoteDescription(desc);
+        pc.addStream(this.localStream);
 
         return pc.createAnswer()
         .then(description =>{
