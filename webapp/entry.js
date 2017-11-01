@@ -1,6 +1,6 @@
 require("!style-loader!css-loader!./styles/styles.css");
 import RTC_Wrapper from "../shared/RTC_Wrapper";
-import Socket from "./Socket";
+import Socket from "./WebRTC_Wrapper";
 
 const VIDEO_SIZE = {width: {exact: 320}, height: {exact: 240}};
 let stream;
@@ -11,11 +11,19 @@ navigator.mediaDevices.getUserMedia({
 })
 .then(s =>{
     stream = s;
-    let socket1 = new Socket("http://localhost:9009", '1', "A", "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExNDF9.FhKsOogaLFJBixiZWOZWnZDyfPXMANSG7dBA96CyhIM", stream, (stream) =>{
-        let remoteVideo = document.getElementById("1" + "-other");
-        remoteVideo.srcObject = stream;
-    });
-    let video1 = document.getElementById(socket1.id);
+    let params = {
+        socketUrl : "http://localhost:9009",
+        id : "1",
+        roomUUID: "A",
+        token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExNDF9.FhKsOogaLFJBixiZWOZWnZDyfPXMANSG7dBA96CyhIM",
+        localStream: stream,
+        onRemoteStreamAdded: (stream) =>{
+            let remoteVideo = document.getElementById("1" + "-other");
+            remoteVideo.srcObject = stream;
+        }
+    }
+    let socket1 = new Socket(params);
+    let video1 = document.getElementById("1");
     video1.srcObject = stream;
 
     let button = document.getElementById("1-submit");
@@ -27,12 +35,20 @@ navigator.mediaDevices.getUserMedia({
     return new Promise(resolve => setTimeout(resolve, 150))
 })
 .then(() =>{
-    let socket2 = new Socket("http://localhost:9009", '2', "A", "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjJ9.7pWxwmRmTcOnCzrLd2brSrRxKuQuWSnp_X9ewmwJxk4", stream, (stream) =>{
-        let remoteVideo = document.getElementById("2" + "-other");
-        remoteVideo.srcObject = stream;
-    });
+    let params = {
+        socketUrl : "http://localhost:9009",
+        id : "2",
+        roomUUID: "A",
+        token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjJ9.7pWxwmRmTcOnCzrLd2brSrRxKuQuWSnp_X9ewmwJxk4",
+        localStream: stream,
+        onRemoteStreamAdded: (stream) =>{
+            let remoteVideo = document.getElementById("2" + "-other");
+            remoteVideo.srcObject = stream;
+        }
+    }
+    let socket2 = new Socket(params);
 
-    let video2 = document.getElementById(socket2.id);
+    let video2 = document.getElementById("2");
     video2.srcObject = stream;
 
     let button = document.getElementById("2-submit");

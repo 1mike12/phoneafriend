@@ -20,16 +20,21 @@ const onClose = (event) =>{
 };
 
 export default class Socket {
-    constructor(socketUrl, id, roomUUID, token, localStream, onRemoteStreamAdded){
-        this.id = id;
-        this.roomUUID = roomUUID;
-        this.localStream = localStream;
-        this.userUUID_PC = new Map();
-        this.token = token;
-        this.onRemoteStreamAdded = onRemoteStreamAdded;
+    constructor(params){
 
-        let socket = io(socketUrl, {
-            query: `token=${token}`
+        for (let key in params) {
+            this[key] = params[key];
+        }
+        // this.id = id;
+        // this.roomUUID = roomUUID;
+        // this.localStream = localStream;
+        // this.token = token;
+        // this.onRemoteStreamAdded = onRemoteStreamAdded;
+
+        this.userUUID_PC = new Map();
+        console.log(this.socketUrl)
+        let socket = io(this.socketUrl, {
+            query: `token=${this.token}`
         });
         this.socket = socket;
 
