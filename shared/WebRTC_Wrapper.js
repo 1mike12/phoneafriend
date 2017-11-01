@@ -3,6 +3,9 @@ import SocketActions from "./SocketActions";
 
 const RTC_PEER_CONFIG = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
 
+// this class expects following classes to be globally available,
+// (made global in RN )
+// RTCIceCandidate, RTCPeerConnection, RTCSessionDescription;
 
 export default class WebRTC_Wrapper {
 

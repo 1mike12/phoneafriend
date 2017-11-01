@@ -1,14 +1,9 @@
 import React from 'react';
 import {
-    Vibration,
     ActivityIndicator,
-    Button,
-    FlatList,
     Text,
-    TextInput,
     View,
-    ScrollView,
-    ToastAndroid, Image
+    Image
 } from "react-native";
 import styles from "../styles";
 import timeAgo from "time-ago";
@@ -16,7 +11,7 @@ import config from "../configReact";
 import Fab from "../components/Fab";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {
-    MediaStreamTrack, getUserMedia, RTCPeerConnection, RTCView, RTCSessionDescription,
+    RTCPeerConnection, RTCView, RTCSessionDescription,
     RTCIceCandidate
 } from "react-native-webrtc";
 import StreamService from "../services/StreamService";

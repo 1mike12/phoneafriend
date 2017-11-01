@@ -11,6 +11,16 @@ import CallScreen from "./screens/CallScreen";
 
 registerScreens();
 
+//todo make sure these are global for iOSas well
+import {
+    RTCPeerConnection, RTCSessionDescription,
+    RTCIceCandidate
+} from "react-native-webrtc";
+global.RTCPeerConnection = RTCPeerConnection;
+global.RTCSessionDescription = RTCSessionDescription;
+global.RTCIceCandidate = RTCIceCandidate;
+
+
 const icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==';
 // start the app
 
