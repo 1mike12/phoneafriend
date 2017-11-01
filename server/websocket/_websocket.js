@@ -39,16 +39,17 @@ io.use((socket, next) =>{
 io.on("connect", socket =>{
 
     socket.on(SocketActions.JOIN_ROOM, (params, callback) =>{
-        let uuid = params.uuid + "";
-        if (!uuid) return callback(400);
+        let roomUUID = params.roomUUID;
+        if (!roomUUID) return callback("invalid roomUUID provided", null);
+        roomUUID = roomUUID + "";
 
-        socket.join(uuid);
-        roomUUIDs.add(uuid);
+        socket.join(roomUUID);
+        roomUUIDs.add(roomUUID);
 
-        let othersInRoom = io.getSocketIdsForRoom(uuid, socket.id);
-        socket.broadcast.to(uuid).emit(SocketActions.USER_JOINED_ROOM, othersInRoom);
+        let othersInRoom = io.getSocketIdsForRoom(roomUUID, socket.id);
+        socket.broadcast.to(roomUUID).emit(SocketActions.USER_JOINED_ROOM, othersInRoom);
 
-        if (callback) callback(othersInRoom)
+        if (callback) callback(null, othersInRoom)
     });
 
     /**

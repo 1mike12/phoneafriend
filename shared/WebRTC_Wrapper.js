@@ -12,9 +12,8 @@ export default class WebRTC_Wrapper {
     constructor(params){
 
         for (let key in params) {
-            this[key] = params[key];
+            if (params.hasOwnProperty(key)) this[key] = params[key];
         }
-        // this.id = id;
         // this.roomUUID = roomUUID;
         // this.localStream = localStream;
         // this.token = token;
@@ -28,7 +27,8 @@ export default class WebRTC_Wrapper {
         this.socket = socket;
 
         socket.on("connect", () =>{
-            socket.emit(SocketActions.JOIN_ROOM, {uuid: this.roomUUID}, (userUUIDS) =>{
+            socket.emit(SocketActions.JOIN_ROOM, {roomUUID: this.roomUUID}, (e, userUUIDS) =>{
+                if (e) return new Error(e);
                 if (userUUIDS.length > 0){
                     userUUIDS.forEach(userUUID => this.connect(userUUID))
                 } else {
@@ -155,6 +155,13 @@ export default class WebRTC_Wrapper {
         for (let pc of this.userUUID_PC.values()) {
             pc.text.send(message)
         }
+    }
+
+    destroy(){
+        for (let pc of this.userUUID_PC.values()) {
+            pc.close()
+        }
+        this.socket.close();
     }
 
     static attachDataChannelFunctions(dataChannel){

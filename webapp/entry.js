@@ -12,7 +12,6 @@ navigator.mediaDevices.getUserMedia({
     stream = s;
     let params = {
         socketUrl : "http://localhost:9009",
-        id : "1",
         roomUUID: "A",
         token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExNDF9.FhKsOogaLFJBixiZWOZWnZDyfPXMANSG7dBA96CyhIM",
         localStream: stream,
@@ -36,7 +35,6 @@ navigator.mediaDevices.getUserMedia({
 .then(() =>{
     let params = {
         socketUrl : "http://localhost:9009",
-        id : "2",
         roomUUID: "A",
         token: "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjJ9.7pWxwmRmTcOnCzrLd2brSrRxKuQuWSnp_X9ewmwJxk4",
         localStream: stream,
